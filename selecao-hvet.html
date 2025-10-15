@@ -36,6 +36,17 @@
       .badge-soft{ background:#e7f1ff; color:#0b2447; border:1px solid #cfe2ff; }
       .form-control[readonly]{ background:#f8f9fa; }
       .review-table td{ vertical-align: top; }
+      .review-section{ background:#f8faff; border:1px solid #dbe7ff; border-radius:.85rem; padding:1.25rem; }
+      .review-section + .review-section{ margin-top:1rem; }
+      .review-line{ display:flex; flex-direction:column; gap:.25rem; padding:.35rem 0; border-bottom:1px dashed rgba(13,110,253,.15); }
+      .review-line:last-child{ border-bottom:0; padding-bottom:0; }
+      .review-label{ font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6c757d; }
+      .review-value{ font-weight:600; color:#0b2447; word-break:break-word; }
+      .review-placeholder{ color:#adb5bd; font-weight:500; }
+      @media (min-width: 768px){
+        .review-line{ flex-direction:row; align-items:center; gap:1.5rem; }
+        .review-label{ min-width:200px; margin-bottom:0; }
+      }
       .frame-card{
         max-width: 1020px;
         background:#ffffff;
@@ -572,52 +583,148 @@
       }
 
       // ========= Review =========
+      const reviewPlaceholder = '<span class="review-placeholder">—</span>';
+      const fmtDateBr = iso => {
+        if(!iso) return '';
+        const [y,m,d] = String(iso).split('-');
+        if(y && m && d) return `${d}/${m}/${y}`;
+        return '';
+      };
+      const fmtPhone = (ddd, num) => {
+        const dd = onlyDigits(ddd);
+        const n = onlyDigits(num);
+        if(!dd && !n) return '';
+        if(n.length === 9) return `(${dd}) ${n.slice(0,5)}-${n.slice(5)}`;
+        if(n.length === 8) return `(${dd}) ${n.slice(0,4)}-${n.slice(4)}`;
+        if(n) return `(${dd}) ${n}`;
+        return dd ? `(${dd})` : '';
+      };
+      const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
+      const present = value => {
+        if(value === undefined || value === null) return reviewPlaceholder;
+        const str = String(value).trim();
+        return str ? esc(str) : reviewPlaceholder;
+      };
       function updateReview(){
-        const nome=esc($('#nome').value), email=esc(($('#email').value||'').toLowerCase());
+        const nome=$('#nome').value;
+        const email=($('#email').value||'').toLowerCase();
         const cpf=fmtCPF($('#cpf').value);
-        const tel = esc(`(${onlyDigits($('#tel1_ddd').value)}) ${onlyDigits($('#tel1_num').value)}`);
-        const cep=fmtCEP($('#cep').value), log=esc($('#logradouro').value), num=esc($('#numero').value),
-              bai=esc($('#bairro').value), cid=esc($('#cidade').value), uf=esc(($('#uf').value||'').toUpperCase());
-        const genero=esc($('#genero').value), raca=esc($('#raca').value), pnp=esc($('#cotasPNP').value);
-        const nivel=esc($('#nivel').value), ies=esc($('#ies').value), curso=esc($('#curso').value), ano=esc($('#ano_conclusao').value);
-        $('#reviewBlock').innerHTML = `
-          <div class="row g-3">
-            <div class="col-md-6">
-              <div class="p-3 border rounded">
-                <div class="fw-semibold mb-2">Identificação</div>
-                <div><span class="pill me-2">Nome</span> ${nome}</div>
-                <div><span class="pill me-2">CPF</span> ${cpf}</div>
-                <div><span class="pill me-2">E-mail</span> ${email}</div>
-                <div><span class="pill me-2">Telefone</span> ${tel}</div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="p-3 border rounded">
-                <div class="fw-semibold mb-2">Endereço</div>
-                <div><span class="pill me-2">CEP</span> ${cep}</div>
-                <div><span class="pill me-2">Logradouro</span> ${log}, ${num}</div>
-                <div><span class="pill me-2">Bairro</span> ${bai}</div>
-                <div><span class="pill me-2">Cidade/UF</span> ${cid}/${uf}</div>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="p-3 border rounded">
-                <div class="fw-semibold mb-2">Formação</div>
-                <div><span class="pill me-2">Nível</span> ${nivel}</div>
-                <div><span class="pill me-2">Curso</span> ${curso}</div>
-                <div><span class="pill me-2">IES</span> ${ies}</div>
-                <div><span class="pill me-2">Ano</span> ${ano}</div>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="p-3 border rounded">
-                <div class="fw-semibold mb-2">Raça/Gênero</div>
-                <div><span class="pill me-2">Gênero</span> ${genero}</div>
-                <div><span class="pill me-2">Cor/Raça</span> ${raca}</div>
-                <div><span class="pill me-2">PNP</span> ${pnp}</div>
-              </div>
-            </div>
-          </div>`;
+        const telPrincipal = fmtPhone($('#tel1_ddd').value, $('#tel1_num').value);
+        const telAdicional = fmtPhone($('#tel2_ddd').value, document.getElementById('tel2_num')?.value || '');
+        const nasc = fmtDateBr($('#nasc').value);
+        const nacionalidade = $('#nacionalidade').value;
+        const naturalidade = joinParts([
+          $('#naturalidade_cidade').value,
+          ($('#naturalidade_uf').value||'').toUpperCase()
+        ]);
+        const rgNumero = $('#rg_numero').value;
+        const rgOrgao = $('#rg_orgao').value;
+        const rgUf = ($('#rg_uf').value||'').toUpperCase();
+        const rgData = fmtDateBr($('#rg_data').value);
+        const cep=fmtCEP($('#cep').value);
+        const logradouro = joinParts([
+          $('#logradouro').value,
+          $('#numero').value ? `Nº ${$('#numero').value}` : ''
+        ], ', ');
+        const complemento = $('#complemento').value;
+        const bairro = $('#bairro').value;
+        const cidadeUf = joinParts([
+          $('#cidade').value,
+          ($('#uf').value||'').toUpperCase()
+        ], ' / ');
+        const genero=$('#genero').value;
+        const raca=$('#raca').value;
+        const pnp=$('#cotasPNP').value;
+        const nivel=$('#nivel').value;
+        const ies=$('#ies').value;
+        const curso=$('#curso').value;
+        const ano=$('#ano_conclusao').value;
+        const militarValue=document.querySelector('input[name="militar"]:checked')?.value || '';
+        const militar = militarValue==='SIM' ? 'Sim' : militarValue==='NAO' ? 'Não' : '';
+        const politicosValue=document.querySelector('input[name="politicos"]:checked')?.value || '';
+        const politicos = politicosValue==='SIM' ? 'Sim' : politicosValue==='NAO' ? 'Não' : '';
+        const titulo=$('#titulo').value;
+        const zona=$('#zona').value;
+        const secao=$('#secao').value;
+        const isPcd=$('#is_pcd').value;
+        const tipoPcd=$('#tipo_pcd').value;
+        const necessidade=$('#necessidade').value;
+        const vinculoPublico=$('#vinculo_publico').value;
+        const qualVinculo=$('#qual_vinculo').value;
+        const pisPasep=$('#pis_pasep').value;
+        const experienciaTempo=$('#experiencia_tempo').value;
+
+        const reviewSections = [
+          { title:'Dados pessoais', rows:[
+            {label:'Nome completo', value: present(nome)},
+            {label:'Data de nascimento', value: present(nasc)},
+            {label:'Nacionalidade', value: present(nacionalidade)},
+            {label:'Naturalidade', value: present(naturalidade)}
+          ]},
+          { title:'Documentos', rows:[
+            {label:'RG', value: present(rgNumero)},
+            {label:'Órgão expedidor', value: present(rgOrgao)},
+            {label:'UF do RG', value: present(rgUf)},
+            {label:'Data de expedição', value: present(rgData)},
+            {label:'CPF', value: present(cpf)}
+          ]},
+          { title:'Contatos', rows:[
+            {label:'E-mail', value: present(email)},
+            {label:'Telefone principal', value: present(telPrincipal)},
+            {label:'Telefone adicional', value: present(telAdicional)}
+          ]},
+          { title:'Endereço', rows:[
+            {label:'CEP', value: present(cep)},
+            {label:'Logradouro / número', value: present(logradouro)},
+            {label:'Complemento', value: present(complemento)},
+            {label:'Bairro', value: present(bairro)},
+            {label:'Cidade / UF', value: present(cidadeUf)}
+          ]},
+          { title:'Escolaridade e formação', rows:[
+            {label:'Nível', value: present(nivel)},
+            {label:'Curso', value: present(curso)},
+            {label:'Instituição', value: present(ies)},
+            {label:'Ano de conclusão', value: present(ano)}
+          ]},
+          { title:'Raça e gênero', rows:[
+            {label:'Gênero', value: present(genero)},
+            {label:'Cor/Raça (IBGE)', value: present(raca)},
+            {label:'Concorrer às vagas PNP?', value: present(pnp)}
+          ]},
+          { title:'Situação militar e eleitoral', rows:[
+            {label:'Obrigações militares', value: present(militar)},
+            {label:'Direitos políticos', value: present(politicos)},
+            {label:'Título de eleitor', value: present(titulo)},
+            {label:'Zona', value: present(zona)},
+            {label:'Seção', value: present(secao)}
+          ]},
+          { title:'Pessoa com deficiência (PCD)', rows:[
+            {label:'É PCD?', value: present(isPcd)},
+            {label:'Tipo de deficiência', value: present(tipoPcd)},
+            {label:'Necessidade especial', value: present(necessidade)}
+          ]},
+          { title:'Vínculos e experiência', rows:[
+            {label:'Vínculo com serviço público?', value: present(vinculoPublico)},
+            {label:'Qual vínculo', value: present(qualVinculo)},
+            {label:'PIS/PASEP', value: present(pisPasep)},
+            {label:'Tempo de experiência', value: present(experienciaTempo)}
+          ]}
+        ];
+
+        const renderRow = ({label, value}) => `
+          <div class="review-line">
+            <div class="review-label">${esc(label)}</div>
+            <div class="review-value">${value}</div>
+          </div>
+        `;
+        const renderSection = (section) => `
+          <section class="review-section">
+            <h3 class="h6 mb-3">${esc(section.title)}</h3>
+            ${section.rows.map(renderRow).join('')}
+          </section>
+        `;
+
+        $('#reviewBlock').innerHTML = reviewSections.map(renderSection).join('');
       }
 
       // ========= Submit state =========
