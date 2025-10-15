@@ -36,20 +36,7 @@
       .badge-soft{ background:#e7f1ff; color:#0b2447; border:1px solid #cfe2ff; }
       .form-control[readonly]{ background:#f8f9fa; }
       .review-table td{ vertical-align: top; }
-      .review-section{ background:#f8faff; border:1px solid #dbe7ff; border-radius:.85rem; padding:1.25rem; }
-      .review-section + .review-section{ margin-top:1rem; }
-      .review-grid{ display:grid; grid-template-columns:repeat(1,minmax(0,1fr)); gap:1rem; }
-      .review-item{ background:#ffffff; border:1px solid rgba(13,110,253,.08); border-radius:.75rem; padding:.75rem .9rem; box-shadow:0 4px 12px rgba(13,110,253,.04); display:flex; flex-direction:column; gap:.35rem; min-height:84px; }
-      .review-label{ font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#6c757d; font-weight:600; }
-      .review-value{ font-weight:600; color:#0b2447; word-break:break-word; line-height:1.4; }
       .review-placeholder{ color:#adb5bd; font-weight:600; letter-spacing:.04em; }
-      @media (min-width: 576px){
-        .review-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
-      }
-      @media (min-width: 992px){
-        .review-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
-        .review-item{ min-height:96px; padding:1rem 1.1rem; }
-      }
       .frame-card{
         max-width: 1020px;
         background:#ffffff;
@@ -574,19 +561,22 @@
       </section>
 
       <section class="step-panel" data-step-panel="5" aria-label="Etapa 6 - Revisão e envio">
-        <div class="card card-form mb-4">
+        <div class="card card-form mb-5">
           <div class="card-header">
-            <h2 class="h5 mb-0">Declaração, revisão e envio</h2>
+            <h2 class="h5 mb-0">Revisão e envio</h2>
           </div>
           <div class="card-body">
-            <div class="alert alert-info tiny">
-              Declaro, sob as penas da lei, que as informações prestadas são verdadeiras e que apresentarei a documentação comprobatória exigida no prazo do Edital.
-            </div>
-
             <div id="reviewBlock" class="mb-3"></div>
 
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="termoResponsabilidade">
+              <label class="form-check-label" for="termoResponsabilidade">
+                DECLARO que todas as informações fornecidas são verdadeiras e exatas, DECLARO, ainda, estar ciente de que prestar declaração falsa caracteriza o crime de falsidade ideológica previsto no art. 299 do Código Penal Brasileiro, e que por tal crime serei responsabilizado, independentemente das sanções administrativas, caso se comprove a inveracidade do declarado neste documento. DECLARO estar ciente e de acordo com os termos da Política de Privacidade, nos termos da Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD). DECLARO, por fim, que tomo ciência, neste ato, de toda a legislação mencionada acima.
+              </label>
+            </div>
+
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-secondary" id="btnSubmitAll" disabled>Enviar inscrição</button>
+              <button type="button" class="btn btn-secondary" id="btnSubmitAll" disabled>Enviar dados</button>
               <div id="finalStatus" class="ms-2"></div>
             </div>
             <pre class="json mt-3 d-none" id="finalOut"></pre>
@@ -830,21 +820,23 @@
         ];
 
         const renderRow = ({label, value}) => `
-          <div class="review-item">
-            <div class="review-label">${esc(label)}</div>
-            <div class="review-value">${value}</div>
-          </div>
-        `;
+              <tr>
+                <td width="240"><strong>${esc(label)}</strong></td>
+                <td>${value}</td>
+              </tr>
+            `;
         const renderSection = (section) => `
-          <section class="review-section">
-            <h3 class="h6 mb-3">${esc(section.title)}</h3>
-            <div class="review-grid">
-              ${section.rows.map(renderRow).join('')}
-            </div>
+          <section class="mb-4">
+            <h3 class="h6 section-title mb-2">${esc(section.title)}</h3>
+            <table class="table table-sm review-table mb-0">
+              <tbody>
+                ${section.rows.map(renderRow).join('')}
+              </tbody>
+            </table>
           </section>
         `;
 
-        $('#reviewBlock').innerHTML = reviewSections.map(renderSection).join('');
+        $('#reviewBlock').innerHTML = reviewSections.map(renderSection).join('\n');
       }
 
       // ========= Submit state =========
@@ -871,7 +863,9 @@
       }
       function refreshSubmitState(){
         const btn=$('#btnSubmitAll');
-        const allOk = baseFieldsOk() && docsRequiredOk();
+        const termo=document.getElementById('termoResponsabilidade');
+        const termoOk = termo ? termo.checked : true;
+        const allOk = baseFieldsOk() && docsRequiredOk() && termoOk;
         btn.disabled = !allOk;
         btn.classList.toggle('btn-success', allOk);
         btn.classList.toggle('btn-secondary', !allOk);
@@ -992,6 +986,10 @@
       const hetVideo=$('#het_video'); const statusHetVideo=document.createElement('div'); hetVideo?.parentElement?.appendChild(statusHetVideo);
       hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
       bindChecker('pcd_laudo','status_pcd_laudo',{});
+      const termoCheck=document.getElementById('termoResponsabilidade');
+      if(termoCheck){
+        termoCheck.addEventListener('change', refreshSubmitState);
+      }
 
       // ========= Draft (localStorage) =========
       const DRAFT_KEY='hvr_inscricao_draft_v1';
@@ -1075,6 +1073,8 @@
         fd.append('qual_vinculo',$('#qual_vinculo').value.trim());
         fd.append('pis_pasep',$('#pis_pasep').value.trim());
         fd.append('experiencia_tempo',$('#experiencia_tempo').value.trim());
+        const termo=document.getElementById('termoResponsabilidade');
+        fd.append('termo_responsabilidade', termo && termo.checked ? 'ACEITO' : 'NAO');
 
         // uploads
         appendIfFile(fd,'doc_id','doc_id');
