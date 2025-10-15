@@ -165,7 +165,7 @@
       .tiny{ font-size:.85rem; }
       .pill{ border-radius:999px; padding:.25rem .6rem; border:1px solid #dee2e6; }
       .uploader-status{ min-height:1.75rem; }
-      .racial-declaration-box{
+      .declaration-box{
         background:#f8f9fa;
         border:1px solid #dbe7ff;
         border-radius:.75rem;
@@ -176,10 +176,11 @@
         line-height:1.55;
         color:#0b2447;
       }
-      .racial-declaration-box strong{ letter-spacing:.3px; }
-      .racial-declaration-actions .btn{ min-width:130px; }
-      .racial-declaration-box::-webkit-scrollbar{ width:8px; }
-      .racial-declaration-box::-webkit-scrollbar-thumb{ background:#c7d5f8; border-radius:999px; }
+      .declaration-box strong{ letter-spacing:.3px; }
+      .declaration-box::-webkit-scrollbar{ width:8px; }
+      .declaration-box::-webkit-scrollbar-thumb{ background:#c7d5f8; border-radius:999px; }
+      .declaration-check{ margin-top:1rem; }
+      .declaration-actions .btn{ min-width:140px; }
       @media (max-width: 992px){
         :root{ --stage-w:100vw; --pattern-w:100vw; }
         .stage, .pattern-strip{ left:0; }
@@ -269,43 +270,48 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label required" for="nome">Nome completo</label>
                 <input type="text" id="nome" class="form-control" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" required>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <label class="form-label required" for="nasc">Data de nascimento</label>
                 <input type="date" id="nasc" class="form-control" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" required>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <label class="form-label required" for="nacionalidade">Nacionalidade</label>
-                <input type="text" id="nacionalidade" class="form-control" placeholder="Brasileira" required>
+                <input type="text" id="nacionalidade" class="form-control" required>
               </div>
-              <div class="col-md-2">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-5">
                 <label class="form-label required" for="naturalidade_cidade">Naturalidade</label>
                 <input type="text" id="naturalidade_cidade" class="form-control" placeholder="Cidade" required>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <label class="form-label required" for="naturalidade_uf">UF</label>
                 <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" placeholder="PE" required>
               </div>
-
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="form-label required" for="rg_numero">RG</label>
                 <input type="text" id="rg_numero" class="form-control" inputmode="numeric" maxlength="14" required>
               </div>
-              <div class="col-md-2">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-4">
                 <label class="form-label required" for="rg_orgao">Órgão</label>
                 <input type="text" id="rg_orgao" class="form-control" required>
               </div>
-              <div class="col-md-1">
+              <div class="col-md-3">
                 <label class="form-label required" for="rg_uf">UF</label>
                 <input type="text" id="rg_uf" maxlength="2" class="form-control" required>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <label class="form-label required" for="rg_data">Expedição</label>
                 <input type="date" id="rg_data" class="form-control" required>
               </div>
+            </div>
+            <div class="row g-3 mt-0">
               <div class="col-md-4">
                 <label class="form-label required" for="cpf">CPF</label>
                 <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username }}" required>
@@ -335,17 +341,19 @@
                   <div class="form-check"><input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO"><label class="form-check-label" for="politicos_nao">Não</label></div>
                 </div>
               </div>
+            </div>
+            <div class="row g-3 mt-0">
               <div class="col-md-4">
                 <label class="form-label" for="titulo">Título de Eleitor</label>
-                <input type="text" id="titulo" class="form-control">
+                <input type="text" id="titulo" class="form-control" inputmode="numeric" maxlength="12">
               </div>
-              <div class="col-md-2">
+              <div class="col-md-4">
                 <label class="form-label" for="zona">Zona</label>
-                <input type="text" id="zona" class="form-control">
+                <input type="text" id="zona" class="form-control" inputmode="numeric" maxlength="4">
               </div>
-              <div class="col-md-2">
+              <div class="col-md-4">
                 <label class="form-label" for="secao">Seção</label>
-                <input type="text" id="secao" class="form-control">
+                <input type="text" id="secao" class="form-control" inputmode="numeric" maxlength="4">
               </div>
             </div>
           </div>
@@ -364,26 +372,20 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label required" for="email">E-mail</label>
                 <input type="email" id="email" class="form-control" value="{{ $json.email }}" required>
                 <div class="help tiny" id="emailHelp"></div>
               </div>
               <div class="col-md-3">
-                <label class="form-label required" for="tel1_ddd">Telefone (DDD)</label>
-                <input type="text" id="tel1_ddd" class="form-control" inputmode="numeric" maxlength="2" required>
+                <label class="form-label required" for="tel1">Telefone 1</label>
+                <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" required>
+                <div class="help tiny" id="tel1Help"></div>
               </div>
               <div class="col-md-3">
-                <label class="form-label required" for="tel1_num">Telefone (Número)</label>
-                <input type="text" id="tel1_num" class="form-control" inputmode="numeric" maxlength="9" required>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label" for="tel2_ddd">Telefone 2 (DDD)</label>
-                <input type="text" id="tel2_ddd" class="form-control" inputmode="numeric" maxlength="2">
-              </div>
-              <div class="col-md-3">
-                <label class="form-label" for="tel2_num">Telefone 2 (Número)</label>
-                <input type="text" id="tel2_num" class="form-control" inputmode="numeric" maxlength="9">
+                <label class="form-label" for="tel2">Telefone 2</label>
+                <input type="text" id="tel2" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número">
+                <div class="help tiny" id="tel2Help"></div>
               </div>
             </div>
           </div>
@@ -396,7 +398,7 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <label class="form-label required" for="cep">CEP</label>
                 <input type="text" id="cep" class="form-control" placeholder="00000-000" inputmode="numeric" maxlength="8" value="{{ $json.postal_code }}" required>
               </div>
@@ -404,23 +406,27 @@
                 <label class="form-label required" for="logradouro">Logradouro</label>
                 <input type="text" id="logradouro" class="form-control" value="{{ $json.addressStreet }}" required>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <label class="form-label required" for="numero">Número</label>
                 <input type="text" id="numero" class="form-control" value="{{ $json.addressNumber }}" required>
               </div>
-              <div class="col-md-2">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-4">
                 <label class="form-label" for="complemento">Complemento</label>
                 <input type="text" id="complemento" class="form-control" value="{{ $json.addressComplement }}">
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="form-label required" for="bairro">Bairro</label>
                 <input type="text" id="bairro" class="form-control" value="{{ $json.neighborhood }}" required>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="form-label required" for="cidade">Cidade</label>
                 <input type="text" id="cidade" class="form-control" value="{{ $json.locality }}" required>
               </div>
-              <div class="col-md-2">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-3">
                 <label class="form-label required" for="uf">UF</label>
                 <input type="text" id="uf" class="form-control" maxlength="2" value="PE" required>
               </div>
@@ -441,7 +447,7 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="form-label required" for="nivel">Nível</label>
                 <select id="nivel" class="form-select" required>
                   <option value="">Selecione...</option>
@@ -452,15 +458,17 @@
                   <option>Pós-graduação</option>
                 </select>
               </div>
-              <div class="col-md-5">
+              <div class="col-md-4">
                 <label class="form-label required" for="ies">Instituição</label>
                 <input type="text" id="ies" class="form-control" required>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-4">
                 <label class="form-label required" for="curso">Curso</label>
                 <input type="text" id="curso" class="form-control" required>
               </div>
-              <div class="col-md-2">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-3">
                 <label class="form-label required" for="ano_conclusao">Ano</label>
                 <input type="text" id="ano_conclusao" class="form-control" inputmode="numeric" maxlength="4" required>
               </div>
@@ -474,7 +482,7 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="form-label required" for="vinculo_publico">Vínculo com serviço público?</label>
                 <select id="vinculo_publico" class="form-select" required>
                   <option value="">Selecione...</option>
@@ -486,11 +494,13 @@
                 <label class="form-label" for="qual_vinculo">Qual vínculo</label>
                 <input type="text" id="qual_vinculo" class="form-control">
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="form-label" for="pis_pasep">PIS/PASEP</label>
                 <input type="text" id="pis_pasep" class="form-control">
               </div>
-              <div class="col-md-2">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-3">
                 <label class="form-label" for="experiencia_tempo">Tempo (meses/anos)</label>
                 <input type="text" id="experiencia_tempo" class="form-control">
               </div>
@@ -689,19 +699,29 @@
 
             <div class="mb-4">
               <h3 class="h6 section-title mb-2">Autodeclaração étnico-racial</h3>
-              <div id="racialDeclarationText" class="racial-declaration-box" tabindex="0" role="textbox" aria-readonly="true"></div>
-              <div class="d-flex justify-content-end gap-2 mt-3 racial-declaration-actions" id="racialDeclarationActions">
-                <button type="button" class="btn btn-outline-danger btn-sm" data-racial-choice="decline" disabled>Não aceito</button>
-                <button type="button" class="btn btn-outline-success btn-sm" data-racial-choice="accept" disabled>Aceito</button>
+              <div id="racialDeclarationText" class="declaration-box" tabindex="0" role="textbox" aria-readonly="true"></div>
+              <div class="form-check declaration-check">
+                <input class="form-check-input" type="checkbox" id="racialDeclarationAgree" disabled>
+                <label class="form-check-label" for="racialDeclarationAgree">Confirmo que a autodeclaração acima corresponde à minha manifestação.</label>
               </div>
-              <div class="form-text tiny mt-2" id="racialDeclarationHint">Role o texto até o final para habilitar as opções.</div>
+              <div class="form-text tiny mt-2" id="racialDeclarationHint">Role o texto até o final para habilitar o aceite.</div>
             </div>
 
-            <div class="form-check mb-3">
-              <input class="form-check-input" type="checkbox" id="termoResponsabilidade">
-              <label class="form-check-label" for="termoResponsabilidade">
+            <div class="mb-4">
+              <h3 class="h6 section-title mb-2">Declaração de responsabilidade</h3>
+              <div id="responsibilityText" class="declaration-box" tabindex="0" role="textbox" aria-readonly="true">
                 DECLARO que todas as informações fornecidas são verdadeiras e exatas, DECLARO, ainda, estar ciente de que prestar declaração falsa caracteriza o crime de falsidade ideológica previsto no art. 299 do Código Penal Brasileiro, e que por tal crime serei responsabilizado, independentemente das sanções administrativas, caso se comprove a inveracidade do declarado neste documento. DECLARO estar ciente e de acordo com os termos da Política de Privacidade, nos termos da Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD). DECLARO, por fim, que tomo ciência, neste ato, de toda a legislação mencionada acima.
-              </label>
+              </div>
+              <div class="form-check declaration-check">
+                <input class="form-check-input" type="checkbox" id="termoResponsabilidade" disabled>
+                <label class="form-check-label" for="termoResponsabilidade">Li e estou de acordo com a declaração de responsabilidade.</label>
+              </div>
+              <div class="form-text tiny mt-2" id="responsibilityHint">Role o texto até o final para habilitar o aceite.</div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 declaration-actions mb-3">
+              <button type="button" class="btn btn-outline-success" id="acceptAllDeclarations">Aceitar tudo</button>
+              <button type="button" class="btn btn-outline-danger" id="declineAllDeclarations">Não aceitar</button>
             </div>
 
             <div class="d-flex gap-2">
@@ -742,7 +762,6 @@
 
       // ========= Validators =========
       function isValidEmail(v){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(String(v||'').trim()); }
-      function isValidCell(v){ const d=onlyDigits(v); return /^(?:[1-9][0-9])9[0-9]{8}$/.test(d); }
       function isValidCPF(cpf){
         cpf = onlyDigits(cpf);
         if(!cpf || cpf.length !== 11) return false;
@@ -827,14 +846,27 @@
         if(y && m && d) return `${d}/${m}/${y}`;
         return '';
       };
-      const fmtPhone = (ddd, num) => {
-        const dd = onlyDigits(ddd);
-        const n = onlyDigits(num);
-        if(!dd && !n) return '';
-        if(n.length === 9) return `(${dd}) ${n.slice(0,5)}-${n.slice(5)}`;
-        if(n.length === 8) return `(${dd}) ${n.slice(0,4)}-${n.slice(4)}`;
-        if(n) return `(${dd}) ${n}`;
-        return dd ? `(${dd})` : '';
+      const fmtPhone = (value) => {
+        const digits = onlyDigits(value).slice(0,11);
+        if(!digits) return '';
+        if(digits.length <= 2){
+          if(digits.length === 1) return `(${digits}`;
+          return `(${digits})`;
+        }
+        const ddd = digits.slice(0,2);
+        const base = digits.slice(2);
+        if(base.length <= 4) return `(${ddd}) ${base}`;
+        if(base.length === 8) return `(${ddd}) ${base.slice(0,4)}-${base.slice(4)}`;
+        if(base.length >= 9){
+          const first = base.slice(0,5);
+          const second = base.slice(5,9);
+          return `(${ddd}) ${first}${second ? '-' + second : ''}`;
+        }
+        return `(${ddd}) ${base}`;
+      };
+      const isValidPhone = (value) => {
+        const digits = onlyDigits(value);
+        return /^(?:[1-9][0-9])(?:9[0-9]{8}|[2-9][0-9]{7})$/.test(digits);
       };
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
       const present = value => {
@@ -843,43 +875,39 @@
         return str ? esc(str) : reviewPlaceholder;
       };
       const racialDeclarationBox = $('#racialDeclarationText');
+      const racialCheckbox = $('#racialDeclarationAgree');
       const racialHint = $('#racialDeclarationHint');
-      const racialButtons = Array.from(document.querySelectorAll('[data-racial-choice]'));
-      let racialButtonsEnabled = false;
-      let racialAcceptance = null;
+      const responsibilityBox = $('#responsibilityText');
+      const responsibilityCheckbox = $('#termoResponsabilidade');
+      const responsibilityHint = $('#responsibilityHint');
       let lastRacialSignature = '';
       const declarationDateFormatter = new Intl.DateTimeFormat('pt-BR');
 
-      function setRacialAcceptance(value){
-        racialAcceptance = value;
-        racialButtons.forEach(btn => {
-          const choice = btn.dataset.racialChoice;
-          const isActive = value && choice === value;
-          btn.classList.toggle('active', !!isActive);
-          if(choice === 'accept'){
-            btn.classList.toggle('btn-success', !!isActive);
-            btn.classList.toggle('btn-outline-success', !isActive);
-          }else{
-            btn.classList.toggle('btn-danger', !!isActive);
-            btn.classList.toggle('btn-outline-danger', !isActive);
-          }
-        });
+      function resetDeclaration(box, checkbox, hint){
+        if(!box || !checkbox) return;
+        checkbox.checked = false;
+        checkbox.disabled = true;
+        if(hint){
+          hint.textContent = 'Role o texto até o final para habilitar o aceite.';
+        }
+        requestAnimationFrame(()=>{ box.scrollTop = 0; });
         refreshSubmitState();
       }
 
-      function setRacialButtonsEnabled(enabled){
-        racialButtonsEnabled = !!enabled;
-        racialButtons.forEach(btn => {
-          btn.disabled = !enabled;
-        });
-        if(!enabled){
-          setRacialAcceptance(null);
+      function markDeclarationReady(checkbox, hint){
+        if(!checkbox) return;
+        if(!checkbox.disabled) return;
+        checkbox.disabled = false;
+        if(hint){
+          hint.textContent = 'Marque o checkbox para confirmar.';
         }
       }
 
-      function updateRacialHint(message){
-        if(racialHint){
-          racialHint.textContent = message;
+      function handleScrollable(box, checkbox, hint){
+        if(!box || !checkbox) return;
+        const reachedBottom = Math.ceil(box.scrollTop + box.clientHeight) >= box.scrollHeight - 4;
+        if(reachedBottom){
+          markDeclarationReady(checkbox, hint);
         }
       }
 
@@ -930,47 +958,53 @@
         const hasChanged = signature !== lastRacialSignature;
         if(hasChanged){
           lastRacialSignature = signature;
-          setRacialButtonsEnabled(false);
-          updateRacialHint('Role o texto até o final para habilitar as opções.');
-          requestAnimationFrame(()=>{ racialDeclarationBox.scrollTop = 0; });
+          resetDeclaration(racialDeclarationBox, racialCheckbox, racialHint);
         }
         racialDeclarationBox.innerHTML = template;
       }
 
-      function handleRacialScroll(){
-        if(!racialDeclarationBox || racialButtonsEnabled) return;
-        const reachedBottom = Math.ceil(racialDeclarationBox.scrollTop + racialDeclarationBox.clientHeight) >= racialDeclarationBox.scrollHeight - 4;
-        if(reachedBottom){
-          setRacialButtonsEnabled(true);
-          updateRacialHint('Selecione uma das opções abaixo.');
-        }
-      }
+      racialDeclarationBox?.addEventListener('scroll', ()=>handleScrollable(racialDeclarationBox, racialCheckbox, racialHint));
+      responsibilityBox?.addEventListener('scroll', ()=>handleScrollable(responsibilityBox, responsibilityCheckbox, responsibilityHint));
+      racialCheckbox?.addEventListener('change', refreshSubmitState);
+      responsibilityCheckbox?.addEventListener('change', refreshSubmitState);
 
-      racialDeclarationBox?.addEventListener('scroll', handleRacialScroll);
-      racialButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          if(btn.disabled) return;
-          const choice = btn.dataset.racialChoice;
-          if(racialAcceptance === choice){
-            setRacialAcceptance(null);
-            updateRacialHint('Selecione uma das opções abaixo.');
-            return;
-          }
-          setRacialAcceptance(choice);
-          if(choice === 'accept'){
-            updateRacialHint('Você aceitou a autodeclaração.');
-          }else if(choice === 'decline'){
-            updateRacialHint('Você não aceitou a autodeclaração.');
-          }
-        });
+      const acceptAllBtn = $('#acceptAllDeclarations');
+      const declineAllBtn = $('#declineAllDeclarations');
+      acceptAllBtn?.addEventListener('click', ()=>{
+        if(racialDeclarationBox){
+          racialDeclarationBox.scrollTop = racialDeclarationBox.scrollHeight;
+          handleScrollable(racialDeclarationBox, racialCheckbox, racialHint);
+        }
+        if(responsibilityBox){
+          responsibilityBox.scrollTop = responsibilityBox.scrollHeight;
+          handleScrollable(responsibilityBox, responsibilityCheckbox, responsibilityHint);
+        }
+        if(racialCheckbox){
+          markDeclarationReady(racialCheckbox, racialHint);
+          racialCheckbox.checked = true;
+        }
+        if(responsibilityCheckbox){
+          markDeclarationReady(responsibilityCheckbox, responsibilityHint);
+          responsibilityCheckbox.checked = true;
+        }
+        refreshSubmitState();
+      });
+      declineAllBtn?.addEventListener('click', ()=>{
+        if(racialCheckbox){
+          racialCheckbox.checked = false;
+        }
+        if(responsibilityCheckbox){
+          responsibilityCheckbox.checked = false;
+        }
+        refreshSubmitState();
       });
 
       function updateReview(){
         const nome=$('#nome').value;
         const email=($('#email').value||'').toLowerCase();
         const cpf=fmtCPF($('#cpf').value);
-        const telPrincipal = fmtPhone($('#tel1_ddd').value, $('#tel1_num').value);
-        const telAdicional = fmtPhone($('#tel2_ddd').value, document.getElementById('tel2_num')?.value || '');
+        const telPrincipal = fmtPhone($('#tel1').value);
+        const telAdicional = fmtPhone($('#tel2').value);
         const nasc = fmtDateBr($('#nasc').value);
         const nacionalidade = $('#nacionalidade').value;
         const naturalidade = joinParts([
@@ -1094,10 +1128,13 @@
 
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1_ddd','tel1_num','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','raca','cotasPNP','is_pcd','vinculo_publico'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','raca','cotasPNP','is_pcd','vinculo_publico'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isValidCPF($('#cpf').value)) return false;
         if(!isValidEmail($('#email').value)) return false;
+        if(!isValidPhone($('#tel1').value)) return false;
+        const tel2Val = $('#tel2')?.value || '';
+        if(tel2Val && !isValidPhone(tel2Val)) return false;
         return true;
       }
       function docsRequiredOk(){
@@ -1116,9 +1153,8 @@
       }
       function refreshSubmitState(){
         const btn=$('#btnSubmitAll');
-        const termo=document.getElementById('termoResponsabilidade');
-        const termoOk = termo ? termo.checked : true;
-        const racialOk = racialAcceptance === 'accept';
+        const termoOk = responsibilityCheckbox ? responsibilityCheckbox.checked : true;
+        const racialOk = racialCheckbox ? racialCheckbox.checked : true;
         const allOk = baseFieldsOk() && docsRequiredOk() && termoOk && racialOk;
         btn.disabled = !allOk;
         btn.classList.toggle('btn-success', allOk);
@@ -1204,16 +1240,67 @@
           input.value=nv; requestAnimationFrame(()=>{ input.setSelectionRange(nv.length,nv.length); input.dispatchEvent(new Event('input',{bubbles:true})); });
         });
       }
+      function bindPhoneInput(id, helpId, {required=false}={}){
+        const input=$(id);
+        if(!input) return;
+        const help = helpId ? $(helpId) : null;
+        const apply = (value)=>{
+          const digits = onlyDigits(value).slice(0,11);
+          const formatted = digits ? fmtPhone(digits) : '';
+          input.value = formatted;
+          const hasDigits = digits.length > 0;
+          const valid = hasDigits ? isValidPhone(digits) : !required;
+          input.setCustomValidity(valid ? '' : (hasDigits ? 'Informe um telefone válido com DDD.' : ''));
+          if(help){
+            help.textContent = hasDigits && !valid ? 'Informe um telefone válido com DDD.' : '';
+          }
+          refreshSubmitState();
+          updateReview();
+        };
+        input.addEventListener('input', e=>{ apply(e.target.value); });
+        input.addEventListener('blur', ()=>apply(input.value));
+        input.addEventListener('keydown', e=>{
+          if(e.ctrlKey||e.metaKey||e.altKey) return;
+          const allowed=['Backspace','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete','Home','End'];
+          if(allowed.includes(e.key)) return;
+          if(/^[0-9]$/.test(e.key)) return;
+          e.preventDefault();
+        });
+        input.addEventListener('paste', e=>{
+          e.preventDefault();
+          const paste = (e.clipboardData||window.clipboardData).getData('text');
+          apply(paste);
+        });
+        apply(input.value);
+      }
+      function bindUppercase(id){
+        const el=$(id);
+        if(!el) return;
+        el.addEventListener('input', e=>{
+          const {selectionStart, selectionEnd} = e.target;
+          e.target.value = (e.target.value||'').toUpperCase();
+          if(typeof selectionStart==='number' && typeof selectionEnd==='number'){
+            e.target.setSelectionRange(selectionStart, selectionEnd);
+          }
+        });
+        el.addEventListener('blur', e=>{ e.target.value = (e.target.value||'').toUpperCase(); });
+      }
       bindNumeric('#cpf',11);
       bindNumeric('#rg_numero',14);
-      bindNumeric('#tel1_ddd',2);
-      bindNumeric('#tel1_num',9);
-      bindNumeric('#tel2_ddd',2);
-      bindNumeric('#tel2_num',9);
       bindNumeric('#cep',8);
       bindNumeric('#ano_conclusao',4);
+      bindNumeric('#titulo',12);
+      bindNumeric('#zona',4);
+      bindNumeric('#secao',4);
+      bindPhoneInput('#tel1','#tel1Help',{required:true});
+      bindPhoneInput('#tel2','#tel2Help',{required:false});
+      bindUppercase('#rg_orgao');
+      bindUppercase('#rg_uf');
+      bindUppercase('#naturalidade_uf');
+      bindUppercase('#uf');
 
       $('#email').addEventListener('input', e=>{
+        e.target.value = (e.target.value||'').toLowerCase();
         const v=e.target.value.trim(); const ok=isValidEmail(v);
         e.target.setCustomValidity(v && !ok ? 'E-mail inválido' : '');
         $('#emailHelp').textContent = v ? (ok ? '' : 'Informe um e-mail válido.') : '';
@@ -1250,19 +1337,13 @@
       const hetVideo=$('#het_video'); const statusHetVideo=document.createElement('div'); hetVideo?.parentElement?.appendChild(statusHetVideo);
       hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
       bindChecker('pcd_laudo','status_pcd_laudo',{});
-      const termoCheck=document.getElementById('termoResponsabilidade');
-      if(termoCheck){
-        termoCheck.addEventListener('change', refreshSubmitState);
-      }
-
       // ========= Draft (localStorage) =========
       const DRAFT_KEY='hvr_inscricao_draft_v1';
       const watchedSelectors = [
         '#nome','#nasc','#nacionalidade','#naturalidade_cidade','#naturalidade_uf',
-        '#rg_numero','#rg_orgao','#rg_uf','#rg_data','#cpf','#email','#tel1_ddd','#tel1_num','#tel2_ddd',
-        '#tel2_num','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf',
+        '#rg_numero','#rg_orgao','#rg_uf','#rg_data','#cpf','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf',
         '#nivel','#ies','#curso','#ano_conclusao','#genero','#raca','#cotasPNP','#is_pcd','#tipo_pcd','#necessidade',
-        '#vinculo_publico','#qual_vinculo','#pis_pasep','#experiencia_tempo'
+        '#vinculo_publico','#qual_vinculo','#pis_pasep','#experiencia_tempo','#titulo','#zona','#secao'
       ];
       function saveDraft(){
         const data={};
@@ -1272,7 +1353,13 @@
       function loadDraft(){
         try{
           const data=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');
-          Object.entries(data).forEach(([sel,val])=>{ const el=$(sel); if(el && typeof val==='string') el.value=val; });
+          Object.entries(data).forEach(([sel,val])=>{
+            const el=$(sel);
+            if(el && typeof val==='string'){
+              el.value=val;
+              el.dispatchEvent(new Event('input',{bubbles:true}));
+            }
+          });
         }catch(e){}
       }
       $('#quickSave').addEventListener('click', ()=>{
@@ -1296,15 +1383,13 @@
         fd.append('naturalidade_cidade',$('#naturalidade_cidade').value.trim());
         fd.append('naturalidade_uf',$('#naturalidade_uf').value.trim().toUpperCase());
         fd.append('rg_numero',$('#rg_numero').value.trim());
-        fd.append('rg_orgao',$('#rg_orgao').value.trim());
+        fd.append('rg_orgao',$('#rg_orgao').value.trim().toUpperCase());
         fd.append('rg_uf',$('#rg_uf').value.trim().toUpperCase());
         fd.append('rg_data',$('#rg_data').value);
         fd.append('cpf', onlyDigits($('#cpf').value));
         fd.append('email',$('#email').value.trim().toLowerCase());
-        fd.append('tel1_ddd',onlyDigits($('#tel1_ddd').value));
-        fd.append('tel1_num',onlyDigits($('#tel1_num').value));
-        fd.append('tel2_ddd',onlyDigits($('#tel2_ddd').value));
-        fd.append('tel2_num',onlyDigits($('#tel2_num').value));
+        fd.append('telefone1',onlyDigits($('#tel1').value));
+        fd.append('telefone2',onlyDigits($('#tel2').value));
         // endereço
         fd.append('cep',onlyDigits($('#cep').value));
         fd.append('logradouro',$('#logradouro').value.trim());
@@ -1322,7 +1407,7 @@
         fd.append('genero',$('#genero').value);
         fd.append('raca',$('#raca').value);
         fd.append('concorrer_pnp',$('#cotasPNP').value);
-        fd.append('autodeclaracao_racial', racialAcceptance === 'accept' ? 'ACEITO' : 'NAO');
+        fd.append('autodeclaracao_racial', racialCheckbox && racialCheckbox.checked ? 'ACEITO' : 'NAO');
         fd.append('autodeclaracao_racial_texto', (racialDeclarationBox?.innerText || '').trim());
         // pcd
         fd.append('is_pcd',$('#is_pcd').value);
@@ -1331,16 +1416,15 @@
         // militar/eleitoral
         fd.append('militar', document.querySelector('input[name="militar"]:checked')?.value || '');
         fd.append('politicos', document.querySelector('input[name="politicos"]:checked')?.value || '');
-        fd.append('titulo',$('#titulo').value.trim());
-        fd.append('zona',$('#zona').value.trim());
-        fd.append('secao',$('#secao').value.trim());
+        fd.append('titulo',onlyDigits($('#titulo').value));
+        fd.append('zona',onlyDigits($('#zona').value));
+        fd.append('secao',onlyDigits($('#secao').value));
         // vínculos
         fd.append('vinculo_publico',$('#vinculo_publico').value);
         fd.append('qual_vinculo',$('#qual_vinculo').value.trim());
         fd.append('pis_pasep',$('#pis_pasep').value.trim());
         fd.append('experiencia_tempo',$('#experiencia_tempo').value.trim());
-        const termo=document.getElementById('termoResponsabilidade');
-        fd.append('termo_responsabilidade', termo && termo.checked ? 'ACEITO' : 'NAO');
+        fd.append('termo_responsabilidade', responsibilityCheckbox && responsibilityCheckbox.checked ? 'ACEITO' : 'NAO');
 
         // uploads
         appendIfFile(fd,'doc_id','doc_id');
@@ -1392,6 +1476,7 @@
       function init(){
         loadDraft();
         bindWizard();
+        resetDeclaration(responsibilityBox, responsibilityCheckbox, responsibilityHint);
         attachWatchers();
         updateReview();
         refreshSubmitState();
