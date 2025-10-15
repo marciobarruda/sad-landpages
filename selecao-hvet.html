@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Seleção Pública Simplificada — Inscrição</title>
+    <title>Seleção Simplificada — HVR | Inscrição</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
@@ -18,6 +18,7 @@
           radial-gradient(800px 500px at 110% 0%, #f3f7ff 0%, #ffffff 60%),
           linear-gradient(180deg,#ffffff 0%, #f9fbff 100%);
         min-height:100vh;
+        color:var(--text);
       }
       .stage{ width:var(--stage-w); margin:0 auto; position:relative; left:-6px; }
       header.hero{ width:var(--stage-w); height:240px; background:url('https://statics.recife.pe.gov.br/images/dynamics/zonaazul/banner.jpeg') center/cover no-repeat; }
@@ -36,7 +37,7 @@
       .form-control[readonly]{ background:#f8f9fa; }
       .review-table td{ vertical-align: top; }
       .frame-card{
-        max-width: 1040px;
+        max-width: 1020px;
         background:#ffffff;
         border-radius:1rem;
         box-shadow:0 18px 40px rgba(13,110,253,.12), 0 8px 22px rgba(13,110,253,.08);
@@ -44,9 +45,11 @@
         position:relative; z-index:2;
         margin:-90px auto -90px !important;
       }
-      .pill{ font-weight:600; }
-      .list-bulleted li+li{ margin-top:.25rem; }
-      .small-muted{ font-size:.875rem; color:#6c757d; }
+      .subtle{ color:#6c757d; font-weight:500; letter-spacing:.2px; }
+      .floating-save{ position:fixed; right:1rem; bottom:1rem; z-index:50; }
+      .tiny{ font-size:.85rem; }
+      .pill{ border-radius:999px; padding:.25rem .6rem; border:1px solid #dee2e6; }
+      .uploader-status{ min-height:1.75rem; }
       @media (max-width: 992px){
         :root{ --stage-w:100vw; --pattern-w:100vw; }
         .stage, .pattern-strip{ left:0; }
@@ -61,371 +64,404 @@
     <div class="pattern-strip pattern-top"></div>
 
     <main class="container my-4 frame-card" id="app">
-      <h2 class="h4 text-center mb-1">Seleção Pública Simplificada – Inscrição</h2>
-      <p class="text-center small-muted mb-4">Preencha seus dados e anexe os documentos nas seções abaixo. Você já está logado.</p>
+      <div class="text-center mb-4">
+        <h1 class="h4 mb-1">Seleção Simplificada — Hospital Veterinário do Recife</h1>
+        <p class="text-muted subtle">Inscrição on-line • Usuário já autenticado</p>
+      </div>
 
-      <!-- Dados do(a) Candidato(a) -->
+      <!-- Seção 1: Dados Pessoais -->
       <div class="card card-form mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2 class="h5 mb-0">Dados do(a) Candidato(a)</h2>
-          <span class="badge badge-soft">Campos básicos</span>
+        <div class="card-header">
+          <h2 class="h5 mb-0">Dados Pessoais</h2>
         </div>
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label required" for="cpf">CPF</label>
-              <input type="text" inputmode="numeric" maxlength="14" class="form-control" id="cpf" value="{{ $json.preferred_username }}" placeholder="Somente números" readonly required>
-            </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
               <label class="form-label required" for="nome">Nome completo</label>
-              <input type="text" class="form-control" id="nome" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" readonly required>
+              <input type="text" id="nome" class="form-control" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="nasc">Data de nascimento</label>
+              <input type="date" id="nasc" class="form-control" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="nacionalidade">Nacionalidade</label>
+              <input type="text" id="nacionalidade" class="form-control" placeholder="Brasileira" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="naturalidade_cidade">Naturalidade</label>
+              <input type="text" id="naturalidade_cidade" class="form-control" placeholder="Cidade" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="naturalidade_uf">UF</label>
+              <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" placeholder="PE" required>
+            </div>
+
+            <div class="col-12"><hr></div>
+
+            <div class="col-md-3">
+              <label class="form-label required" for="rg_numero">RG</label>
+              <input type="text" id="rg_numero" class="form-control" inputmode="numeric" maxlength="14" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="rg_orgao">Órgão</label>
+              <input type="text" id="rg_orgao" class="form-control" required>
+            </div>
+            <div class="col-md-1">
+              <label class="form-label required" for="rg_uf">UF</label>
+              <input type="text" id="rg_uf" maxlength="2" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="rg_data">Expedição</label>
+              <input type="date" id="rg_data" class="form-control" required>
             </div>
             <div class="col-md-4">
-              <label class="form-label required" for="email">E‑mail</label>
-              <input type="email" class="form-control" id="email" value="{{ $json.email }}" readonly required>
+              <label class="form-label required" for="cpf">CPF</label>
+              <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username }}" required>
+              <div class="help tiny" id="cpfHelp"></div>
+            </div>
+
+            <div class="col-12"><hr></div>
+
+            <div class="col-md-4">
+              <label class="form-label required" for="email">E-mail</label>
+              <input type="email" id="email" class="form-control" value="{{ $json.email }}" required>
+              <div class="help tiny" id="emailHelp"></div>
             </div>
             <div class="col-md-3">
-              <label class="form-label required" for="nascimento">Nascimento</label>
-              <input type="date" class="form-control" id="nascimento" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" readonly required>
+              <label class="form-label required" for="tel1_ddd">Telefone (DDD)</label>
+              <input type="text" id="tel1_ddd" class="form-control" inputmode="numeric" maxlength="2" required>
             </div>
             <div class="col-md-3">
-              <label class="form-label required" for="telefone">Telefone/WhatsApp</label>
-              <input type="text" class="form-control" id="telefone" inputmode="numeric" placeholder="DDD + número (apenas dígitos)" value="{{ $json.telefone }}" required>
+              <label class="form-label required" for="tel1_num">Telefone (Número)</label>
+              <input type="text" id="tel1_num" class="form-control" inputmode="numeric" maxlength="9" required>
             </div>
-            <div class="col-md-3">
-              <label class="form-label required" for="sexo">Sexo (para fins do serviço militar)</label>
-              <select id="sexo" class="form-select" required>
-                <option value="">Selecione…</option>
-                <option value="MASCULINO">Masculino</option>
-                <option value="FEMININO">Feminino</option>
-                <option value="OUTRO">Outro/Não declarar</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label required" for="pcd">Pessoa com deficiência?</label>
-              <select id="pcd" class="form-select" required>
-                <option value="NAO" selected>Não</option>
-                <option value="SIM">Sim</option>
-              </select>
+            <div class="col-md-2">
+              <label class="form-label" for="tel2_ddd">Telefone 2 (DDD)</label>
+              <input type="text" id="tel2_ddd" class="form-control" inputmode="numeric" maxlength="2">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Endereço -->
+      <!-- Seção 2: Endereço -->
       <div class="card card-form mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h2 class="h5 mb-0">Endereço</h2>
-          <span class="badge badge-soft">ViaCEP automático</span>
+          <span class="badge badge-soft">ViaCEP / BrasilAPI</span>
         </div>
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label class="form-label required" for="cep">CEP</label>
-              <input type="text" class="form-control" id="cep" placeholder="00000-000" value="{{ $json.postal_code }}" required>
+              <input type="text" id="cep" class="form-control" placeholder="00000-000" inputmode="numeric" maxlength="8" value="{{ $json.postal_code }}" required>
             </div>
             <div class="col-md-6">
               <label class="form-label required" for="logradouro">Logradouro</label>
-              <input type="text" class="form-control" id="logradouro" value="{{ $json.addressStreet }}" required>
+              <input type="text" id="logradouro" class="form-control" value="{{ $json.addressStreet }}" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="numero">Número</label>
+              <input type="text" id="numero" class="form-control" value="{{ $json.addressNumber }}" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label" for="complemento">Complemento</label>
+              <input type="text" id="complemento" class="form-control" value="{{ $json.addressComplement }}">
             </div>
             <div class="col-md-3">
-              <label class="form-label required" for="numero">Número</label>
-              <input type="text" class="form-control" id="numero" value="{{ $json.addressNumber }}" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label" for="complemento">Complemento</label>
-              <input type="text" class="form-control" id="complemento" value="{{ $json.addressComplement }}">
-            </div>
-            <div class="col-md-4">
               <label class="form-label required" for="bairro">Bairro</label>
-              <input type="text" class="form-control" id="bairro" value="{{ $json.neighborhood }}" required>
+              <input type="text" id="bairro" class="form-control" value="{{ $json.neighborhood }}" required>
             </div>
             <div class="col-md-3">
               <label class="form-label required" for="cidade">Cidade</label>
-              <input type="text" class="form-control" id="cidade" value="{{ $json.locality }}" required>
+              <input type="text" id="cidade" class="form-control" value="{{ $json.locality }}" required>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-2">
               <label class="form-label required" for="uf">UF</label>
-              <input type="text" class="form-control" id="uf" maxlength="2" value="PE" required>
+              <input type="text" id="uf" class="form-control" maxlength="2" value="PE" required>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Documentos para Cadastro -->
-      <div class="card card-form mb-4" id="sec-cadastro">
+      <!-- Seção 3: Situação Militar e Eleitoral -->
+      <div class="card card-form mb-4">
         <div class="card-header">
-          <h2 class="h5 mb-0">Documentos para Cadastro</h2>
-        </div>
-        <div class="card-body">
-          <div class="row g-4">
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">1) Identificação + CPF</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="docIdentidadeCpf" accept="image/*,application/pdf" multiple>
-                  </div>
-                  <div class="help mt-2">RG (frente e verso) e CPF ou comprovante de situação cadastral no CPF. Máx. 2 MB por arquivo.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#docIdentidadeCpf">Limpar</button>
-                  <div id="statusIdentidadeCpf" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">2) Comprovante de residência</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="docComprovanteRes" accept="image/*,application/pdf">
-                  </div>
-                  <div class="help mt-2">Formatos: JPG, JPEG, PNG ou PDF. Máx. 2 MB.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#docComprovanteRes">Limpar</button>
-                  <div id="statusCompRes" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">3) Quitação Eleitoral</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="docQuitacaoEleitoral" accept="image/*,application/pdf">
-                  </div>
-                  <div class="help mt-2">Comprovante de quitação eleitoral. Máx. 2 MB.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#docQuitacaoEleitoral">Limpar</button>
-                  <div id="statusQuitacaoEleitoral" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">4) Serviço Militar (obrigatório para sexo masculino)</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="docServMilitar" accept="image/*,application/pdf" disabled>
-                  </div>
-                  <div class="help mt-2">CAM, CDI, CI ou CRM. Máx. 2 MB.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#docServMilitar">Limpar</button>
-                  <div id="statusServMilitar" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">5) Escolaridade exigida</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="docEscolaridade" accept="image/*,application/pdf">
-                  </div>
-                  <div class="help mt-2">Diploma/Histórico/Certificado conforme o cargo. Máx. 2 MB.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#docEscolaridade">Limpar</button>
-                  <div id="statusEscolaridade" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">6) Deficiência (se declarado PCD)</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="docDeficiencia" accept="image/*,application/pdf" disabled>
-                  </div>
-                  <div class="help mt-2">Declaração (modelo Anexo IV) e exames pertinentes. Máx. 2 MB por arquivo.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#docDeficiencia">Limpar</button>
-                  <div id="statusDeficiencia" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">7) Atuação como Jurado (se aplicável)</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="docJurado" accept="image/*,application/pdf">
-                  </div>
-                  <div class="help mt-2">Certidões/declarações/atestados emitidos por Tribunais. Máx. 2 MB.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#docJurado">Limpar</button>
-                  <div id="statusJurado" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Heteroidentificação (para candidatos autodeclarados negros) -->
-      <div class="card card-form mb-4" id="sec-hetero">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2 class="h5 mb-0">Procedimento de Heteroidentificação</h2>
-          <div class="d-flex align-items-center gap-2">
-            <label class="form-label m-0">Autodeclarado negro?</label>
-            <select id="cotaRacial" class="form-select form-select-sm" style="width:auto">
-              <option value="NAO" selected>Não</option>
-              <option value="SIM">Sim</option>
-            </select>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="alert alert-info py-2 mb-3">Preencha esta seção somente se você se autodeclarou negro (preto/pardo) na inscrição.</div>
-          <div class="row g-4">
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">Documento de identidade (frente e verso)</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="hetIdentidade" accept="image/*,application/pdf" multiple disabled>
-                  </div>
-                  <div class="help mt-2">Formatos: JPG, JPEG, PNG ou PDF. Máx. 2 MB por arquivo.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#hetIdentidade">Limpar</button>
-                  <div id="statusHetIdentidade" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">Fotos (frente e perfil) — fundo branco</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="hetFotos" accept="image/*" multiple disabled>
-                  </div>
-                  <div class="help mt-2">2 fotos coloridas (frente e perfil). Máx. 2 MB por arquivo.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#hetFotos">Limpar</button>
-                  <div id="statusHetFotos" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12">
-              <h3 class="h6 section-title mb-2">Vídeo (até 20s)</h3>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                  <div class="dropzone">
-                    <input class="form-control" type="file" id="hetVideo" accept="video/mp4,video/quicktime" disabled>
-                  </div>
-                  <div class="help mt-2">Extensões: MP4 ou MOV. Máx. 30 MB. Diga: nome, cargo e “declaro que sou negro, da cor preta ou parda”.</div>
-                </div>
-                <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-                  <button type="button" class="btn btn-outline-secondary" data-clear="#hetVideo">Limpar</button>
-                  <div id="statusHetVideo" class="ms-auto"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Avaliação Biopsicossocial -->
-      <div class="card card-form mb-4" id="sec-bps">
-        <div class="card-header">
-          <h2 class="h5 mb-0">Avaliação Biopsicossocial</h2>
-        </div>
-        <div class="card-body">
-          <h3 class="h6 section-title mb-2">Laudo médico (legível)</h3>
-          <div class="row g-3 align-items-center">
-            <div class="col-md-8">
-              <div class="dropzone">
-                <input class="form-control" type="file" id="bpsLaudo" accept="application/pdf,image/*">
-              </div>
-              <div class="help mt-2">Extensões: PDF, PNG, JPEG, GIF, JPG. Tamanho até 2 MB.</div>
-            </div>
-            <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-              <button type="button" class="btn btn-outline-secondary" data-clear="#bpsLaudo">Limpar</button>
-              <div id="statusBpsLaudo" class="ms-auto"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Análise Curricular -->
-      <div class="card card-form mb-4" id="sec-curricular">
-        <div class="card-header">
-          <h2 class="h5 mb-0">Análise Curricular</h2>
-        </div>
-        <div class="card-body">
-          <h3 class="h6 section-title mb-2">Experiência profissional, títulos e certificados</h3>
-          <div class="row g-3 align-items-center">
-            <div class="col-md-8">
-              <div class="dropzone">
-                <input class="form-control" type="file" id="curricularDocs" accept="image/*,application/pdf" multiple>
-              </div>
-              <div class="help mt-2">Anexar documentos conforme Tabela de Pontuação. Máx. 2 MB por arquivo.</div>
-            </div>
-            <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
-              <button type="button" class="btn btn-outline-secondary" data-clear="#curricularDocs">Limpar</button>
-              <div id="statusCurricular" class="ms-auto"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recursos (habilitados somente nas datas previstas) -->
-      <div class="card card-form mb-4" id="sec-recursos">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2 class="h5 mb-0">Interposição de Recursos</h2>
-          <span class="badge badge-soft">Habilitado conforme cronograma</span>
+          <h2 class="h5 mb-0">Situação militar e eleitoral</h2>
         </div>
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label" for="recursoEtapa">Etapa</label>
-              <select id="recursoEtapa" class="form-select">
-                <option value="">Selecione…</option>
-                <option value="analise_preliminar">Resultado Preliminar da Análise Curricular</option>
-                <option value="hetero_preliminar">Resultado Preliminar da Heteroidentificação</option>
-                <option value="bps_preliminar">Resultado Preliminar da Avaliação Biopsicossocial</option>
-              </select>
-            </div>
-            <div class="col-12">
-              <label class="form-label" for="recursoTexto">Justificativa</label>
-              <textarea id="recursoTexto" class="form-control" rows="4" placeholder="Fundamente seu recurso…"></textarea>
-              <div class="help mt-2">Anexe, se necessário, documentos complementares (máx. 2 MB cada).</div>
-            </div>
-            <div class="col-12">
-              <div class="dropzone">
-                <input class="form-control" type="file" id="recursoAnexos" accept="image/*,application/pdf" multiple>
+            <div class="col-md-4">
+              <label class="form-label required">Obrigações militares em dia? (masculino)</label><br>
+              <div class="d-flex gap-3">
+                <div class="form-check"><input class="form-check-input" type="radio" name="militar" id="militar_sim" value="SIM"><label class="form-check-label" for="militar_sim">Sim</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="militar" id="militar_nao" value="NAO"><label class="form-check-label" for="militar_nao">Não</label></div>
               </div>
             </div>
-            <div class="col-12 d-flex gap-2">
-              <button class="btn btn-secondary" id="btnEnviarRecurso" disabled>Protocolar Recurso</button>
-              <div id="statusRecurso" class="ms-2"></div>
+            <div class="col-md-4">
+              <label class="form-label required">Em pleno gozo dos direitos políticos?</label><br>
+              <div class="d-flex gap-3">
+                <div class="form-check"><input class="form-check-input" type="radio" name="politicos" id="politicos_sim" value="SIM"><label class="form-check-label" for="politicos_sim">Sim</label></div>
+                <div class="form-check"><input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO"><label class="form-check-label" for="politicos_nao">Não</label></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="titulo">Título de Eleitor</label>
+              <input type="text" id="titulo" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label" for="zona">Zona</label>
+              <input type="text" id="zona" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label" for="secao">Seção</label>
+              <input type="text" id="secao" class="form-control">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Revisão e Envio Geral -->
-      <div class="card card-form mb-5">
+      <!-- Seção 4: Escolaridade e Formação -->
+      <div class="card card-form mb-4">
         <div class="card-header">
-          <h2 class="h5 mb-0">Revisão e Envio</h2>
+          <h2 class="h5 mb-0">Escolaridade e formação</h2>
         </div>
         <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label required" for="nivel">Nível</label>
+              <select id="nivel" class="form-select" required>
+                <option value="">Selecione...</option>
+                <option>Fundamental</option>
+                <option>Médio</option>
+                <option>Técnico</option>
+                <option>Superior</option>
+                <option>Pós-graduação</option>
+              </select>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label required" for="ies">Instituição</label>
+              <input type="text" id="ies" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="curso">Curso</label>
+              <input type="text" id="curso" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label required" for="ano_conclusao">Ano</label>
+              <input type="text" id="ano_conclusao" class="form-control" inputmode="numeric" maxlength="4" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção 5: Raça e Gênero / Cotas PNP -->
+      <div class="card card-form mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Informações de raça e gênero</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label required" for="genero">Gênero</label>
+              <select id="genero" class="form-select" required>
+                <option value="">Selecione...</option>
+                <option>Feminino</option>
+                <option>Masculino</option>
+                <option>Outro</option>
+              </select>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label required" for="raca">Cor/Raça (IBGE)</label>
+              <select id="raca" class="form-select" required>
+                <option value="">Selecione...</option>
+                <option>Branca</option>
+                <option>Preta</option>
+                <option>Parda</option>
+                <option>Amarela</option>
+                <option>Indígena</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required" for="cotasPNP">Concorrer às vagas PNP?</label>
+              <select id="cotasPNP" class="form-select" required>
+                <option value="">Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+          </div>
+          <div class="help tiny mt-2">Se optar por PNP, serão exigidos arquivos de heteroidentificação abaixo.</div>
+        </div>
+      </div>
+
+      <!-- Seção 6: PCD -->
+      <div class="card card-form mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Pessoa com Deficiência (PCD)</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label required" for="is_pcd">É PCD?</label>
+              <select id="is_pcd" class="form-select" required>
+                <option value="">Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
+              <input type="text" id="tipo_pcd" class="form-control">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label" for="necessidade">Necessidade especial (provas/etapas)</label>
+              <input type="text" id="necessidade" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção 7: Experiência e Vínculos -->
+      <div class="card card-form mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Experiência e vínculos</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label required" for="vinculo_publico">Vínculo com serviço público?</label>
+              <select id="vinculo_publico" class="form-select" required>
+                <option value="">Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="qual_vinculo">Qual vínculo</label>
+              <input type="text" id="qual_vinculo" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label" for="pis_pasep">PIS/PASEP</label>
+              <input type="text" id="pis_pasep" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label" for="experiencia_tempo">Tempo (meses/anos)</label>
+              <input type="text" id="experiencia_tempo" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção 8: Envio de Documentos (com limites) -->
+      <div class="card card-form mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="h5 mb-0">Documentos</h2>
+          <span class="badge badge-soft">2 MB por doc/foto • 30 MB vídeo</span>
+        </div>
+        <div class="card-body">
+          <ul class="tiny mb-3">
+            <li>Documentos/fotos: PDF, JPG, JPEG, PNG (até 2 MB cada).</li>
+            <li>Vídeo (heteroidentificação): MP4, MOV (até 30 MB).</li>
+          </ul>
+
+          <section class="mb-4">
+            <h3 class="h6 section-title mb-2">1) Cadastro</h3>
+            <div class="row g-3 align-items-end">
+              <div class="col-md-8">
+                <label class="form-label required">Documento de identificação (RG frente/verso) e CPF</label>
+                <div class="dropzone"><input class="form-control" type="file" id="doc_id" accept=".pdf,image/*" multiple required></div>
+              </div>
+              <div class="col-md-4"><div id="status_doc_id" class="uploader-status ms-auto"></div></div>
+
+              <div class="col-md-8">
+                <label class="form-label required">Comprovante de residência</label>
+                <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
+              </div>
+              <div class="col-md-4"><div id="status_doc_res" class="uploader-status ms-auto"></div></div>
+
+              <div class="col-md-8">
+                <label class="form-label required">Quitação eleitoral</label>
+                <div class="dropzone"><input class="form-control" type="file" id="doc_quitacao_eleitoral" accept=".pdf,image/*" required></div>
+              </div>
+              <div class="col-md-4"><div id="status_doc_eleitoral" class="uploader-status ms-auto"></div></div>
+
+              <div class="col-md-8">
+                <label class="form-label">Quitação do serviço militar (masculino)</label>
+                <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
+                <div class="help tiny">CAM / CDI / CI / CRM.</div>
+              </div>
+              <div class="col-md-4"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
+
+              <div class="col-md-8">
+                <label class="form-label required">Comprovação da escolaridade</label>
+                <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
+              </div>
+              <div class="col-md-4"><div id="status_doc_escolaridade" class="uploader-status ms-auto"></div></div>
+
+              <div class="col-md-8">
+                <label class="form-label">Experiência / títulos / certificados</label>
+                <div class="dropzone"><input class="form-control" type="file" id="doc_curriculo" accept=".pdf,image/*" multiple></div>
+              </div>
+              <div class="col-md-4"><div id="status_doc_curriculo" class="uploader-status ms-auto"></div></div>
+            </div>
+          </section>
+
+          <hr>
+
+          <section class="mb-4">
+            <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PNP)</h3>
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label class="form-label">Documento de identidade (frente/verso)</label>
+                <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
+              </div>
+              <div class="col-md-4 d-flex align-items-end"><div id="status_het_id" class="uploader-status ms-auto"></div></div>
+
+              <div class="col-md-6">
+                <label class="form-label">Foto de frente</label>
+                <div class="dropzone"><input class="form-control" type="file" id="het_frente" accept="image/*"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Foto de perfil</label>
+                <div class="dropzone"><input class="form-control" type="file" id="het_perfil" accept="image/*"></div>
+              </div>
+
+              <div class="col-md-12">
+                <label class="form-label">Vídeo (até 20s)</label>
+                <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
+                <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
+              </div>
+            </div>
+          </section>
+
+          <hr>
+
+          <section class="mb-2">
+            <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label class="form-label">Laudo médico</label>
+                <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
+              </div>
+              <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Seção 9: Declaração, Revisão e Envio -->
+      <div class="card card-form mb-5">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Declaração, revisão e envio</h2>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info tiny">
+            Declaro, sob as penas da lei, que as informações prestadas são verdadeiras e que apresentarei a documentação comprobatória exigida no prazo do Edital.
+          </div>
+
           <div id="reviewBlock" class="mb-3"></div>
+
           <div class="d-flex gap-2">
             <button type="button" class="btn btn-secondary" id="btnSubmitAll" disabled>Enviar inscrição</button>
             <div id="finalStatus" class="ms-2"></div>
@@ -434,355 +470,386 @@
         </div>
       </div>
 
-      <!-- Publicações do Certame -->
-      <div class="card card-form mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2 class="h5 mb-0">Publicações do Certame</h2>
-          <span class="badge badge-soft">Atualizado por etapas</span>
-        </div>
-        <div class="card-body" id="publicacoes"></div>
-      </div>
-
-      <div class="text-center text-muted mb-5">⚠️ Esta página realiza pré‑validações dos arquivos e organiza seu envio. A análise oficial seguirá o Edital.</div>
+      <div class="text-center text-muted tiny mb-5">Pré-validações locais. A conferência oficial seguirá o Edital do certame.</div>
     </main>
 
     <div class="pattern-strip pattern-bottom"></div>
+    <button class="btn btn-primary rounded-pill shadow floating-save" id="quickSave" type="button">Salvar rascunho</button>
 
     <script>
-      // ============================ CONFIG ==============================
-      const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/inscricao-simplificada"; // ajustar no deploy
-      const RECURSO_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/recurso-certame"; // ajustar no deploy
+      // ========= Config =========
+      const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/inscricao-hvr";
+      const DOC_OK_EXT = ['pdf','jpg','jpeg','png'];
+      const DOC_MAX_MB = 2;
+      const VID_OK_EXT = ['mp4','mov'];
+      const VID_MAX_MB = 30;
 
-      // Publicações (preencher URLs quando disponíveis)
-      const PUBLICACOES = [
-        { chave:'edital', rotulo:'Edital e Anexos', url:'#', ativo:true },
-        { chave:'concorrencia', rotulo:'Concorrência', url:'', ativo:false },
-        { chave:'analise_preliminar', rotulo:'Resultado Preliminar da Análise Curricular', url:'', ativo:false },
-        { chave:'hetero_preliminar', rotulo:'Resultado Preliminar do Procedimento de Heteroidentificação', url:'', ativo:false },
-        { chave:'bps_preliminar', rotulo:'Resultado Preliminar da Avaliação Biopsicossocial', url:'', ativo:false },
-        { chave:'analise_definitivo', rotulo:'Resultado Definitivo da Análise Curricular', url:'', ativo:false },
-        { chave:'hetero_definitivo', rotulo:'Resultado Definitivo do Procedimento de Heteroidentificação', url:'', ativo:false },
-        { chave:'bps_definitivo', rotulo:'Resultado Definitivo da Avaliação Biopsicossocial', url:'', ativo:false },
-        { chave:'homologacao', rotulo:'Homologação', url:'', ativo:false },
-      ];
-
-      // Janela temporal para recursos (exemplo placeholders)
-      const JANELA_RECURSO = {
-        analise_preliminar: { inicio: '2025-10-20', fim: '2025-10-21' },
-        hetero_preliminar: { inicio: '2025-10-27', fim: '2025-10-28' },
-        bps_preliminar:    { inicio: '2025-11-03', fim: '2025-11-04' },
-      };
-
-      // ============================== UTILS ============================
+      // ========= Utils =========
       const $ = (sel) => document.querySelector(sel);
-      const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-      const show = (el) => el.classList.remove('d-none');
-      const hide = (el) => el.classList.add('d-none');
-      const onlyDigits = (s) => (s||'').replace(/\D+/g, '');
-      const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4') : (d||'—'); };
-      const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\d{5})(\d{3})/,'$1-$2') : (d||'—'); };
-      const esc = s => { const d=document.createElement('div'); d.innerText=s??''; return d.innerHTML||'—'; };
-      const yyyyMmDd = (date = new Date()) => date.toISOString().slice(0,10);
-      const between = (d, a, b) => d>=a && d<=b;
+      const onlyDigits = (s) => (s||'').replace(/\\D+/g, '');
+      const esc = s => { const d=document.createElement('div'); d.innerText=s??''; return d.innerHTML||''; };
+      const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/,'$1.$2.$3-$4') : (d||''); };
+      const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\\d{5})(\\d{3})/,'$1-$2') : (d||''); };
+      const toMB = bytes => Math.round((bytes/1024/1024)*100)/100;
 
-      // Tamanho/Tipo
-      const MAX_DOC_MB = 2; // documentos e fotos
-      const MAX_VIDEO_MB = 30; // vídeo
-      const DOC_ACCEPT = ['application/pdf','image/jpeg','image/jpg','image/png','image/gif'];
-      const VIDEO_ACCEPT = ['video/mp4','video/quicktime'];
-
-      function bytesToMB(b){ return b / (1024*1024); }
-      function fileOk(file, isVideo=false){
-        if(!file) return false;
-        const mb = bytesToMB(file.size);
-        if(isVideo){ if(mb > MAX_VIDEO_MB) return false; if(!VIDEO_ACCEPT.includes(file.type)) return false; }
-        else { if(mb > MAX_DOC_MB) return false; if(!DOC_ACCEPT.includes(file.type)) return false; }
+      // ========= Validators =========
+      function isValidEmail(v){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(String(v||'').trim()); }
+      function isValidCell(v){ const d=onlyDigits(v); return /^(?:[1-9][0-9])9[0-9]{8}$/.test(d); }
+      function isValidCPF(cpf){
+        cpf = onlyDigits(cpf);
+        if(!cpf || cpf.length !== 11) return false;
+        if(/^([0-9])\\1+$/.test(cpf)) return false;
+        let soma=0, rest;
+        for(let i=1;i<=9;i++) soma += parseInt(cpf.substring(i-1,i))*(11-i);
+        rest=(soma*10)%11; if(rest===10||rest===11) rest=0; if(rest!==parseInt(cpf.substring(9,10))) return false;
+        soma=0; for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
+        rest=(soma*10)%11; if(rest===10||rest===11) rest=0; if(rest!==parseInt(cpf.substring(10,11))) return false;
         return true;
       }
-
-      function validateInputFiles(input, {isVideo=false, required=false}={}){
+      function checkFiles(input, {video=false, required=false, minFiles=1}){
         const files = Array.from(input.files||[]);
-        if(required && files.length===0) return false;
-        return files.every(f=>fileOk(f,isVideo));
-      }
-
-      function setStatus(el, type, msg){
-        el.innerHTML = `<span class="badge text-bg-${type} d-inline-flex align-items-center">${esc(msg)}</span>`;
-      }
-
-      // ======================= REGRAS DE HABILITAÇÃO ====================
-      function refreshHabilitacao(){
-        const sexo = $('#sexo').value;
-        const pcd = $('#pcd').value;
-        const cota = $('#cotaRacial').value;
-
-        // Militar: exigido somente para masculino
-        const militar = $('#docServMilitar');
-        militar.disabled = (sexo !== 'MASCULINO');
-
-        // PCD: exige anexos
-        const def = $('#docDeficiencia');
-        def.disabled = (pcd !== 'SIM');
-
-        // Heteroidentificação: habilita blocos
-        $('#hetIdentidade').disabled = (cota !== 'SIM');
-        $('#hetFotos').disabled      = (cota !== 'SIM');
-        $('#hetVideo').disabled      = (cota !== 'SIM');
-
-        // Recursos: habilita pelo calendário
-        const etapa = $('#recursoEtapa').value;
-        const hoje = yyyyMmDd();
-        const jan = JANELA_RECURSO[etapa];
-        const aberto = jan ? between(hoje, jan.inicio, jan.fim) : false;
-        $('#btnEnviarRecurso').disabled = !aberto || !etapa;
-        $('#statusRecurso').innerHTML = aberto ? '<span class="badge text-bg-success">Janela aberta</span>' : '<span class="badge text-bg-warning">Fora do período</span>';
-      }
-
-      ['change','input'].forEach(evt=>{
-        $('#sexo').addEventListener(evt, refreshHabilitacao);
-        $('#pcd').addEventListener(evt, refreshHabilitacao);
-        $('#cotaRacial').addEventListener(evt, refreshHabilitacao);
-        $('#recursoEtapa').addEventListener(evt, refreshHabilitacao);
-      });
-
-      // ============================= VIA CEP ============================
-      $('#cep').addEventListener('blur', async () => {
-        const cep=onlyDigits($('#cep').value);
-        if(cep.length!==8) return;
-        try{
-          const res=await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-          const data=await res.json();
-          if(data && !data.erro){
-            $('#logradouro').value=data.logradouro||'';
-            $('#bairro').value=data.bairro||'';
-            $('#cidade').value=data.localidade||'';
-            $('#uf').value=(data.uf||'').toUpperCase();
-            updateReview();
+        if(required && files.length < minFiles){ return {ok:false, msg:`Selecione pelo menos ${minFiles} arquivo(s).`}; }
+        for(const f of files){
+          const e = (String(f.name).split('.').pop()||'').toLowerCase();
+          if(video){
+            if(!VID_OK_EXT.includes(e)) return {ok:false, msg:`Inválido (${e}). Aceitos: ${VID_OK_EXT.join(', ').toUpperCase()}`};
+            if(toMB(f.size) > VID_MAX_MB) return {ok:false, msg:`Vídeo > ${VID_MAX_MB} MB: ${toMB(f.size)} MB`};
+          }else{
+            if(!DOC_OK_EXT.includes(e)) return {ok:false, msg:`Inválido (${e}). Aceitos: ${DOC_OK_EXT.join(', ').toUpperCase()}`};
+            if(toMB(f.size) > DOC_MAX_MB) return {ok:false, msg:`Arquivo > ${DOC_MAX_MB} MB: ${toMB(f.size)} MB`};
           }
-        }catch(e){}
-      });
-
-      // =========================== PÚBLICAÇÕES ==========================
-      function renderPublicacoes(){
-        const wrap = $('#publicacoes');
-        wrap.innerHTML = '';
-        const ul = document.createElement('ul');
-        ul.className = 'list-group';
-        PUBLICACOES.forEach(item => {
-          const li = document.createElement('li');
-          li.className = 'list-group-item d-flex justify-content-between align-items-center';
-          li.innerHTML = `<span>${esc(item.rotulo)}</span>` +
-            (item.ativo && item.url ? `<a class="btn btn-sm btn-outline-primary" target="_blank" href="${item.url}">Abrir</a>`
-                                     : `<span class="badge text-bg-secondary">Em breve</span>`);
-          ul.appendChild(li);
-        });
-        wrap.appendChild(ul);
+        }
+        return {ok:true, msg:`${files.length} arquivo(s) ok`};
       }
+      function setStatus(el, type, msg, spinning=false){
+        const spinner = spinning ? '<span class="spinner-border spinner-border-sm align-middle ms-2"></span>' : '';
+        el.innerHTML = '<span class="badge text-bg-'+type+' d-inline-flex align-items-center">'+esc(msg)+spinner+'</span>';
+      }
+      const ok = (el,msg='Ok')=>setStatus(el,'success',msg);
+      const bad = (el,msg='Inválido')=>setStatus(el,'danger',msg);
 
-      // ============================= REVIEW =============================
-      function updateReview(){
-        const cpf=fmtCPF($('#cpf').value),
-              nome=esc($('#nome').value),
-              nasc=esc((($('#nascimento').value)||'').split('-').reverse().join('/')),
-              email=esc($('#email').value.toLowerCase()), tel=esc($('#telefone').value);
-        const cep=fmtCEP($('#cep').value), logr=esc($('#logradouro').value), num=esc($('#numero').value),
-              comp=esc($('#complemento').value), bairro=esc($('#bairro').value), cidade=esc($('#cidade').value), uf=esc($('#uf').value.toUpperCase());
-
-        $('#reviewBlock').innerHTML = `
-          <h6>Dados do(a) Candidato(a)</h6>
-          <table class="table table-sm review-table"><tbody>
-            <tr><td width="200"><strong>CPF</strong></td><td>${cpf}</td></tr>
-            <tr><td><strong>Nome</strong></td><td>${nome}</td></tr>
-            <tr><td><strong>Nascimento</strong></td><td>${nasc}</td></tr>
-            <tr><td><strong>E‑mail</strong></td><td>${email}</td></tr>
-            <tr><td><strong>Telefone</strong></td><td>${tel}</td></tr>
-          </tbody></table>
-
-          <h6>Endereço</h6>
-          <table class="table table-sm review-table"><tbody>
-            <tr><td width="200"><strong>CEP</strong></td><td>${cep}</td></tr>
-            <tr><td><strong>Logradouro</strong></td><td>${logr}</td></tr>
-            <tr><td><strong>Número</strong></td><td>${num}</td></tr>
-            <tr><td><strong>Complemento</strong></td><td>${comp}</td></tr>
-            <tr><td><strong>Bairro</strong></td><td>${bairro}</td></tr>
-            <tr><td><strong>Cidade/UF</strong></td><td>${cidade} / ${uf}</td></tr>
-          </tbody></table>`;
-
+      // ========= CEP (ViaCEP + BrasilAPI) =========
+      async function lookupCep(cep){
+        const normalized = onlyDigits(cep);
+        if(normalized.length !== 8) return null;
+        const providers = [
+          async () => {
+            const res = await fetch(`https://viacep.com.br/ws/${normalized}/json/`);
+            if(!res.ok) throw new Error(`ViaCEP HTTP ${res.status}`);
+            const data = await res.json();
+            if(data?.erro) return null;
+            return { logradouro:data.logradouro, bairro:data.bairro, cidade:data.localidade, uf:data.uf };
+          },
+          async () => {
+            const res = await fetch(`https://brasilapi.com.br/api/cep/v1/${normalized}`);
+            if(!res.ok) throw new Error(`BrasilAPI HTTP ${res.status}`);
+            const data = await res.json();
+            if(data?.errors || data?.error || data?.message) return null;
+            return {
+              logradouro: data.street || data.logradouro,
+              bairro: data.neighborhood || data.bairro,
+              cidade: data.city || data.localidade,
+              uf: data.state || data.uf
+            };
+          }
+        ];
+        for(const p of providers){
+          try{ const r=await p(); if(r) return r; }catch(e){ console.warn('CEP provider fail', e); }
+        }
+        return null;
+      }
+      async function autofillAddressByCep(){
+        const cep = onlyDigits($('#cep').value);
+        if(cep.length !== 8) return;
+        const data = await lookupCep(cep);
+        if(!data) return;
+        $('#logradouro').value=String(data.logradouro||'').toUpperCase();
+        $('#bairro').value=String(data.bairro||'').toUpperCase();
+        $('#cidade').value=String(data.cidade||'').toUpperCase();
+        $('#uf').value=(data.uf||'').toUpperCase();
+        updateReview();
         refreshSubmitState();
       }
 
-      ['#telefone','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf']
-        .forEach(sel=>$(sel).addEventListener('input', updateReview));
+      // ========= Review =========
+      function updateReview(){
+        const nome=esc($('#nome').value), email=esc(($('#email').value||'').toLowerCase());
+        const cpf=fmtCPF($('#cpf').value);
+        const tel = esc(`(${onlyDigits($('#tel1_ddd').value)}) ${onlyDigits($('#tel1_num').value)}`);
+        const cep=fmtCEP($('#cep').value), log=esc($('#logradouro').value), num=esc($('#numero').value),
+              bai=esc($('#bairro').value), cid=esc($('#cidade').value), uf=esc(($('#uf').value||'').toUpperCase());
+        const genero=esc($('#genero').value), raca=esc($('#raca').value), pnp=esc($('#cotasPNP').value);
+        const nivel=esc($('#nivel').value), ies=esc($('#ies').value), curso=esc($('#curso').value), ano=esc($('#ano_conclusao').value);
+        $('#reviewBlock').innerHTML = `
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 border rounded">
+                <div class="fw-semibold mb-2">Identificação</div>
+                <div><span class="pill me-2">Nome</span> ${nome}</div>
+                <div><span class="pill me-2">CPF</span> ${cpf}</div>
+                <div><span class="pill me-2">E-mail</span> ${email}</div>
+                <div><span class="pill me-2">Telefone</span> ${tel}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 border rounded">
+                <div class="fw-semibold mb-2">Endereço</div>
+                <div><span class="pill me-2">CEP</span> ${cep}</div>
+                <div><span class="pill me-2">Logradouro</span> ${log}, ${num}</div>
+                <div><span class="pill me-2">Bairro</span> ${bai}</div>
+                <div><span class="pill me-2">Cidade/UF</span> ${cid}/${uf}</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 border rounded">
+                <div class="fw-semibold mb-2">Formação</div>
+                <div><span class="pill me-2">Nível</span> ${nivel}</div>
+                <div><span class="pill me-2">Curso</span> ${curso}</div>
+                <div><span class="pill me-2">IES</span> ${ies}</div>
+                <div><span class="pill me-2">Ano</span> ${ano}</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 border rounded">
+                <div class="fw-semibold mb-2">Raça/Gênero</div>
+                <div><span class="pill me-2">Gênero</span> ${genero}</div>
+                <div><span class="pill me-2">Cor/Raça</span> ${raca}</div>
+                <div><span class="pill me-2">PNP</span> ${pnp}</div>
+              </div>
+            </div>
+          </div>`;
+      }
 
-      // ============================ LIMPAR ==============================
-      $$('button[data-clear]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const sel = btn.getAttribute('data-clear');
-          const input = document.querySelector(sel);
-          if(input){ input.disabled=false; input.value=''; }
-        });
-      });
-
-      // ======================== SUBMISSÃO GERAL =========================
-      function camposObrigatoriosOk(){
-        // básicos
-        if(!onlyDigits($('#cpf').value) || !$('#nome').value || !$('#nascimento').value || !$('#email').value) return false;
-        if(!$('#telefone').value || !$('#cep').value || !$('#logradouro').value || !$('#numero').value || !$('#bairro').value || !$('#cidade').value || !$('#uf').value) return false;
-        // cadastro mínimos
-        if(!$('#docIdentidadeCpf').files.length) return false;
-        if(!$('#docComprovanteRes').files.length) return false;
-        if(!$('#docQuitacaoEleitoral').files.length) return false;
-        if($('#sexo').value==='MASCULINO' && !$('#docServMilitar').files.length) return false;
-        if(!$('#docEscolaridade').files.length) return false;
-        if($('#pcd').value==='SIM' && !$('#docDeficiencia').files.length) return false;
-        // hetero, se SIM
-        if($('#cotaRacial').value==='SIM'){
-          if(!$('#hetIdentidade').files.length) return false;
-          if(!$('#hetFotos').files.length) return false;
-          if(!$('#hetVideo').files.length) return false;
+      // ========= Submit state =========
+      function baseFieldsOk(){
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1_ddd','tel1_num','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','raca','cotasPNP','is_pcd','vinculo_publico'];
+        for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
+        if(!isValidCPF($('#cpf').value)) return false;
+        if(!isValidEmail($('#email').value)) return false;
+        return true;
+      }
+      function docsRequiredOk(){
+        const req = ['doc_id','doc_residencia','doc_quitacao_eleitoral','doc_escolaridade'];
+        for(const id of req){ const el=document.getElementById(id); const ok=checkFiles(el,{required:true}).ok; if(!ok) return false; }
+        if($('#cotasPNP').value==='Sim'){
+          const hv = checkFiles($('#het_video'), {video:true});
+          const hf = checkFiles($('#het_frente'), {});
+          if(!hv.ok || !hf.ok) return false;
+        }
+        if($('#is_pcd').value==='Sim'){
+          const lp = checkFiles($('#pcd_laudo'), {});
+          if(!lp.ok) return false;
         }
         return true;
       }
-
       function refreshSubmitState(){
-        const ok = camposObrigatoriosOk();
-        const btn = $('#btnSubmitAll');
-        btn.disabled = !ok;
-        btn.classList.toggle('btn-success', ok);
-        btn.classList.toggle('btn-secondary', !ok);
+        const btn=$('#btnSubmitAll');
+        const allOk = baseFieldsOk() && docsRequiredOk();
+        btn.disabled = !allOk;
+        btn.classList.toggle('btn-success', allOk);
+        btn.classList.toggle('btn-secondary', !allOk);
       }
 
-      // Validação de tamanho/formatos ao selecionar
-      const fileInputs = [
-        ['#docIdentidadeCpf', {isVideo:false}],
-        ['#docComprovanteRes', {isVideo:false}],
-        ['#docQuitacaoEleitoral', {isVideo:false}],
-        ['#docServMilitar', {isVideo:false}],
-        ['#docEscolaridade', {isVideo:false}],
-        ['#docDeficiencia', {isVideo:false}],
-        ['#docJurado', {isVideo:false}],
-        ['#hetIdentidade', {isVideo:false}],
-        ['#hetFotos', {isVideo:false}],
-        ['#hetVideo', {isVideo:true}],
-        ['#bpsLaudo', {isVideo:false}],
-        ['#curricularDocs', {isVideo:false}],
-        ['#recursoAnexos', {isVideo:false}],
-      ];
-      fileInputs.forEach(([sel,opts])=>{
-        const el = $(sel);
-        el.addEventListener('change', ()=>{
-          const ok = validateInputFiles(el, opts);
-          if(!ok){
-            alert(opts.isVideo ? `Vídeo inválido. Tamanho até ${MAX_VIDEO_MB} MB; formatos MP4/MOV.` : `Arquivo(s) inválido(s). Tamanho até ${MAX_DOC_MB} MB; formatos PDF/JPG/PNG/GIF.`);
-            el.value='';
-          }
-          refreshSubmitState();
+      // ========= Listeners / Masks =========
+      function bindNumeric(id, maxlen){ const el=$(id); if(!el) return;
+        el.addEventListener('input', e=>{ e.target.value=onlyDigits(e.target.value).slice(0,maxlen); updateReview(); refreshSubmitState(); });
+        el.addEventListener('keydown', e=>{
+          if(e.ctrlKey||e.metaKey||e.altKey) return;
+          const allowed=['Backspace','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete','Home','End'];
+          if(allowed.includes(e.key)) return;
+          if(/^[0-9]$/.test(e.key)) return;
+          e.preventDefault();
         });
+        el.addEventListener('paste', e=>{
+          e.preventDefault();
+          const input=e.target;
+          const paste=onlyDigits((e.clipboardData||window.clipboardData).getData('text'));
+          const start=input.selectionStart||0, end=input.selectionEnd||0;
+          const nv=(input.value.slice(0,start)+paste+input.value.slice(end)).slice(0,maxlen);
+          input.value=nv; requestAnimationFrame(()=>{ input.setSelectionRange(nv.length,nv.length); input.dispatchEvent(new Event('input',{bubbles:true})); });
+        });
+      }
+      bindNumeric('#cpf',11);
+      bindNumeric('#rg_numero',14);
+      bindNumeric('#tel1_ddd',2);
+      bindNumeric('#tel1_num',9);
+      bindNumeric('#tel2_ddd',2);
+      bindNumeric('#cep',8);
+      bindNumeric('#ano_conclusao',4);
+
+      $('#email').addEventListener('input', e=>{
+        const v=e.target.value.trim(); const ok=isValidEmail(v);
+        e.target.setCustomValidity(v && !ok ? 'E-mail inválido' : '');
+        $('#emailHelp').textContent = v ? (ok ? '' : 'Informe um e-mail válido.') : '';
+        refreshSubmitState(); updateReview();
+      });
+      $('#cpf').addEventListener('input', e=>{
+        const ok=isValidCPF(e.target.value);
+        $('#cpfHelp').textContent = ok? '' : 'CPF inválido';
+        refreshSubmitState();
       });
 
-      async function submitAll(){
-        if(!camposObrigatoriosOk()){ alert('Preencha os campos e anexos obrigatórios.'); return; }
+      // CEP auto-complete
+      $('#cep').addEventListener('blur', autofillAddressByCep);
+      $('#cep').addEventListener('change', autofillAddressByCep);
+
+      // Upload validators (badges)
+      function bindChecker(inputId, statusId, opts){
+        const input=document.getElementById(inputId);
+        const stat=document.getElementById(statusId);
+        const handler=()=>{
+          const res=checkFiles(input, opts||{});
+          if(res.ok) ok(stat, res.msg); else bad(stat, res.msg);
+          refreshSubmitState();
+        };
+        input?.addEventListener('change', handler);
+      }
+      bindChecker('doc_id','status_doc_id',{required:true, minFiles:1});
+      bindChecker('doc_residencia','status_doc_res',{required:true});
+      bindChecker('doc_quitacao_eleitoral','status_doc_eleitoral',{required:true});
+      bindChecker('doc_militar','status_doc_militar',{});
+      bindChecker('doc_escolaridade','status_doc_escolaridade',{required:true});
+      bindChecker('doc_curriculo','status_doc_curriculo',{});
+      bindChecker('het_id','status_het_id',{});
+      const hetVideo=$('#het_video'); const statusHetVideo=document.createElement('div'); hetVideo?.parentElement?.appendChild(statusHetVideo);
+      hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
+      bindChecker('pcd_laudo','status_pcd_laudo',{});
+
+      // ========= Draft (localStorage) =========
+      const DRAFT_KEY='hvr_inscricao_draft_v1';
+      const watchedSelectors = [
+        '#nome','#nasc','#nacionalidade','#naturalidade_cidade','#naturalidade_uf',
+        '#rg_numero','#rg_orgao','#rg_uf','#rg_data','#cpf','#email','#tel1_ddd','#tel1_num','#tel2_ddd',
+        '#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf',
+        '#nivel','#ies','#curso','#ano_conclusao','#genero','#raca','#cotasPNP','#is_pcd','#tipo_pcd','#necessidade',
+        '#vinculo_publico','#qual_vinculo','#pis_pasep','#experiencia_tempo'
+      ];
+      function saveDraft(){
+        const data={};
+        for(const sel of watchedSelectors){ const el=$(sel); if(!el) continue; data[sel]=el.value; }
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      }
+      function loadDraft(){
         try{
-          setStatus($('#finalStatus'),'secondary','Enviando…');
-          const fd = new FormData();
+          const data=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');
+          Object.entries(data).forEach(([sel,val])=>{ const el=$(sel); if(el && typeof val==='string') el.value=val; });
+        }catch(e){}
+      }
+      $('#quickSave').addEventListener('click', ()=>{
+        saveDraft();
+        const btn=$('#quickSave'); const old=btn.textContent; btn.textContent='Rascunho salvo'; setTimeout(()=>btn.textContent=old,1500);
+      });
 
-          // básicos
-          fd.append('cpf', onlyDigits($('#cpf').value));
-          fd.append('nome', $('#nome').value.trim());
-          fd.append('data_nascimento', $('#nascimento').value);
-          fd.append('email', $('#email').value.trim().toLowerCase());
-          fd.append('telefone', $('#telefone').value.trim());
+      // ========= Build FormData & Enviar =========
+      function appendIfFile(fd, id, key){
+        const input=document.getElementById(id);
+        if(!input) return;
+        const files=Array.from(input.files||[]);
+        files.forEach((f,idx)=> fd.append(key || id + (files.length>1?`[${idx}]`:''), f, f.name));
+      }
+      function buildFormData(){
+        const fd=new FormData();
+        // pessoais
+        fd.append('nome',$('#nome').value.trim());
+        fd.append('data_nascimento',$('#nasc').value);
+        fd.append('nacionalidade',$('#nacionalidade').value.trim());
+        fd.append('naturalidade_cidade',$('#naturalidade_cidade').value.trim());
+        fd.append('naturalidade_uf',$('#naturalidade_uf').value.trim().toUpperCase());
+        fd.append('rg_numero',$('#rg_numero').value.trim());
+        fd.append('rg_orgao',$('#rg_orgao').value.trim());
+        fd.append('rg_uf',$('#rg_uf').value.trim().toUpperCase());
+        fd.append('rg_data',$('#rg_data').value);
+        fd.append('cpf', onlyDigits($('#cpf').value));
+        fd.append('email',$('#email').value.trim().toLowerCase());
+        fd.append('tel1_ddd',onlyDigits($('#tel1_ddd').value));
+        fd.append('tel1_num',onlyDigits($('#tel1_num').value));
+        fd.append('tel2_ddd',onlyDigits($('#tel2_ddd').value));
+        // endereço
+        fd.append('cep',onlyDigits($('#cep').value));
+        fd.append('logradouro',$('#logradouro').value.trim());
+        fd.append('numero',$('#numero').value.trim());
+        fd.append('complemento',$('#complemento').value.trim());
+        fd.append('bairro',$('#bairro').value.trim());
+        fd.append('cidade',$('#cidade').value.trim());
+        fd.append('uf',$('#uf').value.trim().toUpperCase());
+        // formação
+        fd.append('nivel_minimo',$('#nivel').value);
+        fd.append('ies',$('#ies').value.trim());
+        fd.append('curso',$('#curso').value.trim());
+        fd.append('ano_conclusao',$('#ano_conclusao').value.trim());
+        // raça/gênero
+        fd.append('genero',$('#genero').value);
+        fd.append('raca',$('#raca').value);
+        fd.append('concorrer_pnp',$('#cotasPNP').value);
+        // pcd
+        fd.append('is_pcd',$('#is_pcd').value);
+        fd.append('tipo_pcd',$('#tipo_pcd').value.trim());
+        fd.append('necessidade',$('#necessidade').value.trim());
+        // militar/eleitoral
+        fd.append('militar', document.querySelector('input[name="militar"]:checked')?.value || '');
+        fd.append('politicos', document.querySelector('input[name="politicos"]:checked')?.value || '');
+        fd.append('titulo',$('#titulo').value.trim());
+        fd.append('zona',$('#zona').value.trim());
+        fd.append('secao',$('#secao').value.trim());
+        // vínculos
+        fd.append('vinculo_publico',$('#vinculo_publico').value);
+        fd.append('qual_vinculo',$('#qual_vinculo').value.trim());
+        fd.append('pis_pasep',$('#pis_pasep').value.trim());
+        fd.append('experiencia_tempo',$('#experiencia_tempo').value.trim());
 
-          // endereço
-          fd.append('cep', onlyDigits($('#cep').value));
-          fd.append('logradouro', $('#logradouro').value.trim());
-          fd.append('numero', $('#numero').value.trim());
-          fd.append('complemento', $('#complemento').value.trim());
-          fd.append('bairro', $('#bairro').value.trim());
-          fd.append('cidade', $('#cidade').value.trim());
-          fd.append('uf', $('#uf').value.trim().toUpperCase());
+        // uploads
+        appendIfFile(fd,'doc_id','doc_id');
+        appendIfFile(fd,'doc_residencia','doc_residencia');
+        appendIfFile(fd,'doc_quitacao_eleitoral','doc_quitacao_eleitoral');
+        appendIfFile(fd,'doc_militar','doc_militar');
+        appendIfFile(fd,'doc_escolaridade','doc_escolaridade');
+        appendIfFile(fd,'doc_curriculo','doc_curriculo');
+        appendIfFile(fd,'het_id','het_id');
+        appendIfFile(fd,'het_frente','het_frente');
+        appendIfFile(fd,'het_perfil','het_perfil');
+        appendIfFile(fd,'het_video','het_video');
+        appendIfFile(fd,'pcd_laudo','pcd_laudo');
 
-          // flags
-          fd.append('sexo', $('#sexo').value);
-          fd.append('pcd', $('#pcd').value);
-          fd.append('cota_racial', $('#cotaRacial').value);
-
-          // anexos util
-          const appendFiles = (inputSel, name) => {
-            const inp = $(inputSel);
-            Array.from(inp.files||[]).forEach((f,i)=>fd.append(name, f, f.name));
-          };
-
-          // cadastro
-          appendFiles('#docIdentidadeCpf','identificacao_cpf');
-          appendFiles('#docComprovanteRes','comprovante_residencia');
-          appendFiles('#docQuitacaoEleitoral','quitacao_eleitoral');
-          appendFiles('#docServMilitar','servico_militar');
-          appendFiles('#docEscolaridade','escolaridade');
-          appendFiles('#docDeficiencia','documentos_pcd');
-          appendFiles('#docJurado','atuacao_jurado');
-
-          // hetero
-          appendFiles('#hetIdentidade','hetero_identidade');
-          appendFiles('#hetFotos','hetero_fotos');
-          appendFiles('#hetVideo','hetero_video');
-
-          // bps
-          appendFiles('#bpsLaudo','laudo_biopsicossocial');
-
-          // curricular
-          appendFiles('#curricularDocs','analise_curricular');
-
-          fd.append('data_envio', yyyyMmDd());
-
-          const res = await fetch(FINAL_ENDPOINT, { method:'POST', body: fd });
-          const text = await res.text();
-          if(res.ok){
+        return fd;
+      }
+      async function postForm(url, formData){
+        const res = await fetch(url, { method:'POST', body: formData });
+        const text = await res.text();
+        let data=null; try{ data=JSON.parse(text); }catch(e){}
+        return { ok: res.ok, status: res.status, text, data };
+      }
+      async function submitAll(){
+        if($('#btnSubmitAll').disabled) return;
+        try{
+          $('#finalStatus').innerHTML = '<span class="badge text-bg-secondary">Enviando...</span>';
+          const out = await postForm(FINAL_ENDPOINT, buildFormData());
+          if(out.ok){
             alert('Inscrição enviada com sucesso!');
-            const app = document.getElementById('app');
-            app.innerHTML = `
-              <div class="py-5 text-center">
-                <h3 class="mb-3">Sua inscrição foi protocolada</h3>
-                <p class="text-muted">Acompanhe as publicações oficiais nesta página.</p>
-              </div>`;
+            document.getElementById('app').innerHTML = `<div class="py-5 text-center"><h3 class="mb-3">Sua inscrição foi registrada</h3><p class="text-muted">Acompanhe as publicações oficiais do certame.</p></div>`;
           }else{
-            setStatus($('#finalStatus'),'danger','Falha no envio');
-            $('#finalOut').textContent = text; show($('#finalOut'));
+            $('#finalStatus').innerHTML = '<span class="badge text-bg-danger">Falha no envio</span>';
+            $('#finalOut').textContent = out.text || ''; $('#finalOut').classList.remove('d-none');
           }
         }catch(e){
-          setStatus($('#finalStatus'),'danger','Erro de rede');
-          $('#finalOut').textContent = String(e); show($('#finalOut'));
+          $('#finalStatus').innerHTML = '<span class="badge text-bg-danger">Erro de rede</span>';
+          $('#finalOut').textContent = String(e); $('#finalOut').classList.remove('d-none');
         }
       }
-      $('#btnSubmitAll').addEventListener('click', submitAll);
+      document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
 
-      // RECURSO -----------------------------------------------------------
-      $('#btnEnviarRecurso').addEventListener('click', async (e)=>{
-        e.preventDefault();
-        const etapa = $('#recursoEtapa').value;
-        const jan = JANELA_RECURSO[etapa];
-        const hoje = yyyyMmDd();
-        if(!etapa || !jan || !between(hoje, jan.inicio, jan.fim)) return;
-        try{
-          setStatus($('#statusRecurso'),'secondary','Protocolando…');
-          const fd = new FormData();
-          fd.append('cpf', onlyDigits($('#cpf').value));
-          fd.append('etapa', etapa);
-          fd.append('justificativa', $('#recursoTexto').value.trim());
-          Array.from($('#recursoAnexos').files||[]).forEach(f=>fd.append('anexos',f,f.name));
-          fd.append('data_envio', yyyyMmDd());
-          const res = await fetch(RECURSO_ENDPOINT, { method:'POST', body: fd });
-          const text = await res.text();
-          if(res.ok){ setStatus($('#statusRecurso'),'success','Recurso protocolado'); }
-          else { setStatus($('#statusRecurso'),'danger','Falha no protocolo'); console.warn(text); }
-        }catch(err){ setStatus($('#statusRecurso'),'danger','Erro de rede'); }
-      });
-
-      // Inicialização -----------------------------------------------------
+      // ========= Init =========
+      function attachWatchers(){
+        const events=['input','change','blur'];
+        document.querySelectorAll('input,select,textarea').forEach(el=>{
+          events.forEach(ev=> el.addEventListener(ev, ()=>{ updateReview(); refreshSubmitState(); }));
+        });
+      }
       function init(){
-        renderPublicacoes();
-        refreshHabilitacao();
+        loadDraft();
+        attachWatchers();
         updateReview();
+        refreshSubmitState();
+        autofillAddressByCep();
       }
       init();
     </script>
