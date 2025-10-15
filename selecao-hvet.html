@@ -47,26 +47,26 @@
         margin:-90px auto -90px !important;
       }
       .wizard-shell{
-        background:linear-gradient(160deg,#ffffff 0%, #f0f4ff 100%);
-        border:1px solid #d1defc;
+        background:#ffffff;
+        border:1px solid #d8e1fb;
         border-radius:1.25rem;
         padding:1.5rem 1.75rem;
-        box-shadow:0 16px 34px rgba(13,110,253,.08);
-        margin-bottom:2rem;
+        box-shadow:0 18px 36px rgba(13,110,253,.08);
+        margin-bottom:2.25rem;
       }
       .wizard-heading{
         font-weight:700;
         letter-spacing:.18em;
         font-size:.75rem;
         text-transform:uppercase;
-        color:#6c7ab7;
+        color:#5563a5;
         display:flex;
         align-items:center;
         gap:.5rem;
       }
       .wizard-heading::before{
         content:'';
-        width:36px;
+        width:32px;
         height:2px;
         background:rgba(13,110,253,.35);
         border-radius:999px;
@@ -74,70 +74,86 @@
       .wizard-steps{
         list-style:none;
         margin:0;
-        padding:1rem 0 0;
+        padding:1.1rem 0 0;
         display:flex;
-        flex-wrap:wrap;
-        gap:.75rem;
-        justify-content:space-between;
+        align-items:flex-start;
+        gap:0;
+        position:relative;
+        counter-reset:wizard-step;
       }
       .wizard-step{
-        flex:1 1 140px;
-        min-width:130px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        gap:.6rem;
-        padding:.65rem 1rem;
-        border-radius:999px;
-        background:#f4f7ff;
-        border:1px solid transparent;
-        color:#0b2447;
+        flex:1 1 0;
+        min-width:0;
+        position:relative;
+        padding:0 1rem;
         cursor:pointer;
-        transition:all .2s ease;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        text-align:center;
+        gap:.45rem;
       }
-      .wizard-step:hover:not(.active){
-        border-color:rgba(13,110,253,.25);
-        box-shadow:0 6px 14px rgba(13,110,253,.12);
+      .wizard-step::before,
+      .wizard-step::after{
+        content:'';
+        position:absolute;
+        top:19px;
+        width:50%;
+        height:2px;
+        background:#dce4ff;
+        z-index:0;
+      }
+      .wizard-step::before{ left:0; }
+      .wizard-step::after{ left:50%; }
+      .wizard-step:first-child::before{ display:none; }
+      .wizard-step:last-child::after{ display:none; }
+      .wizard-step.completed::before,
+      .wizard-step.completed::after,
+      .wizard-step.active::before{
+        background:linear-gradient(90deg,var(--brand) 0%, var(--brand-dark) 100%);
       }
       .wizard-step .wizard-index{
-        width:36px;
-        height:36px;
+        width:38px;
+        height:38px;
         border-radius:50%;
-        border:2px solid var(--brand);
-        display:inline-flex;
+        border:3px solid #dce4ff;
+        background:#ffffff;
+        display:flex;
         align-items:center;
         justify-content:center;
         font-weight:700;
-        color:var(--brand);
-        background:#ffffff;
+        color:#6a77b4;
+        z-index:1;
+        transition:all .2s ease;
+        box-shadow:0 6px 12px rgba(13,110,253,.08);
       }
       .wizard-step .wizard-label{
         font-weight:600;
-        letter-spacing:.3px;
-      }
-      .wizard-step.active{
-        background:var(--brand);
-        border-color:var(--brand);
-        color:#ffffff;
-        box-shadow:0 12px 24px rgba(13,110,253,.22);
+        letter-spacing:.04em;
+        font-size:.92rem;
+        color:#516098;
       }
       .wizard-step.active .wizard-index{
-        background:#0b5ed7;
-        border-color:#0b5ed7;
+        border-color:var(--brand);
         color:#ffffff;
-      }
-      .wizard-step.completed{
-        background:#e7f4ec;
-        border-color:#34c38f;
-        color:#0f5132;
+        background:linear-gradient(135deg,var(--brand) 0%, var(--brand-dark) 100%);
+        box-shadow:0 10px 20px rgba(13,110,253,.22);
       }
       .wizard-step.completed .wizard-index{
-        background:#198754;
-        border-color:#198754;
+        border-color:#2ca46d;
+        background:#2ca46d;
         color:#ffffff;
       }
-      .wizard-progress{ height:6px; background:#e9ecef; border-radius:999px; overflow:hidden; margin-top:1.5rem; }
-      .wizard-progress .progress-bar{ height:100%; background:var(--brand); width:0%; transition:width .3s ease; }
+      .wizard-step.active .wizard-label{
+        color:var(--brand-dark);
+      }
+      .wizard-step.completed .wizard-label{
+        color:#2c7a52;
+      }
+      .wizard-step:hover .wizard-index{
+        transform:translateY(-2px);
+      }
+      .wizard-progress{ display:none; }
       .step-panel{ display:none; }
       .step-panel.active{ display:block; animation:fadeIn .3s ease; }
       @keyframes fadeIn{ from{ opacity:0; transform:translateY(12px);} to{ opacity:1; transform:translateY(0);} }
@@ -172,15 +188,33 @@
         .frame-card{ margin:-60px auto -60px; padding:1.25rem; }
         .wizard-shell{ padding:1.25rem 1.1rem; }
         .wizard-heading::before{ width:24px; }
-        .wizard-steps{ gap:.5rem; }
-        .wizard-step{ flex:1 1 calc(50% - .5rem); padding:.55rem .85rem; }
+        .wizard-steps{
+          overflow-x:auto;
+          gap:1.5rem;
+          padding:1rem 0 1.25rem;
+          margin:0 -.5rem;
+          scrollbar-width:thin;
+        }
+        .wizard-steps::-webkit-scrollbar{ height:6px; }
+        .wizard-steps::-webkit-scrollbar-thumb{ background:#c2cff6; border-radius:999px; }
+        .wizard-step{
+          min-width:160px;
+          align-items:flex-start;
+          text-align:left;
+          padding:0 .75rem;
+        }
+        .wizard-step::before,
+        .wizard-step::after{
+          top:18px;
+        }
       }
       @media (max-width: 576px){
-        .wizard-step{ flex:1 1 100%; justify-content:flex-start; }
-        .wizard-step .wizard-index{ width:32px; height:32px; }
-        .wizard-step .wizard-label{ font-size:.9rem; }
-        .wizard-progress{ margin-top:1rem; }
+        .wizard-step{ min-width:150px; }
+        .wizard-step .wizard-index{ width:34px; height:34px; }
+        .wizard-step .wizard-label{ font-size:.88rem; }
         .racial-declaration-box{ max-height:200px; }
+        .wizard-step::before,
+        .wizard-step::after{ top:17px; }
       }
     </style>
   </head>
@@ -856,22 +890,39 @@
         const cpfFormatted = cpfDigits ? fmtCPF(cpfDigits) : '';
         const racaSelect = $('#raca');
         const racaLabel = racaSelect && racaSelect.value ? String(racaSelect.selectedOptions[0]?.textContent || '').trim().toUpperCase() : '';
+        const generoSelect = $('#genero');
+        const generoUpper = generoSelect && generoSelect.value ? String(generoSelect.value).trim().toUpperCase() : '';
+        const autodeclaradoWord = generoUpper === 'FEMININO' ? 'AUTODECLARADA' : generoUpper === 'MASCULINO' ? 'AUTODECLARADO' : 'AUTODECLARANTE';
         const cidadeUpper = String($('#cidade')?.value || '').trim().toUpperCase();
-        const signature = [nomeUpper, cpfDigits, racaLabel, cidadeUpper].join('|');
+        const raceKey = racaLabel ? racaLabel.normalize('NFD').replace(/[\u0300-\u036f]/g,'') : '';
+        const raceGenderMap = {
+          FEMININO: { BRANCA:'BRANCA', PRETA:'PRETA', PARDA:'PARDA', AMARELA:'AMARELA', INDIGENA:'INDÍGENA' },
+          MASCULINO: { BRANCA:'BRANCO', PRETA:'PRETO', PARDA:'PARDO', AMARELA:'AMARELO', INDIGENA:'INDÍGENA' }
+        };
+        let raceDisplay = racaLabel;
+        if(raceKey){
+          const map = raceGenderMap[generoUpper] || null;
+          if(map && map[raceKey]){
+            raceDisplay = map[raceKey];
+          }else if(raceGenderMap.FEMININO[raceKey]){
+            raceDisplay = raceGenderMap.FEMININO[raceKey];
+          }
+        }
+        const signature = [nomeUpper, cpfDigits, raceDisplay, cidadeUpper, autodeclaradoWord].join('|');
         const nameSegment = nomeUpper ? `<strong>${esc(nomeUpper)}</strong>` : '____________________________';
         const cpfSegment = cpfFormatted ? `<strong>${esc(cpfFormatted.toUpperCase())}</strong>` : '________________';
-        const raceSegment = racaLabel ? `<strong>${esc(racaLabel)}</strong>` : '________________';
+        const raceSegment = raceDisplay ? `<strong>${esc(raceDisplay)}</strong>` : '________________';
+        const autodeclaradoSegment = autodeclaradoWord ? `<strong>${esc(autodeclaradoWord)}</strong>` : '________________';
         const citySegment = cidadeUpper ? `<strong>${esc(cidadeUpper)}</strong>` : '________________';
         const dateStr = declarationDateFormatter.format(new Date());
-        const raceLine = `• ${raceSegment}`;
+        const raceSentence = `sou ${autodeclaradoSegment} ${raceSegment}.`;
         const template = [
           'Para fins do disposto na Portaria do Ministério do Trabalho nº3784/2023, em cumprimento da Lei 14.553/02023.',
           'As informações relativas à etnia e raça devem ser obrigatoriamente prestadas nas inclusões, alterações ou retificações cadastrais dos trabalhadores, respeitando o critério de autodeclaração do trabalhador, em conformidade com a classificação utilizada pelo Instituto Brasileiro de Geografia e Estatística– IBGE.',
           '',
           `Eu, ${nameSegment},`,
           `portador do CPF nº ${cpfSegment}, AUTODECLARO, sob penas de lei que,`,
-          'sou:',
-          raceLine,
+          raceSentence,
           '',
           'Por ser expressão da verdade, firmo e assino a presente para que a mesma produza seus efeitos legais e de direito.',
           `Cidade e Data: ${citySegment}, <strong>${esc(dateStr)}</strong>`
