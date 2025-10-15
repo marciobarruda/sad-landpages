@@ -38,14 +38,17 @@
       .review-table td{ vertical-align: top; }
       .review-section{ background:#f8faff; border:1px solid #dbe7ff; border-radius:.85rem; padding:1.25rem; }
       .review-section + .review-section{ margin-top:1rem; }
-      .review-line{ display:flex; flex-direction:column; gap:.25rem; padding:.35rem 0; border-bottom:1px dashed rgba(13,110,253,.15); }
-      .review-line:last-child{ border-bottom:0; padding-bottom:0; }
-      .review-label{ font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6c757d; }
-      .review-value{ font-weight:600; color:#0b2447; word-break:break-word; }
-      .review-placeholder{ color:#adb5bd; font-weight:500; }
-      @media (min-width: 768px){
-        .review-line{ flex-direction:row; align-items:center; gap:1.5rem; }
-        .review-label{ min-width:200px; margin-bottom:0; }
+      .review-grid{ display:grid; grid-template-columns:repeat(1,minmax(0,1fr)); gap:1rem; }
+      .review-item{ background:#ffffff; border:1px solid rgba(13,110,253,.08); border-radius:.75rem; padding:.75rem .9rem; box-shadow:0 4px 12px rgba(13,110,253,.04); display:flex; flex-direction:column; gap:.35rem; min-height:84px; }
+      .review-label{ font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#6c757d; font-weight:600; }
+      .review-value{ font-weight:600; color:#0b2447; word-break:break-word; line-height:1.4; }
+      .review-placeholder{ color:#adb5bd; font-weight:600; letter-spacing:.04em; }
+      @media (min-width: 576px){
+        .review-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+      }
+      @media (min-width: 992px){
+        .review-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+        .review-item{ min-height:96px; padding:1rem 1.1rem; }
       }
       .frame-card{
         max-width: 1020px;
@@ -712,7 +715,7 @@
         ];
 
         const renderRow = ({label, value}) => `
-          <div class="review-line">
+          <div class="review-item">
             <div class="review-label">${esc(label)}</div>
             <div class="review-value">${value}</div>
           </div>
@@ -720,7 +723,9 @@
         const renderSection = (section) => `
           <section class="review-section">
             <h3 class="h6 mb-3">${esc(section.title)}</h3>
-            ${section.rows.map(renderRow).join('')}
+            <div class="review-grid">
+              ${section.rows.map(renderRow).join('')}
+            </div>
           </section>
         `;
 
