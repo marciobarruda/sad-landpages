@@ -270,35 +270,40 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-6">
+              <div class="col-md-3">
+                <label class="form-label required" for="cpf">CPF</label>
+                <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username }}" required>
+                <div class="help tiny" id="cpfHelp"></div>
+              </div>
+              <div class="col-md-5">
                 <label class="form-label required" for="nome">Nome completo</label>
                 <input type="text" id="nome" class="form-control" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" required>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="form-label required" for="nasc">Data de nascimento</label>
                 <input type="date" id="nasc" class="form-control" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" required>
               </div>
-              <div class="col-md-3">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-4">
                 <label class="form-label required" for="nacionalidade">Nacionalidade</label>
                 <input type="text" id="nacionalidade" class="form-control" required>
               </div>
-            </div>
-            <div class="row g-3 mt-0">
               <div class="col-md-5">
                 <label class="form-label required" for="naturalidade_cidade">Naturalidade</label>
-                <input type="text" id="naturalidade_cidade" class="form-control" placeholder="Cidade" required>
+                <input type="text" id="naturalidade_cidade" class="form-control" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="naturalidade_uf">UF</label>
-                <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" placeholder="PE" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label required" for="rg_numero">RG</label>
-                <input type="text" id="rg_numero" class="form-control" inputmode="numeric" maxlength="14" required>
+                <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
-              <div class="col-md-4">
+              <div class="col-md-3">
+                <label class="form-label required" for="rg_numero">RG</label>
+                <input type="text" id="rg_numero" class="form-control" inputmode="numeric" maxlength="14" required>
+              </div>
+              <div class="col-md-3">
                 <label class="form-label required" for="rg_orgao">Órgão</label>
                 <input type="text" id="rg_orgao" class="form-control" required>
               </div>
@@ -313,9 +318,8 @@
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4">
-                <label class="form-label required" for="cpf">CPF</label>
-                <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username }}" required>
-                <div class="help tiny" id="cpfHelp"></div>
+                <label class="form-label" for="pis_pasep">PIS/PASEP</label>
+                <input type="text" id="pis_pasep" class="form-control">
               </div>
             </div>
           </div>
@@ -447,7 +451,7 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label required" for="nivel">Nível</label>
                 <select id="nivel" class="form-select" required>
                   <option value="">Selecione...</option>
@@ -456,18 +460,19 @@
                   <option>Técnico</option>
                   <option>Superior</option>
                   <option>Pós-graduação</option>
+                  <option>Doutorado</option>
                 </select>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label required" for="ies">Instituição</label>
                 <input type="text" id="ies" class="form-control" required>
               </div>
-              <div class="col-md-4">
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-9">
                 <label class="form-label required" for="curso">Curso</label>
                 <input type="text" id="curso" class="form-control" required>
               </div>
-            </div>
-            <div class="row g-3 mt-0">
               <div class="col-md-3">
                 <label class="form-label required" for="ano_conclusao">Ano</label>
                 <input type="text" id="ano_conclusao" class="form-control" inputmode="numeric" maxlength="4" required>
@@ -490,17 +495,13 @@
                   <option>Não</option>
                 </select>
               </div>
-              <div class="col-md-4">
+            </div>
+            <div id="vinculoDetalhes" class="row g-3 mt-0 d-none">
+              <div class="col-md-6">
                 <label class="form-label" for="qual_vinculo">Qual vínculo</label>
                 <input type="text" id="qual_vinculo" class="form-control">
               </div>
-              <div class="col-md-4">
-                <label class="form-label" for="pis_pasep">PIS/PASEP</label>
-                <input type="text" id="pis_pasep" class="form-control">
-              </div>
-            </div>
-            <div class="row g-3 mt-0">
-              <div class="col-md-3">
+              <div class="col-md-6">
                 <label class="form-label" for="experiencia_tempo">Tempo (meses/anos)</label>
                 <input type="text" id="experiencia_tempo" class="form-control">
               </div>
@@ -568,13 +569,17 @@
                   <option>Não</option>
                 </select>
               </div>
-              <div class="col-md-4">
-                <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
-                <input type="text" id="tipo_pcd" class="form-control">
-              </div>
-              <div class="col-md-5">
-                <label class="form-label" for="necessidade">Necessidade especial (provas/etapas)</label>
-                <input type="text" id="necessidade" class="form-control">
+              <div id="pcdDetalhes" class="col-md-9 d-none">
+                <div class="row g-3">
+                  <div class="col-md-5">
+                    <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
+                    <input type="text" id="tipo_pcd" class="form-control">
+                  </div>
+                  <div class="col-md-7">
+                    <label class="form-label" for="necessidade">Necessidade especial (provas/etapas)</label>
+                    <input type="text" id="necessidade" class="form-control">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -670,7 +675,7 @@
 
             <hr>
 
-            <section class="mb-2">
+            <section id="pcdDocsSection" class="mb-2 d-none">
               <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
               <div class="row g-3">
                 <div class="col-md-8">
@@ -848,25 +853,27 @@
       };
       const fmtPhone = (value) => {
         const digits = onlyDigits(value).slice(0,11);
-        if(!digits) return '';
-        if(digits.length <= 2){
-          if(digits.length === 1) return `(${digits}`;
-          return `(${digits})`;
-        }
-        const ddd = digits.slice(0,2);
-        const base = digits.slice(2);
-        if(base.length <= 4) return `(${ddd}) ${base}`;
-        if(base.length === 8) return `(${ddd}) ${base.slice(0,4)}-${base.slice(4)}`;
-        if(base.length >= 9){
-          const first = base.slice(0,5);
-          const second = base.slice(5,9);
-          return `(${ddd}) ${first}${second ? '-' + second : ''}`;
-        }
-        return `(${ddd}) ${base}`;
+        return digits;
       };
       const isValidPhone = (value) => {
         const digits = onlyDigits(value);
         return /^(?:[1-9][0-9])(?:9[0-9]{8}|[2-9][0-9]{7})$/.test(digits);
+      };
+      const isAdult = (value) => {
+        if(!value) return false;
+        const parts = String(value).split('-');
+        if(parts.length !== 3) return false;
+        const [y,m,d] = parts.map(Number);
+        if(!y || !m || !d) return false;
+        const birth = new Date(y, m - 1, d);
+        if(Number.isNaN(birth.getTime())) return false;
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if(monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())){
+          age--;
+        }
+        return age >= 18;
       };
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
       const present = value => {
@@ -944,6 +951,7 @@
         const citySegment = cidadeUpper ? `<strong>${esc(cidadeUpper)}</strong>` : '________________';
         const dateStr = declarationDateFormatter.format(new Date());
         const raceSentence = `sou ${autodeclaradoSegment} ${raceSegment}.`;
+        const locationLine = [citySegment, `<strong>${esc(dateStr)}</strong>`].filter(Boolean).join(', ');
         const template = [
           'Para fins do disposto na Portaria do Ministério do Trabalho nº3784/2023, em cumprimento da Lei 14.553/02023.',
           'As informações relativas à etnia e raça devem ser obrigatoriamente prestadas nas inclusões, alterações ou retificações cadastrais dos trabalhadores, respeitando o critério de autodeclaração do trabalhador, em conformidade com a classificação utilizada pelo Instituto Brasileiro de Geografia e Estatística– IBGE.',
@@ -953,7 +961,7 @@
           raceSentence,
           '',
           'Por ser expressão da verdade, firmo e assino a presente para que a mesma produza seus efeitos legais e de direito.',
-          `Cidade e Data: ${citySegment}, <strong>${esc(dateStr)}</strong>`
+          locationLine
         ].join('\n');
         const hasChanged = signature !== lastRacialSignature;
         if(hasChanged){
@@ -1130,11 +1138,20 @@
       function baseFieldsOk(){
         const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','raca','cotasPNP','is_pcd','vinculo_publico'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
+        if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
         if(!isValidEmail($('#email').value)) return false;
         if(!isValidPhone($('#tel1').value)) return false;
         const tel2Val = $('#tel2')?.value || '';
         if(tel2Val && !isValidPhone(tel2Val)) return false;
+        if($('#vinculo_publico').value === 'Sim'){
+          if(!String($('#qual_vinculo').value||'').trim()) return false;
+          if(!String($('#experiencia_tempo').value||'').trim()) return false;
+        }
+        if($('#is_pcd').value === 'Sim'){
+          if(!String($('#tipo_pcd').value||'').trim()) return false;
+          if(!String($('#necessidade').value||'').trim()) return false;
+        }
         return true;
       }
       function docsRequiredOk(){
@@ -1146,7 +1163,7 @@
           if(!hv.ok || !hf.ok) return false;
         }
         if($('#is_pcd').value==='Sim'){
-          const lp = checkFiles($('#pcd_laudo'), {});
+          const lp = checkFiles($('#pcd_laudo'), {required:true});
           if(!lp.ok) return false;
         }
         return true;
@@ -1246,8 +1263,7 @@
         const help = helpId ? $(helpId) : null;
         const apply = (value)=>{
           const digits = onlyDigits(value).slice(0,11);
-          const formatted = digits ? fmtPhone(digits) : '';
-          input.value = formatted;
+          input.value = digits;
           const hasDigits = digits.length > 0;
           const valid = hasDigits ? isValidPhone(digits) : !required;
           input.setCustomValidity(valid ? '' : (hasDigits ? 'Informe um telefone válido com DDD.' : ''));
@@ -1289,6 +1305,7 @@
       bindNumeric('#rg_numero',14);
       bindNumeric('#cep',8);
       bindNumeric('#ano_conclusao',4);
+      bindNumeric('#pis_pasep',11);
       bindNumeric('#titulo',12);
       bindNumeric('#zona',4);
       bindNumeric('#secao',4);
@@ -1298,6 +1315,61 @@
       bindUppercase('#rg_uf');
       bindUppercase('#naturalidade_uf');
       bindUppercase('#uf');
+
+      function toggleVinculoDetails(){
+        const wrap = $('#vinculoDetalhes');
+        const show = $('#vinculo_publico')?.value === 'Sim';
+        wrap?.classList.toggle('d-none', !show);
+        ['#qual_vinculo','#experiencia_tempo'].forEach(sel=>{
+          const field=$(sel);
+          if(!field) return;
+          field.required = show;
+          if(!show){ field.value=''; }
+        });
+        updateReview();
+        refreshSubmitState();
+      }
+      $('#vinculo_publico')?.addEventListener('change', toggleVinculoDetails);
+
+      function togglePcdDetails(){
+        const isSim = $('#is_pcd')?.value === 'Sim';
+        const wrap = $('#pcdDetalhes');
+        const docs = $('#pcdDocsSection');
+        wrap?.classList.toggle('d-none', !isSim);
+        docs?.classList.toggle('d-none', !isSim);
+        ['#tipo_pcd','#necessidade'].forEach(sel=>{
+          const field=$(sel);
+          if(!field) return;
+          field.required = isSim;
+          if(!isSim){ field.value=''; }
+        });
+        const laudo=$('#pcd_laudo');
+        if(laudo){
+          laudo.required = isSim;
+        }
+        const status=$('#status_pcd_laudo');
+        if(!isSim){
+          if(laudo){ laudo.value=''; }
+          if(status){ status.textContent=''; status.className='uploader-status ms-auto'; }
+        }else if(status && laudo){
+          const result = checkFiles(laudo, {required:true});
+          if(result.ok) ok(status, result.msg); else bad(status, result.msg);
+        }
+        updateReview();
+        refreshSubmitState();
+      }
+      $('#is_pcd')?.addEventListener('change', togglePcdDetails);
+
+      const nascInput = $('#nasc');
+      nascInput?.addEventListener('change', e=>{
+        const value = e.target.value;
+        if(value && !isAdult(value)){
+          alert('A inscrição é permitida apenas para maiores de 18 anos.');
+          e.target.value='';
+          e.target.focus();
+        }
+        refreshSubmitState();
+      });
 
       $('#email').addEventListener('input', e=>{
         e.target.value = (e.target.value||'').toLowerCase();
@@ -1321,7 +1393,8 @@
         const input=document.getElementById(inputId);
         const stat=document.getElementById(statusId);
         const handler=()=>{
-          const res=checkFiles(input, opts||{});
+          const cfg = typeof opts === 'function' ? opts() : (opts||{});
+          const res=checkFiles(input, cfg);
           if(res.ok) ok(stat, res.msg); else bad(stat, res.msg);
           refreshSubmitState();
         };
@@ -1336,7 +1409,7 @@
       bindChecker('het_id','status_het_id',{});
       const hetVideo=$('#het_video'); const statusHetVideo=document.createElement('div'); hetVideo?.parentElement?.appendChild(statusHetVideo);
       hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
-      bindChecker('pcd_laudo','status_pcd_laudo',{});
+      bindChecker('pcd_laudo','status_pcd_laudo',()=>({required: $('#is_pcd')?.value === 'Sim'}));
       // ========= Draft (localStorage) =========
       const DRAFT_KEY='hvr_inscricao_draft_v1';
       const watchedSelectors = [
@@ -1475,6 +1548,8 @@
       }
       function init(){
         loadDraft();
+        toggleVinculoDetails();
+        togglePcdDetails();
         bindWizard();
         resetDeclaration(responsibilityBox, responsibilityCheckbox, responsibilityHint);
         attachWatchers();
