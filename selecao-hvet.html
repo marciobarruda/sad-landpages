@@ -907,7 +907,7 @@
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
       const isGeneroMasculino = () => String($('#genero')?.value || '').trim().toUpperCase() === 'MASCULINO';
       const pickDataValue = (source, keys=[]) => {
-        if(!source) return '';
+        if(!source || typeof source !== 'object') return '';
         for(const key of keys){
           if(key in source){
             const val = source[key];
@@ -1530,29 +1530,42 @@
       hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
       bindChecker('pcd_laudo','status_pcd_laudo',()=>({required: $('#is_pcd')?.value === 'Sim'}));
 
-      function populateDocIdFields(data){
-        if(!data) return;
-        const nome = pickDataValue(data,['nome','nome_completo','name','fullName']);
+      function populateDocIdFields(payload){
+        const entry = Array.isArray(payload)
+          ? payload.find(item => item && typeof item === 'object')
+          : (payload && typeof payload === 'object' ? payload : null);
+        if(!entry) return;
+        const nome = pickDataValue(entry,['nome','nome_completo','name','fullName']);
         if(nome) applyIfEmpty('#nome', nome);
-        const cpfValue = pickDataValue(data,['cpf','CPF','cpfNumero']);
+        const cpfValue = pickDataValue(entry,['cpf','CPF','cpfNumero']);
         if(cpfValue) applyIfEmpty('#cpf', onlyDigits(cpfValue).slice(0,11));
-        const nascIso = parseToIsoDate(pickDataValue(data,['data_nascimento','dataNascimento','nascimento','birthDate']));
+        const docNumberRaw = pickDataValue(entry,['num_doc']);
+        if(docNumberRaw){
+          const docDigits = onlyDigits(docNumberRaw);
+          if(docDigits.length === 11){
+            applyIfEmpty('#cpf', docDigits.slice(0,11));
+          }
+          if(docDigits){
+            applyIfEmpty('#rg_numero', docDigits.slice(0,14));
+          }
+        }
+        const nascIso = parseToIsoDate(pickDataValue(entry,['data_nascimento','dataNascimento','nascimento','birthDate']));
         if(nascIso) applyIfEmpty('#nasc', nascIso);
-        const nacionalidade = pickDataValue(data,['nacionalidade']);
+        const nacionalidade = pickDataValue(entry,['nacionalidade']);
         if(nacionalidade) applyIfEmpty('#nacionalidade', nacionalidade, v => String(v).toUpperCase());
-        const naturalidadeCidade = pickDataValue(data,['naturalidade','naturalidade_cidade','cidade_naturalidade']);
+        const naturalidadeCidade = pickDataValue(entry,['naturalidade','naturalidade_cidade','cidade_naturalidade']);
         if(naturalidadeCidade) applyIfEmpty('#naturalidade_cidade', naturalidadeCidade, v => String(v).toUpperCase());
-        const naturalidadeUf = pickDataValue(data,['naturalidade_uf','uf_naturalidade','naturalidadeUf']);
+        const naturalidadeUf = pickDataValue(entry,['naturalidade_uf','uf_naturalidade','naturalidadeUf']);
         if(naturalidadeUf) applyIfEmpty('#naturalidade_uf', naturalidadeUf, v => String(v).toUpperCase());
-        const rgNumero = pickDataValue(data,['rg','rg_numero','numero_rg']);
+        const rgNumero = pickDataValue(entry,['rg','rg_numero','numero_rg']);
         if(rgNumero) applyIfEmpty('#rg_numero', onlyDigits(rgNumero).slice(0,14));
-        const rgOrgao = pickDataValue(data,['rg_orgao','orgao_emissor','orgaoExpedidor']);
+        const rgOrgao = pickDataValue(entry,['rg_orgao','orgao_emissor','orgaoExpedidor','orgao']);
         if(rgOrgao) applyIfEmpty('#rg_orgao', rgOrgao, v => String(v).toUpperCase());
-        const rgUf = pickDataValue(data,['rg_uf','uf_rg']);
+        const rgUf = pickDataValue(entry,['rg_uf','uf_rg','uf_doc']);
         if(rgUf) applyIfEmpty('#rg_uf', rgUf, v => String(v).toUpperCase());
-        const rgData = parseToIsoDate(pickDataValue(data,['rg_expedicao','data_expedicao','rg_data']));
+        const rgData = parseToIsoDate(pickDataValue(entry,['rg_expedicao','data_expedicao','rg_data','exp_doc']));
         if(rgData) applyIfEmpty('#rg_data', rgData);
-        const pisValue = pickDataValue(data,['pis','pis_pasep']);
+        const pisValue = pickDataValue(entry,['pis','pis_pasep']);
         if(pisValue) applyIfEmpty('#pis_pasep', onlyDigits(pisValue).slice(0,11));
         updateReview();
         refreshSubmitState();
