@@ -226,7 +226,7 @@
     <main class="container my-4 frame-card" id="app">
       <div class="text-center mb-4">
         <h1 class="h4 mb-1">Seleção Simplificada — Hospital Veterinário do Recife</h1>
-        <p class="text-muted subtle">Inscrição on-line • Usuário já autenticado</p>
+        <p class="text-muted subtle">Inscrição on-line</p>
       </div>
 
       <div class="wizard-shell">
@@ -235,23 +235,23 @@
         <ol class="wizard-steps" role="tablist">
           <li class="wizard-step active" data-step="0" role="tab" aria-selected="true" tabindex="0">
             <span class="wizard-index">1</span>
-            <span class="wizard-label">Identificação</span>
+            <span class="wizard-label">Documentos</span>
           </li>
           <li class="wizard-step" data-step="1" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">2</span>
-            <span class="wizard-label">Contato &amp; Endereço</span>
+            <span class="wizard-label">Identificação</span>
           </li>
           <li class="wizard-step" data-step="2" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">3</span>
-            <span class="wizard-label">Formação &amp; Vínculos</span>
+            <span class="wizard-label">Contato &amp; Endereço</span>
           </li>
           <li class="wizard-step" data-step="3" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">4</span>
-            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
+            <span class="wizard-label">Formação &amp; Vínculos</span>
           </li>
           <li class="wizard-step" data-step="4" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">5</span>
-            <span class="wizard-label">Documentos</span>
+            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
           </li>
           <li class="wizard-step" data-step="5" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">6</span>
@@ -263,7 +263,116 @@
         </div>
       </div>
 
-      <section class="step-panel active" data-step-panel="0" aria-label="Etapa 1 - Identificação">
+      <section class="step-panel active" data-step-panel="0" aria-label="Etapa 1 - Documentos">
+        <div class="card card-form mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Documentos</h2>
+            <span class="badge badge-soft">2 MB por doc/foto • 30 MB vídeo</span>
+          </div>
+          <div class="card-body">
+            <ul class="tiny mb-3">
+              <li>Documentos/fotos: PDF, JPG, JPEG, PNG (até 2 MB cada).</li>
+              <li>Vídeo (heteroidentificação): MP4, MOV (até 30 MB).</li>
+            </ul>
+
+            <section class="mb-4">
+              <h3 class="h6 section-title mb-2">1) Cadastro</h3>
+              <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                  <label class="form-label required">Documento de identificação oficial com foto (frente)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_frente" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_id_frente" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Documento de identificação oficial com foto (verso)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_verso" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_id_verso" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Comprovante de residência</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_res" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Quitação eleitoral</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_quitacao_eleitoral" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_eleitoral" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8 d-none" id="docMilitarWrap">
+                  <label class="form-label">Quitação do serviço militar (masculino)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
+                  <div class="help tiny">CAM / CDI / CI / CRM.</div>
+                </div>
+                <div class="col-md-4 d-none" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Comprovação da escolaridade</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_escolaridade" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label">Experiência / títulos / certificados</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_curriculo" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_curriculo" class="uploader-status ms-auto"></div></div>
+              </div>
+            </section>
+
+            <hr>
+
+            <section class="mb-4">
+              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PNP)</h3>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Documento de identidade (frente/verso)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_het_id" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Foto de frente</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_frente" accept="image/*"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Foto de perfil</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_perfil" accept="image/*"></div>
+                </div>
+
+                <div class="col-md-12">
+                  <label class="form-label">Vídeo (até 20s)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
+                  <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
+                </div>
+              </div>
+            </section>
+
+            <hr>
+
+            <section id="pcdDocsSection" class="mb-2 d-none">
+              <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Laudo médico</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="wizard-controls">
+          <span class="spacer"></span>
+          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
+        </div>
+      </section>
+
+      <section class="step-panel" data-step-panel="1" aria-label="Etapa 2 - Identificação">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Identificação civil</h2>
@@ -272,14 +381,14 @@
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label required" for="cpf">CPF</label>
-                <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username }}" required>
+                <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username ?? '' }}" required>
                 <div class="help tiny" id="cpfHelp"></div>
               </div>
-              <div class="col-md-5">
+              <div class="col-md-6">
                 <label class="form-label required" for="nome">Nome completo</label>
                 <input type="text" id="nome" class="form-control" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" required>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <label class="form-label required" for="nasc">Data de nascimento</label>
                 <input type="date" id="nasc" class="form-control" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" required>
               </div>
@@ -296,6 +405,17 @@
               <div class="col-md-3">
                 <label class="form-label required" for="naturalidade_uf">UF</label>
                 <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" required>
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-4">
+                <label class="form-label required" for="genero">Gênero</label>
+                <select id="genero" class="form-select" required>
+                  <option value="">Selecione...</option>
+                  <option>Feminino</option>
+                  <option>Masculino</option>
+                  <option>Outro</option>
+                </select>
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -331,8 +451,8 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label required">Obrigações militares em dia? (masculino)</label><br>
+              <div class="col-md-4 d-none" id="militarPergunta">
+                <label class="form-label">Obrigações militares em dia? (masculino)</label><br>
                 <div class="d-flex gap-3">
                   <div class="form-check"><input class="form-check-input" type="radio" name="militar" id="militar_sim" value="SIM"><label class="form-check-label" for="militar_sim">Sim</label></div>
                   <div class="form-check"><input class="form-check-input" type="radio" name="militar" id="militar_nao" value="NAO"><label class="form-check-label" for="militar_nao">Não</label></div>
@@ -364,12 +484,12 @@
         </div>
 
         <div class="wizard-controls">
-          <span class="spacer"></span>
+          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
           <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="1" aria-label="Etapa 2 - Contato e endereço">
+      <section class="step-panel" data-step-panel="2" aria-label="Etapa 3 - Contato e endereço">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Contato</h2>
@@ -378,7 +498,7 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="email">E-mail</label>
-                <input type="email" id="email" class="form-control" value="{{ $json.email }}" required>
+                <input type="email" id="email" class="form-control" value="{{ $json.email ?? '' }}" required>
                 <div class="help tiny" id="emailHelp"></div>
               </div>
               <div class="col-md-3">
@@ -404,35 +524,35 @@
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label required" for="cep">CEP</label>
-                <input type="text" id="cep" class="form-control" placeholder="00000-000" inputmode="numeric" maxlength="8" value="{{ $json.postal_code }}" required>
+                <input type="text" id="cep" class="form-control" placeholder="00000-000" inputmode="numeric" maxlength="8" value="{{ $json.postal_code ?? '' }}" required>
               </div>
               <div class="col-md-6">
                 <label class="form-label required" for="logradouro">Logradouro</label>
-                <input type="text" id="logradouro" class="form-control" value="{{ $json.addressStreet }}" required>
+                <input type="text" id="logradouro" class="form-control" value="{{ $json.addressStreet ?? '' }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="numero">Número</label>
-                <input type="text" id="numero" class="form-control" value="{{ $json.addressNumber }}" required>
+                <input type="text" id="numero" class="form-control" value="{{ $json.addressNumber ?? '' }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4">
                 <label class="form-label" for="complemento">Complemento</label>
-                <input type="text" id="complemento" class="form-control" value="{{ $json.addressComplement }}">
+                <input type="text" id="complemento" class="form-control" value="{{ $json.addressComplement ?? '' }}">
               </div>
               <div class="col-md-4">
                 <label class="form-label required" for="bairro">Bairro</label>
-                <input type="text" id="bairro" class="form-control" value="{{ $json.neighborhood }}" required>
+                <input type="text" id="bairro" class="form-control" value="{{ $json.neighborhood ?? '' }}" required>
               </div>
               <div class="col-md-4">
                 <label class="form-label required" for="cidade">Cidade</label>
-                <input type="text" id="cidade" class="form-control" value="{{ $json.locality }}" required>
+                <input type="text" id="cidade" class="form-control" value="{{ $json.locality ?? '' }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-3">
                 <label class="form-label required" for="uf">UF</label>
-                <input type="text" id="uf" class="form-control" maxlength="2" value="PE" required>
+                <input type="text" id="uf" class="form-control" maxlength="2" value="{{ $json.state ?? '' }}" required>
               </div>
             </div>
           </div>
@@ -444,7 +564,7 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="2" aria-label="Etapa 3 - Formação e vínculos">
+      <section class="step-panel" data-step-panel="3" aria-label="Etapa 4 - Formação e vínculos">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Escolaridade e formação</h2>
@@ -515,23 +635,14 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="3" aria-label="Etapa 4 - Cotas e acessibilidade">
+      <section class="step-panel" data-step-panel="4" aria-label="Etapa 5 - Cotas e acessibilidade">
         <div class="card card-form mb-4">
           <div class="card-header">
-            <h2 class="h5 mb-0">Informações de raça e gênero</h2>
+            <h2 class="h5 mb-0">Informações de raça e cotas</h2>
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-3">
-                <label class="form-label required" for="genero">Gênero</label>
-                <select id="genero" class="form-select" required>
-                  <option value="">Selecione...</option>
-                  <option>Feminino</option>
-                  <option>Masculino</option>
-                  <option>Outro</option>
-                </select>
-              </div>
-              <div class="col-md-5">
+              <div class="col-md-6">
                 <label class="form-label required" for="raca">Cor/Raça (IBGE)</label>
                 <select id="raca" class="form-select" required>
                   <option value="">Selecione...</option>
@@ -542,7 +653,7 @@
                   <option>Indígena</option>
                 </select>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label required" for="cotasPNP">Concorrer às vagas PNP?</label>
                 <select id="cotasPNP" class="form-select" required>
                   <option value="">Selecione...</option>
@@ -582,109 +693,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="wizard-controls">
-          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
-          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
-        </div>
-      </section>
-
-      <section class="step-panel" data-step-panel="4" aria-label="Etapa 5 - Documentos">
-        <div class="card card-form mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0">Documentos</h2>
-            <span class="badge badge-soft">2 MB por doc/foto • 30 MB vídeo</span>
-          </div>
-          <div class="card-body">
-            <ul class="tiny mb-3">
-              <li>Documentos/fotos: PDF, JPG, JPEG, PNG (até 2 MB cada).</li>
-              <li>Vídeo (heteroidentificação): MP4, MOV (até 30 MB).</li>
-            </ul>
-
-            <section class="mb-4">
-              <h3 class="h6 section-title mb-2">1) Cadastro</h3>
-              <div class="row g-3 align-items-end">
-                <div class="col-md-8">
-                  <label class="form-label required">Documento de identificação (RG frente/verso) e CPF</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_id" accept=".pdf,image/*" multiple required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_id" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Comprovante de residência</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_res" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Quitação eleitoral</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_quitacao_eleitoral" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_eleitoral" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label">Quitação do serviço militar (masculino)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
-                  <div class="help tiny">CAM / CDI / CI / CRM.</div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Comprovação da escolaridade</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_escolaridade" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label">Experiência / títulos / certificados</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_curriculo" accept=".pdf,image/*" multiple></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_curriculo" class="uploader-status ms-auto"></div></div>
-              </div>
-            </section>
-
-            <hr>
-
-            <section class="mb-4">
-              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PNP)</h3>
-              <div class="row g-3">
-                <div class="col-md-8">
-                  <label class="form-label">Documento de identidade (frente/verso)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_het_id" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Foto de frente</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_frente" accept="image/*"></div>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Foto de perfil</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_perfil" accept="image/*"></div>
-                </div>
-
-                <div class="col-md-12">
-                  <label class="form-label">Vídeo (até 20s)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
-                  <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
-                </div>
-              </div>
-            </section>
-
-            <hr>
-
-            <section id="pcdDocsSection" class="mb-2 d-none">
-              <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
-              <div class="row g-3">
-                <div class="col-md-8">
-                  <label class="form-label">Laudo médico</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
-              </div>
-            </section>
           </div>
         </div>
 
@@ -752,6 +760,10 @@
     <script>
       // ========= Config =========
       const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/inscricao-hvr";
+      const DOC_ID_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/doc-id";
+      const QUITACAO_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/quitacao-eleitoral";
+      const RESIDENCIA_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-residencia";
+      const ESCOLARIDADE_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-escolaridade";
       const DOC_OK_EXT = ['pdf','jpg','jpeg','png'];
       const DOC_MAX_MB = 2;
       const VID_OK_EXT = ['mp4','mov'];
@@ -844,11 +856,28 @@
       }
 
       // ========= Review =========
-      const reviewPlaceholder = '<span class="review-placeholder">—</span>';
+      const reviewPlaceholder = '';
       const fmtDateBr = iso => {
         if(!iso) return '';
         const [y,m,d] = String(iso).split('-');
         if(y && m && d) return `${d}/${m}/${y}`;
+        return '';
+      };
+      const parseToIsoDate = (value) => {
+        if(!value) return '';
+        const str = String(value).trim();
+        if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+        if(/^\d{2}\/\d{2}\/\d{4}$/.test(str)){
+          const [d,m,y] = str.split('/');
+          return `${y}-${m}-${d}`;
+        }
+        const dt = new Date(str);
+        if(!Number.isNaN(dt.getTime())){
+          const y = dt.getFullYear();
+          const m = String(dt.getMonth()+1).padStart(2,'0');
+          const d = String(dt.getDate()).padStart(2,'0');
+          return `${y}-${m}-${d}`;
+        }
         return '';
       };
       const fmtPhone = (value) => {
@@ -876,6 +905,39 @@
         return age >= 18;
       };
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
+      const isGeneroMasculino = () => String($('#genero')?.value || '').trim().toUpperCase() === 'MASCULINO';
+      const pickDataValue = (source, keys=[]) => {
+        if(!source) return '';
+        for(const key of keys){
+          if(key in source){
+            const val = source[key];
+            if(val !== undefined && val !== null){
+              const str = String(val).trim();
+              if(str) return str;
+            }
+          }
+        }
+        return '';
+      };
+      const applyIfEmpty = (selector, value, transform) => {
+        const el = $(selector);
+        if(!el) return;
+        const current = String(el.value || '').trim();
+        if(current) return;
+        if(value === undefined || value === null) return;
+        const transformed = transform ? transform(value) : value;
+        const finalValue = transformed === undefined || transformed === null ? '' : String(transformed);
+        if(!finalValue.trim()) return;
+        el.value = finalValue;
+        ['input','change'].forEach(evt => el.dispatchEvent(new Event(evt,{bubbles:true})));
+      };
+      const resetUploaderStatus = (id) => {
+        const el = document.getElementById(id);
+        if(el){
+          el.textContent = '';
+          el.className = 'uploader-status ms-auto';
+        }
+      };
       const present = value => {
         if(value === undefined || value === null) return reviewPlaceholder;
         const str = String(value).trim();
@@ -1155,8 +1217,12 @@
         return true;
       }
       function docsRequiredOk(){
-        const req = ['doc_id','doc_residencia','doc_quitacao_eleitoral','doc_escolaridade'];
+        const req = ['doc_id_frente','doc_id_verso','doc_residencia','doc_quitacao_eleitoral','doc_escolaridade'];
         for(const id of req){ const el=document.getElementById(id); const ok=checkFiles(el,{required:true}).ok; if(!ok) return false; }
+        if(isGeneroMasculino()){
+          const militarOk = checkFiles(document.getElementById('doc_militar'), {required:true}).ok;
+          if(!militarOk) return false;
+        }
         if($('#cotasPNP').value==='Sim'){
           const hv = checkFiles($('#het_video'), {video:true});
           const hf = checkFiles($('#het_frente'), {});
@@ -1225,7 +1291,7 @@
         wizardSteps.forEach((step,i)=>{
           const activate = ()=>{
             if(i === currentStepIndex) return;
-            if(i <= currentStepIndex + 1) goToStep(i);
+            goToStep(i);
           };
           step.addEventListener('click', activate);
           step.addEventListener('keydown', evt=>{
@@ -1316,6 +1382,42 @@
       bindUppercase('#naturalidade_uf');
       bindUppercase('#uf');
 
+      function toggleGeneroDependents(){
+        const isMasc = isGeneroMasculino();
+        document.querySelectorAll('input[name="militar"]').forEach(radio=>{
+          radio.required = isMasc;
+          if(!isMasc) radio.checked = false;
+        });
+        const militarWrap = $('#militarPergunta');
+        if(militarWrap){
+          militarWrap.classList.toggle('d-none', !isMasc);
+        }
+        const docWrap = $('#docMilitarWrap');
+        if(docWrap){
+          docWrap.classList.toggle('d-none', !isMasc);
+        }
+        const statusWrap = $('#status_doc_militar_wrap');
+        if(statusWrap){
+          statusWrap.classList.toggle('d-none', !isMasc);
+        }
+        const docInput = $('#doc_militar');
+        if(docInput){
+          docInput.required = isMasc;
+          if(!isMasc){
+            docInput.value='';
+            resetUploaderStatus('status_doc_militar');
+          }else{
+            const status = document.getElementById('status_doc_militar');
+            if(status && docInput.files?.length){
+              const res = checkFiles(docInput,{required:false});
+              if(res.ok) ok(status,res.msg); else bad(status,res.msg);
+            }
+          }
+        }
+        refreshSubmitState();
+      }
+      $('#genero')?.addEventListener('change', toggleGeneroDependents);
+
       function toggleVinculoDetails(){
         const wrap = $('#vinculoDetalhes');
         const show = $('#vinculo_publico')?.value === 'Sim';
@@ -1400,16 +1502,192 @@
         };
         input?.addEventListener('change', handler);
       }
-      bindChecker('doc_id','status_doc_id',{required:true, minFiles:1});
+      bindChecker('doc_id_frente','status_doc_id_frente',{required:true});
+      bindChecker('doc_id_verso','status_doc_id_verso',{required:true});
       bindChecker('doc_residencia','status_doc_res',{required:true});
       bindChecker('doc_quitacao_eleitoral','status_doc_eleitoral',{required:true});
-      bindChecker('doc_militar','status_doc_militar',{});
+      bindChecker('doc_militar','status_doc_militar',()=>({required: isGeneroMasculino()}));
       bindChecker('doc_escolaridade','status_doc_escolaridade',{required:true});
       bindChecker('doc_curriculo','status_doc_curriculo',{});
       bindChecker('het_id','status_het_id',{});
       const hetVideo=$('#het_video'); const statusHetVideo=document.createElement('div'); hetVideo?.parentElement?.appendChild(statusHetVideo);
       hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
       bindChecker('pcd_laudo','status_pcd_laudo',()=>({required: $('#is_pcd')?.value === 'Sim'}));
+
+      function populateDocIdFields(data){
+        if(!data) return;
+        const nome = pickDataValue(data,['nome','nome_completo','name','fullName']);
+        if(nome) applyIfEmpty('#nome', nome);
+        const cpfValue = pickDataValue(data,['cpf','CPF','cpfNumero']);
+        if(cpfValue) applyIfEmpty('#cpf', onlyDigits(cpfValue).slice(0,11));
+        const nascIso = parseToIsoDate(pickDataValue(data,['data_nascimento','dataNascimento','nascimento','birthDate']));
+        if(nascIso) applyIfEmpty('#nasc', nascIso);
+        const nacionalidade = pickDataValue(data,['nacionalidade']);
+        if(nacionalidade) applyIfEmpty('#nacionalidade', nacionalidade, v => String(v).toUpperCase());
+        const naturalidadeCidade = pickDataValue(data,['naturalidade','naturalidade_cidade','cidade_naturalidade']);
+        if(naturalidadeCidade) applyIfEmpty('#naturalidade_cidade', naturalidadeCidade, v => String(v).toUpperCase());
+        const naturalidadeUf = pickDataValue(data,['naturalidade_uf','uf_naturalidade','naturalidadeUf']);
+        if(naturalidadeUf) applyIfEmpty('#naturalidade_uf', naturalidadeUf, v => String(v).toUpperCase());
+        const rgNumero = pickDataValue(data,['rg','rg_numero','numero_rg']);
+        if(rgNumero) applyIfEmpty('#rg_numero', onlyDigits(rgNumero).slice(0,14));
+        const rgOrgao = pickDataValue(data,['rg_orgao','orgao_emissor','orgaoExpedidor']);
+        if(rgOrgao) applyIfEmpty('#rg_orgao', rgOrgao, v => String(v).toUpperCase());
+        const rgUf = pickDataValue(data,['rg_uf','uf_rg']);
+        if(rgUf) applyIfEmpty('#rg_uf', rgUf, v => String(v).toUpperCase());
+        const rgData = parseToIsoDate(pickDataValue(data,['rg_expedicao','data_expedicao','rg_data']));
+        if(rgData) applyIfEmpty('#rg_data', rgData);
+        const pisValue = pickDataValue(data,['pis','pis_pasep']);
+        if(pisValue) applyIfEmpty('#pis_pasep', onlyDigits(pisValue).slice(0,11));
+        updateReview();
+        refreshSubmitState();
+      }
+
+      function populateQuitacaoFields(data){
+        if(!data) return;
+        const titulo = pickDataValue(data,['titulo','titulo_eleitoral','tituloEleitoral']);
+        if(titulo) applyIfEmpty('#titulo', onlyDigits(titulo).slice(0,12));
+        const zona = pickDataValue(data,['zona','zona_eleitoral']);
+        if(zona) applyIfEmpty('#zona', onlyDigits(zona).slice(0,4));
+        const secao = pickDataValue(data,['secao','seção','secao_eleitoral']);
+        if(secao) applyIfEmpty('#secao', onlyDigits(secao).slice(0,4));
+        updateReview();
+        refreshSubmitState();
+      }
+
+      function populateResidenciaFields(data){
+        if(!data) return;
+        const cep = pickDataValue(data,['cep','codigo_postal','postalCode']);
+        if(cep) applyIfEmpty('#cep', onlyDigits(cep).slice(0,8));
+        const logradouro = pickDataValue(data,['logradouro','address','rua','street']);
+        if(logradouro) applyIfEmpty('#logradouro', logradouro, v => String(v).toUpperCase());
+        const numero = pickDataValue(data,['numero','numero_imovel','numeroEndereco']);
+        if(numero) applyIfEmpty('#numero', numero, v => String(v).toUpperCase());
+        const complemento = pickDataValue(data,['complemento','complement']);
+        if(complemento) applyIfEmpty('#complemento', complemento, v => String(v).toUpperCase());
+        const bairro = pickDataValue(data,['bairro','district','bairroEndereco']);
+        if(bairro) applyIfEmpty('#bairro', bairro, v => String(v).toUpperCase());
+        const cidade = pickDataValue(data,['cidade','localidade','municipio','city']);
+        if(cidade) applyIfEmpty('#cidade', cidade, v => String(v).toUpperCase());
+        const uf = pickDataValue(data,['uf','estado','state']);
+        if(uf) applyIfEmpty('#uf', uf, v => String(v).toUpperCase());
+        updateReview();
+        refreshSubmitState();
+        if(cep) autofillAddressByCep();
+      }
+
+      function populateEscolaridadeFields(data){
+        if(!data) return;
+        const nivel = pickDataValue(data,['nivel','nivel_escolaridade','escolaridade']);
+        if(nivel) applyIfEmpty('#nivel', nivel);
+        const instituicao = pickDataValue(data,['instituicao','instituicao_ensino','ies','instituicaoEnsino']);
+        if(instituicao) applyIfEmpty('#ies', instituicao);
+        const curso = pickDataValue(data,['curso','curso_nome','cursoNome']);
+        if(curso) applyIfEmpty('#curso', curso);
+        const ano = pickDataValue(data,['ano','ano_conclusao','anoConclusao']);
+        if(ano) applyIfEmpty('#ano_conclusao', onlyDigits(ano).slice(0,4));
+        updateReview();
+        refreshSubmitState();
+      }
+
+      async function uploadDocIdBundle(){
+        const frente = document.getElementById('doc_id_frente');
+        const verso = document.getElementById('doc_id_verso');
+        const statusVerso = document.getElementById('status_doc_id_verso');
+        if(!frente || !verso || !statusVerso) return;
+        const frontStatus = document.getElementById('status_doc_id_frente');
+        if(!verso.files || verso.files.length === 0){
+          resetUploaderStatus('status_doc_id_verso');
+          refreshSubmitState();
+          return;
+        }
+        if(!frente.files || frente.files.length === 0){
+          if(frontStatus) bad(frontStatus,'Selecione a frente');
+          refreshSubmitState();
+          return;
+        }
+        const frontCheck = checkFiles(frente,{required:true});
+        if(!frontCheck.ok){
+          if(frontStatus) bad(frontStatus, frontCheck.msg);
+          refreshSubmitState();
+          return;
+        }
+        const backCheck = checkFiles(verso,{required:true});
+        if(!backCheck.ok){
+          bad(statusVerso, backCheck.msg);
+          refreshSubmitState();
+          return;
+        }
+        const frontFile = frente.files[0];
+        const backFile = verso.files[0];
+        if(!frontFile || !backFile) return;
+        const fd = new FormData();
+        fd.append('doc_frente', frontFile, frontFile.name);
+        fd.append('doc_verso', backFile, backFile.name);
+        setStatus(statusVerso,'info','Enviando...',true);
+        try{
+          const out = await postForm(DOC_ID_ENDPOINT, fd);
+          if(out.ok){
+            ok(statusVerso,'Enviado');
+            if(frontStatus) ok(frontStatus,'Enviado');
+            populateDocIdFields(out.data || {});
+          }else{
+            bad(statusVerso, `Erro ${out.status}`);
+            if(frontStatus) bad(frontStatus, `Erro ${out.status}`);
+          }
+        }catch(e){
+          console.error('doc-id upload fail', e);
+          bad(statusVerso,'Falha no envio');
+          if(frontStatus) bad(frontStatus,'Falha no envio');
+        }
+        refreshSubmitState();
+      }
+
+      async function uploadSingleDocument(inputId, statusId, endpoint, fileKey, onData){
+        const input=document.getElementById(inputId);
+        const status=document.getElementById(statusId);
+        if(!input || !status) return;
+        if(!input.files || input.files.length === 0){
+          resetUploaderStatus(statusId);
+          refreshSubmitState();
+          return;
+        }
+        const res=checkFiles(input,{required:true});
+        if(!res.ok){ bad(status,res.msg); refreshSubmitState(); return; }
+        const file=input.files[0];
+        if(!file){
+          resetUploaderStatus(statusId);
+          refreshSubmitState();
+          return;
+        }
+        const fd=new FormData();
+        fd.append(fileKey, file, file.name);
+        setStatus(status,'info','Enviando...',true);
+        try{
+          const out=await postForm(endpoint, fd);
+          if(out.ok){
+            ok(status,'Enviado');
+            if(onData && out.data){ onData(out.data); }
+          }else{
+            bad(status, `Erro ${out.status}`);
+          }
+        }catch(e){
+          console.error('upload fail', e);
+          bad(status,'Falha no envio');
+        }
+        refreshSubmitState();
+      }
+
+      document.getElementById('doc_id_verso')?.addEventListener('change', uploadDocIdBundle);
+      document.getElementById('doc_id_frente')?.addEventListener('change', ()=>{
+        const verso = document.getElementById('doc_id_verso');
+        if(verso?.files?.length){
+          uploadDocIdBundle();
+        }
+      });
+      document.getElementById('doc_quitacao_eleitoral')?.addEventListener('change', ()=> uploadSingleDocument('doc_quitacao_eleitoral','status_doc_eleitoral', QUITACAO_ENDPOINT,'doc_quitacao_eleitoral', populateQuitacaoFields));
+      document.getElementById('doc_residencia')?.addEventListener('change', ()=> uploadSingleDocument('doc_residencia','status_doc_res', RESIDENCIA_ENDPOINT,'doc_residencia', populateResidenciaFields));
+      document.getElementById('doc_escolaridade')?.addEventListener('change', ()=> uploadSingleDocument('doc_escolaridade','status_doc_escolaridade', ESCOLARIDADE_ENDPOINT,'doc_escolaridade', populateEscolaridadeFields));
+
       // ========= Draft (localStorage) =========
       const DRAFT_KEY='hvr_inscricao_draft_v1';
       const watchedSelectors = [
@@ -1500,7 +1778,8 @@
         fd.append('termo_responsabilidade', responsibilityCheckbox && responsibilityCheckbox.checked ? 'ACEITO' : 'NAO');
 
         // uploads
-        appendIfFile(fd,'doc_id','doc_id');
+        appendIfFile(fd,'doc_id_frente','doc_id_frente');
+        appendIfFile(fd,'doc_id_verso','doc_id_verso');
         appendIfFile(fd,'doc_residencia','doc_residencia');
         appendIfFile(fd,'doc_quitacao_eleitoral','doc_quitacao_eleitoral');
         appendIfFile(fd,'doc_militar','doc_militar');
@@ -1550,6 +1829,7 @@
         loadDraft();
         toggleVinculoDetails();
         togglePcdDetails();
+        toggleGeneroDependents();
         bindWizard();
         resetDeclaration(responsibilityBox, responsibilityCheckbox, responsibilityHint);
         attachWatchers();
