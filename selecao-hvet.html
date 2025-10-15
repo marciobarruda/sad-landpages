@@ -1538,15 +1538,19 @@
         const nome = pickDataValue(entry,['nome','nome_completo','name','fullName']);
         if(nome) applyIfEmpty('#nome', nome);
         const cpfValue = pickDataValue(entry,['cpf','CPF','cpfNumero']);
-        if(cpfValue) applyIfEmpty('#cpf', onlyDigits(cpfValue).slice(0,11));
+        const cpfDigits = onlyDigits(cpfValue).slice(0,11);
+        const cpfValid = cpfDigits.length === 11 && isValidCPF(cpfDigits);
+        if(cpfValid) applyIfEmpty('#cpf', cpfDigits);
         const docNumberRaw = pickDataValue(entry,['num_doc']);
         if(docNumberRaw){
           const docDigits = onlyDigits(docNumberRaw);
-          if(docDigits.length === 11){
-            applyIfEmpty('#cpf', docDigits.slice(0,11));
-          }
           if(docDigits){
+            if(!cpfValid && docDigits.length === 11 && isValidCPF(docDigits)){
+              applyIfEmpty('#cpf', docDigits.slice(0,11));
+            }
             applyIfEmpty('#rg_numero', docDigits.slice(0,14));
+          }else{
+            applyIfEmpty('#rg_numero', docNumberRaw);
           }
         }
         const nascIso = parseToIsoDate(pickDataValue(entry,['data_nascimento','dataNascimento','nascimento','birthDate']));
