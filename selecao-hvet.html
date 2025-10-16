@@ -794,7 +794,7 @@
 
             <hr>
 
-            <section id="pcdDocsSection" class="mb-2 d-none">
+            <section id="pcdDocsSection" class="mb-2 field-disabled">
               <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
               <div class="row g-3">
                 <div class="col-md-8">
@@ -1964,7 +1964,9 @@
         const wrap = $('#pcdDetalhes');
         const docs = $('#pcdDocsSection');
         wrap?.classList.toggle('d-none', !isSim);
-        docs?.classList.toggle('d-none', !isSim);
+        if(docs){
+          docs.classList.toggle('field-disabled', !isSim);
+        }
         const tipoField=$('#tipo_pcd');
         if(tipoField){
           tipoField.required = isSim;
@@ -1980,6 +1982,7 @@
         const laudo=$('#pcd_laudo');
         if(laudo){
           laudo.required = isSim;
+          laudo.disabled = !isSim;
         }
         const status=$('#status_pcd_laudo');
         const decl=$('#pcd_declaracao');
@@ -1987,6 +1990,10 @@
         const exames=$('#pcd_exames');
         if(decl){
           decl.required = isSim;
+          decl.disabled = !isSim;
+        }
+        if(exames){
+          exames.disabled = !isSim;
         }
         if(!isSim){
           if(laudo){ laudo.value=''; }
