@@ -456,11 +456,11 @@
             </div>
             <div class="row g-3 mt-0 d-none" id="alistamentoWrap">
               <div class="col-md-4">
-                <label class="form-label" for="alistamento_numero">Número do Certificado de Alistamento Militar</label>
+                <label class="form-label" for="alistamento_numero">Número do Certificado de Reservista</label>
                 <input type="text" id="alistamento_numero" class="form-control">
               </div>
               <div class="col-md-4">
-                <label class="form-label" for="alistamento_orgao">Órgão emissor do certificado</label>
+                <label class="form-label" for="alistamento_orgao">Órgão Emissor</label>
                 <input type="text" id="alistamento_orgao" class="form-control">
               </div>
               <div class="col-md-4">
@@ -1179,7 +1179,17 @@
         return age >= 18;
       };
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
-      const isSexoMasculino = () => String($('#sexo')?.value || '').trim().toUpperCase() === 'MASCULINO';
+      const isSexoMasculino = () => {
+        const sexo = String($('#sexo')?.value || '').trim().toUpperCase();
+        const generoRaw = String($('#genero_identidade')?.value || '').trim();
+        const generoNormalized = generoRaw
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toUpperCase();
+        if(generoNormalized === 'HOMEM CISGENERO') return true;
+        if(generoNormalized) return false;
+        return sexo === 'MASCULINO';
+      };
       const getGeneroIdentidadeValue = () => {
         const selected = String($('#genero_identidade')?.value || '').trim();
         if(selected === 'Outro'){
@@ -1515,9 +1525,9 @@
           ]},
           { title:'Situação militar e eleitoral', rows:[
             {label:'Obrigações militares', value: present(militar)},
-            {label:'Número do alistamento', value: present(alistamentoNumero)},
-            {label:'Órgão emissor', value: present(alistamentoOrgao)},
-            {label:'Data do alistamento', value: present(alistamentoData)},
+            {label:'Número do Certificado de Reservista', value: present(alistamentoNumero)},
+            {label:'Órgão Emissor', value: present(alistamentoOrgao)},
+            {label:'Data de emissão', value: present(alistamentoData)},
             {label:'Direitos políticos', value: present(politicos)},
             {label:'Título de eleitor', value: present(titulo)},
             {label:'Zona', value: present(zona)},
@@ -1874,7 +1884,10 @@
         updateReview();
         refreshSubmitState();
       }
-      $('#genero_identidade')?.addEventListener('change', toggleGeneroOutro);
+      $('#genero_identidade')?.addEventListener('change', ()=>{
+        toggleGeneroOutro();
+        toggleSexoDependents();
+      });
       $('#genero_outro')?.addEventListener('input', ()=>{ updateReview(); refreshSubmitState(); });
 
       function toggleJuradoDetails(){
