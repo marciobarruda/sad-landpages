@@ -31,6 +31,7 @@
       .help{ font-size:.9rem; color:#6c757d; }
       .section-title{ font-weight:700; letter-spacing:.2px; color:#0b2447; }
       .dropzone{ border:2px dashed #cfe2ff; border-radius:.75rem; padding:1rem; background:#f8fbff; }
+      .field-disabled{ opacity:.6; }
       .form-control:focus,.form-select:focus{ box-shadow:0 0 0 .25rem rgba(13,110,253,.15); border-color:var(--brand); }
       pre.json{ background:#0b1020; color:#e6edf3; border-radius:.75rem; padding:1rem; max-height:40vh; overflow:auto; }
       .badge-soft{ background:#e7f1ff; color:#0b2447; border:1px solid #cfe2ff; }
@@ -280,7 +281,7 @@
           </li>
           <li class="wizard-step" data-step="3" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">4</span>
-            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
+            <span class="wizard-label">Dados do certame</span>
           </li>
           <li class="wizard-step" data-step="4" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">5</span>
@@ -288,6 +289,10 @@
           </li>
           <li class="wizard-step" data-step="5" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">6</span>
+            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
+          </li>
+          <li class="wizard-step" data-step="6" role="tab" aria-selected="false" tabindex="-1">
+            <span class="wizard-index">7</span>
             <span class="wizard-label">Revisão final</span>
           </li>
         </ol>
@@ -301,9 +306,10 @@
           <button type="button" class="form-tab-link active" data-tab-target="0" role="tab" aria-selected="true">Identificação</button>
           <button type="button" class="form-tab-link" data-tab-target="1" role="tab" aria-selected="false">Contato &amp; Endereço</button>
           <button type="button" class="form-tab-link" data-tab-target="2" role="tab" aria-selected="false">Formação &amp; Vínculos</button>
-          <button type="button" class="form-tab-link" data-tab-target="3" role="tab" aria-selected="false">Cotas &amp; Acessibilidade</button>
+          <button type="button" class="form-tab-link" data-tab-target="3" role="tab" aria-selected="false">Dados do certame</button>
           <button type="button" class="form-tab-link" data-tab-target="4" role="tab" aria-selected="false">Documentos</button>
-          <button type="button" class="form-tab-link" data-tab-target="5" role="tab" aria-selected="false">Revisão final</button>
+          <button type="button" class="form-tab-link" data-tab-target="5" role="tab" aria-selected="false">Cotas &amp; Acessibilidade</button>
+          <button type="button" class="form-tab-link" data-tab-target="6" role="tab" aria-selected="false">Revisão final</button>
         </div>
       </div>
 
@@ -411,17 +417,15 @@
               </div>
             </div>
             <div class="row g-3 mt-0">
-              <div class="col-md-6">
-                <label class="form-label" for="filiacao1">Filiação 1</label>
-                <input type="text" id="filiacao1" class="form-control">
+              <div class="col-md-4">
+                <label class="form-label required" for="mae">Nome da mãe</label>
+                <input type="text" id="mae" class="form-control" required>
               </div>
-              <div class="col-md-6">
-                <label class="form-label" for="filiacao2">Filiação 2</label>
-                <input type="text" id="filiacao2" class="form-control">
+              <div class="col-md-4">
+                <label class="form-label" for="pai">Nome do pai</label>
+                <input type="text" id="pai" class="form-control">
               </div>
-            </div>
-            <div class="row g-3 mt-0">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <label class="form-label" for="nome_social">Nome social</label>
                 <input type="text" id="nome_social" class="form-control">
               </div>
@@ -451,12 +455,16 @@
               </div>
             </div>
             <div class="row g-3 mt-0 d-none" id="alistamentoWrap">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <label class="form-label" for="alistamento_numero">Número do Certificado de Alistamento Militar</label>
                 <input type="text" id="alistamento_numero" class="form-control">
               </div>
-              <div class="col-md-6">
-                <label class="form-label" for="alistamento_data">Data de alistamento</label>
+              <div class="col-md-4">
+                <label class="form-label" for="alistamento_orgao">Órgão emissor do certificado</label>
+                <input type="text" id="alistamento_orgao" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="alistamento_data">Data de emissão</label>
                 <input type="date" id="alistamento_data" class="form-control">
               </div>
             </div>
@@ -595,6 +603,13 @@
           </div>
         </div>
 
+        <div class="wizard-controls">
+          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
+          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
+        </div>
+      </section>
+
+      <section class="step-panel form-tab-pane" data-step-panel="3" aria-label="Etapa 4 - Dados do certame" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Dados do certame</h2>
@@ -605,10 +620,12 @@
                 <label class="form-label required" for="cargo">Cargo pretendido</label>
                 <select id="cargo" class="form-select" required>
                   <option value="">Selecione...</option>
-                  <option>Médico Veterinário</option>
-                  <option>Assistente Administrativo</option>
-                  <option>Auxiliar de Veterinária</option>
-                  <option>Outro cargo</option>
+                  <option value="Analista em Saúde Animal – Veterinário 40h">Analista em Saúde Animal – Veterinário 40h</option>
+                  <option value="Analista em Saúde Animal – Veterinário 20h">Analista em Saúde Animal – Veterinário 20h</option>
+                  <option value="Analista em Saúde Animal – Veterinário 40h Plantonista">Analista em Saúde Animal – Veterinário 40h Plantonista</option>
+                  <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h</option>
+                  <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista</option>
+                  <option value="Técnico em Saúde Animal - Radiologia e Imagenologia 24h">Técnico em Saúde Animal - Radiologia e Imagenologia 24h</option>
                 </select>
               </div>
               <div class="col-md-6">
@@ -657,7 +674,156 @@
         </div>
       </section>
 
-      <section class="step-panel form-tab-pane" data-step-panel="3" aria-label="Etapa 4 - Cotas e acessibilidade" role="tabpanel">
+      <section class="step-panel form-tab-pane" data-step-panel="4" aria-label="Etapa 5 - Documentos" role="tabpanel">
+        <div class="card card-form mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Documentos</h2>
+            <span class="badge badge-soft">2 MB por doc/foto • 30 MB vídeo</span>
+          </div>
+          <div class="card-body">
+            <ul class="tiny mb-3">
+              <li>Documentos/fotos: PDF, JPG, JPEG, PNG (até 2 MB cada).</li>
+              <li>Vídeo (heteroidentificação): MP4, MOV (até 30 MB).</li>
+            </ul>
+
+            <section class="mb-4">
+              <h3 class="h6 section-title mb-2">1) Cadastro</h3>
+              <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                  <label class="form-label required">Documento de identificação oficial com foto (frente)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_frente" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_id_frente" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Documento de identificação oficial com foto (verso)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_verso" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_id_verso" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">CPF</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_cpf" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_cpf" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Comprovante de residência</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_res" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Quitação eleitoral</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_quitacao_eleitoral" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_eleitoral" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8" id="docMilitarWrap">
+                  <label class="form-label" id="docMilitarLabel">Quitação do serviço militar</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
+                  <div class="help tiny">Obrigatório para candidatos do sexo masculino. Exemplos: CAM, CDI, CI ou CRM.</div>
+                </div>
+                <div class="col-md-4" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8" id="doc_jurado_wrap">
+                  <label class="form-label" id="docJuradoLabel">Certidão de atuação na função de jurado</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_jurado" accept=".pdf,image/*"></div>
+                  <div class="help tiny">Anexe quando declarar atuação como jurado(a) conforme o edital.</div>
+                </div>
+                <div class="col-md-4" id="status_doc_jurado_wrap"><div id="status_doc_jurado" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8 d-none" id="doc_jurado_440_wrap">
+                  <label class="form-label">Certidão de atuação na função de jurado (art. 440 do CPP)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_jurado_440" accept=".pdf,image/*"></div>
+                  <div class="help tiny">Anexar quando houver atuação no período previsto em lei.</div>
+                </div>
+                <div class="col-md-4 d-none" id="status_doc_jurado_440_wrap"><div id="status_doc_jurado_440" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Comprovação da escolaridade</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_escolaridade" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label">Experiência / títulos / certificados</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_curriculo" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_curriculo" class="uploader-status ms-auto"></div></div>
+              </div>
+            </section>
+
+      
+
+      
+
+            <hr>
+
+            <section class="mb-4">
+              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PPNI)</h3>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Declaração de heteroidentificação</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_declaracao" accept=".pdf,image/*"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_het_declaracao" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label">Documento de identidade (frente/verso)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_het_id" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Foto de frente</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_frente" accept="image/*"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Foto de perfil</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_perfil" accept="image/*"></div>
+                </div>
+
+                <div class="col-md-12">
+                  <label class="form-label">Vídeo (até 20s)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
+                  <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
+                </div>
+              </div>
+            </section>
+
+            <hr>
+
+            <section id="pcdDocsSection" class="mb-2 d-none">
+              <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Laudo médico</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
+                <div class="col-md-8">
+                  <label class="form-label">Declaração de deficiência (modelo do edital)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="pcd_declaracao" accept=".pdf,image/*"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_declaracao" class="uploader-status ms-auto"></div></div>
+                <div class="col-md-8">
+                  <label class="form-label">Exames complementares (opcional)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="pcd_exames" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_exames" class="uploader-status ms-auto"></div></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="wizard-controls">
+          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
+          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
+        </div>
+      </section>
+
+<section class="step-panel form-tab-pane" data-step-panel="5" aria-label="Etapa 6 - Cotas e acessibilidade" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Informações de raça e cotas</h2>
@@ -757,151 +923,9 @@
         </div>
       </section>
 
-      <section class="step-panel form-tab-pane" data-step-panel="4" aria-label="Etapa 5 - Documentos" role="tabpanel">
-        <div class="card card-form mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0">Documentos</h2>
-            <span class="badge badge-soft">2 MB por doc/foto • 30 MB vídeo</span>
-          </div>
-          <div class="card-body">
-            <ul class="tiny mb-3">
-              <li>Documentos/fotos: PDF, JPG, JPEG, PNG (até 2 MB cada).</li>
-              <li>Vídeo (heteroidentificação): MP4, MOV (até 30 MB).</li>
-            </ul>
 
-            <section class="mb-4">
-              <h3 class="h6 section-title mb-2">1) Cadastro</h3>
-              <div class="row g-3 align-items-end">
-                <div class="col-md-8">
-                  <label class="form-label required">Documento de identificação oficial com foto (frente)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_frente" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_id_frente" class="uploader-status ms-auto"></div></div>
 
-                <div class="col-md-8">
-                  <label class="form-label required">Documento de identificação oficial com foto (verso)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_verso" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_id_verso" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">CPF</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_cpf" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_cpf" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Comprovante de residência</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_res" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Quitação eleitoral</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_quitacao_eleitoral" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_eleitoral" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8 d-none" id="docMilitarWrap">
-                  <label class="form-label" id="docMilitarLabel">Quitação do serviço militar</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
-                  <div class="help tiny">CAM / CDI / CI / CRM.</div>
-                </div>
-                <div class="col-md-4 d-none" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8 d-none" id="doc_jurado_wrap">
-                  <label class="form-label" id="docJuradoLabel">Certidão de atuação na função de jurado</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_jurado" accept=".pdf,image/*"></div>
-                </div>
-                <div class="col-md-4 d-none" id="status_doc_jurado_wrap"><div id="status_doc_jurado" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8 d-none" id="doc_jurado_440_wrap">
-                  <label class="form-label">Certidão de atuação na função de jurado (art. 440 do CPP)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_jurado_440" accept=".pdf,image/*"></div>
-                  <div class="help tiny">Anexar quando houver atuação no período previsto em lei.</div>
-                </div>
-                <div class="col-md-4 d-none" id="status_doc_jurado_440_wrap"><div id="status_doc_jurado_440" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Comprovação da escolaridade</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_escolaridade" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label">Experiência / títulos / certificados</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_curriculo" accept=".pdf,image/*" multiple></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_curriculo" class="uploader-status ms-auto"></div></div>
-              </div>
-            </section>
-
-            <hr>
-
-            <section class="mb-4">
-              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PPNI)</h3>
-              <div class="row g-3">
-                <div class="col-md-8">
-                  <label class="form-label">Declaração de heteroidentificação</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_declaracao" accept=".pdf,image/*"></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_het_declaracao" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label">Documento de identidade (frente/verso)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_het_id" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Foto de frente</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_frente" accept="image/*"></div>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Foto de perfil</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_perfil" accept="image/*"></div>
-                </div>
-
-                <div class="col-md-12">
-                  <label class="form-label">Vídeo (até 20s)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
-                  <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
-                </div>
-              </div>
-            </section>
-
-            <hr>
-
-            <section id="pcdDocsSection" class="mb-2 d-none">
-              <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
-              <div class="row g-3">
-                <div class="col-md-8">
-                  <label class="form-label">Laudo médico</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
-                <div class="col-md-8">
-                  <label class="form-label">Declaração de deficiência (modelo do edital)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="pcd_declaracao" accept=".pdf,image/*"></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_declaracao" class="uploader-status ms-auto"></div></div>
-                <div class="col-md-8">
-                  <label class="form-label">Exames complementares (opcional)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="pcd_exames" accept=".pdf,image/*" multiple></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_exames" class="uploader-status ms-auto"></div></div>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <div class="wizard-controls">
-          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
-          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
-        </div>
-      </section>
-
-      <section class="step-panel form-tab-pane" data-step-panel="5" aria-label="Etapa 6 - Revisão e envio" role="tabpanel">
+      <section class="step-panel form-tab-pane" data-step-panel="6" aria-label="Etapa 7 - Revisão e envio" role="tabpanel">
         <div class="card card-form mb-5">
           <div class="card-header">
             <h2 class="h5 mb-0">Revisão e envio</h2>
@@ -1100,6 +1124,7 @@
         $('#bairro').value=String(data.bairro||'').toUpperCase();
         $('#cidade').value=String(data.cidade||'').toUpperCase();
         $('#uf').value=(data.uf||'').toUpperCase();
+        updateReview();
         updateReview();
         refreshSubmitState();
       }
@@ -1390,13 +1415,14 @@
           $('#naturalidade_cidade').value,
           ($('#naturalidade_uf').value||'').toUpperCase()
         ]);
-        const filiacao1=$('#filiacao1').value;
-        const filiacao2=$('#filiacao2').value;
+        const mae=$('#mae').value;
+        const pai=$('#pai').value;
         const rgNumero = $('#rg_numero').value;
         const rgOrgao = $('#rg_orgao').value;
         const rgUf = ($('#rg_uf').value||'').toUpperCase();
         const rgData = fmtDateBr($('#rg_data').value);
         const alistamentoNumero=$('#alistamento_numero')?.value || '';
+        const alistamentoOrgao=$('#alistamento_orgao')?.value || '';
         const alistamentoData=fmtDateBr($('#alistamento_data')?.value || '');
         const cep=fmtCEP($('#cep').value);
         const logradouro = joinParts([
@@ -1427,7 +1453,9 @@
         const titulo=$('#titulo').value;
         const zona=$('#zona').value;
         const secao=$('#secao').value;
-        const cargo=$('#cargo').value;
+        const cargoSelect=$('#cargo');
+        const cargoValue=cargoSelect?.value || '';
+        const cargoLabel=cargoSelect && cargoSelect.selectedOptions?.length ? cargoSelect.selectedOptions[0].textContent.trim() : cargoValue;
         const especialidade=$('#especialidade').value;
         const foiJuradoValor=$('#foi_jurado').value;
         const foiJurado = foiJuradoValor==='SIM' ? 'Sim' : foiJuradoValor==='NAO' ? 'Não' : '';
@@ -1447,8 +1475,8 @@
             {label:'Estado civil', value: present(estadoCivil)},
             {label:'Nacionalidade', value: present(nacionalidade)},
             {label:'Naturalidade', value: present(naturalidade)},
-            {label:'Filiação 1', value: present(filiacao1)},
-            {label:'Filiação 2', value: present(filiacao2)}
+            {label:'Nome da mãe', value: present(mae)},
+            {label:'Nome do pai', value: present(pai)}
           ]},
           { title:'Documentos', rows:[
             {label:'RG', value: present(rgNumero)},
@@ -1488,6 +1516,7 @@
           { title:'Situação militar e eleitoral', rows:[
             {label:'Obrigações militares', value: present(militar)},
             {label:'Número do alistamento', value: present(alistamentoNumero)},
+            {label:'Órgão emissor', value: present(alistamentoOrgao)},
             {label:'Data do alistamento', value: present(alistamentoData)},
             {label:'Direitos políticos', value: present(politicos)},
             {label:'Título de eleitor', value: present(titulo)},
@@ -1495,7 +1524,7 @@
             {label:'Seção', value: present(secao)}
           ]},
           { title:'Dados do certame', rows:[
-            {label:'Cargo', value: present(cargo)},
+            {label:'Cargo', value: present(cargoLabel)},
             {label:'Especialidade', value: present(especialidade)},
             {label:'Atuou como jurado(a)?', value: present(foiJurado)},
             {label:'Detalhes da atuação', value: present(juradoPeriodo)},
@@ -1528,7 +1557,7 @@
 
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
@@ -1546,6 +1575,13 @@
         if($('#vinculo_publico').value === 'Sim'){
           if(!String($('#qual_vinculo').value||'').trim()) return false;
           if(!String($('#experiencia_tempo').value||'').trim()) return false;
+        }
+        if(isSexoMasculino()){
+          const militar = document.querySelector('input[name="militar"]:checked');
+          if(!militar) return false;
+          if(!String($('#alistamento_numero').value||'').trim()) return false;
+          if(!String($('#alistamento_orgao').value||'').trim()) return false;
+          if(!String($('#alistamento_data').value||'').trim()) return false;
         }
         if($('#is_pcd').value === 'Sim'){
           if(!String($('#tipo_pcd').value||'').trim()) return false;
@@ -1747,6 +1783,7 @@
       bindUppercase('#rg_uf');
       bindUppercase('#naturalidade_uf');
       bindUppercase('#uf');
+      bindUppercase('#alistamento_orgao');
       bindUppercase('#pcd_cid');
 
       function updateDocMilitarStatus(){
@@ -1765,6 +1802,7 @@
         const isMasc = isSexoMasculino();
         document.querySelectorAll('input[name="militar"]').forEach(radio=>{
           radio.required = isMasc;
+          radio.disabled = !isMasc;
           if(!isMasc) radio.checked = false;
         });
         const militarWrap = $('#militarPergunta');
@@ -1778,6 +1816,7 @@
         const docWrap = $('#docMilitarWrap');
         if(docWrap){
           docWrap.classList.toggle('d-none', !isMasc);
+          docWrap.classList.toggle('field-disabled', !isMasc);
         }
         const docLabel = $('#docMilitarLabel');
         if(docLabel){
@@ -1786,10 +1825,12 @@
         const statusWrap = $('#status_doc_militar_wrap');
         if(statusWrap){
           statusWrap.classList.toggle('d-none', !isMasc);
+          statusWrap.classList.toggle('field-disabled', !isMasc);
         }
         const docInput = $('#doc_militar');
         if(docInput){
           docInput.required = isMasc;
+          docInput.disabled = !isMasc;
           if(!isMasc){
             docInput.value='';
             resetUploaderStatus('status_doc_militar');
@@ -1800,13 +1841,20 @@
         const alistamentoWrap = $('#alistamentoWrap');
         if(alistamentoWrap){
           alistamentoWrap.classList.toggle('d-none', !isMasc);
-          if(!isMasc){
-            const numero = $('#alistamento_numero');
-            const data = $('#alistamento_data');
-            if(numero) numero.value='';
-            if(data) data.value='';
-          }
+          alistamentoWrap.classList.toggle('field-disabled', !isMasc);
+          Array.from(alistamentoWrap.querySelectorAll('.form-label')).forEach(label => {
+            label.classList.toggle('required', isMasc);
+          });
         }
+        const numero = $('#alistamento_numero');
+        const orgao = $('#alistamento_orgao');
+        const data = $('#alistamento_data');
+        [numero, orgao, data].forEach(field=>{
+          if(!field) return;
+          field.required = isMasc;
+          field.disabled = !isMasc;
+          if(!isMasc){ field.value=''; }
+        });
         refreshSubmitState();
       }
       $('#sexo')?.addEventListener('change', toggleSexoDependents);
@@ -1839,13 +1887,22 @@
           periodo.required = show;
           if(!show){ periodo.value=''; }
         }
-        ['#doc_jurado_wrap','#status_doc_jurado_wrap','#doc_jurado_440_wrap','#status_doc_jurado_440_wrap'].forEach(sel=>{
+        ['#doc_jurado_440_wrap','#status_doc_jurado_440_wrap'].forEach(sel=>{
           const wrap=$(sel);
           if(wrap){ wrap.classList.toggle('d-none', !show); }
         });
         const juradoInput=$('#doc_jurado');
         const jurado440Input=$('#doc_jurado_440');
-        if(juradoInput){ juradoInput.required = show; }
+        const juradoWrap=$('#doc_jurado_wrap');
+        const juradoStatusWrap=$('#status_doc_jurado_wrap');
+        const juradoLabel=$('#docJuradoLabel');
+        if(juradoWrap){ juradoWrap.classList.toggle('field-disabled', !show); }
+        if(juradoStatusWrap){ juradoStatusWrap.classList.toggle('field-disabled', !show); }
+        if(juradoLabel){ juradoLabel.classList.toggle('required', show); }
+        if(juradoInput){
+          juradoInput.required = show;
+          juradoInput.disabled = !show;
+        }
         if(jurado440Input){ jurado440Input.required = false; }
         if(!show){
           [juradoInput,jurado440Input].forEach(input=>{
@@ -2230,8 +2287,8 @@
         fd.append('genero_identidade',generoSelect);
         fd.append('genero_outro', generoSelect === 'Outro' ? generoOutro : '');
         fd.append('estado_civil',$('#estado_civil').value);
-        fd.append('filiacao1',$('#filiacao1').value.trim());
-        fd.append('filiacao2',$('#filiacao2').value.trim());
+        fd.append('nome_mae',$('#mae').value.trim());
+        fd.append('nome_pai',$('#pai').value.trim());
         fd.append('nacionalidade',$('#nacionalidade').value.trim());
         fd.append('naturalidade_cidade',$('#naturalidade_cidade').value.trim());
         fd.append('naturalidade_uf',$('#naturalidade_uf').value.trim().toUpperCase());
@@ -2253,6 +2310,7 @@
         fd.append('cidade',$('#cidade').value.trim());
         fd.append('uf',$('#uf').value.trim().toUpperCase());
         fd.append('alistamento_numero',$('#alistamento_numero').value.trim());
+        fd.append('alistamento_orgao',$('#alistamento_orgao').value.trim().toUpperCase());
         fd.append('alistamento_data',$('#alistamento_data').value);
         // formação
         fd.append('nivel_minimo',$('#nivel').value);
@@ -2275,7 +2333,11 @@
         fd.append('zona',onlyDigits($('#zona').value));
         fd.append('secao',onlyDigits($('#secao').value));
         // certame
-        fd.append('cargo',$('#cargo').value);
+        const cargoSelect=$('#cargo');
+        const cargoValue=cargoSelect?.value || '';
+        const cargoLabel=cargoSelect && cargoSelect.selectedOptions?.length ? cargoSelect.selectedOptions[0].textContent.trim() : '';
+        fd.append('cargo', cargoValue);
+        fd.append('cargo_label', cargoLabel);
         fd.append('especialidade',$('#especialidade').value.trim());
         fd.append('foi_jurado',$('#foi_jurado').value);
         fd.append('jurado_periodo',$('#jurado_periodo').value.trim());
