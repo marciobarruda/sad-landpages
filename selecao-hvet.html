@@ -165,6 +165,37 @@
       .tiny{ font-size:.85rem; }
       .pill{ border-radius:999px; padding:.25rem .6rem; border:1px solid #dee2e6; }
       .uploader-status{ min-height:1.75rem; }
+      .tab-shell{ margin-bottom:1.5rem; }
+      .form-tabs{
+        display:flex;
+        flex-wrap:wrap;
+        gap:.5rem;
+        border-bottom:1px solid #dbe7ff;
+        padding-bottom:.75rem;
+        margin-bottom:1.5rem;
+        overflow-x:auto;
+      }
+      .form-tab-link{
+        border:1px solid transparent;
+        background:transparent;
+        border-radius:.75rem;
+        padding:.5rem 1.1rem;
+        font-weight:600;
+        letter-spacing:.02em;
+        color:#516098;
+        transition:all .2s ease;
+        cursor:pointer;
+      }
+      .form-tab-link:focus{ outline:3px solid rgba(13,110,253,.2); outline-offset:2px; }
+      .form-tab-link.active{
+        background:linear-gradient(180deg,#fff 0%,#f5f8ff 100%);
+        border-color:#c5d5ff;
+        color:var(--brand-dark);
+        box-shadow:0 8px 18px rgba(13,110,253,.12);
+      }
+      .form-tab-link:not(.active):hover{ background:#f1f5ff; color:var(--brand-dark); }
+      .form-tabs::-webkit-scrollbar{ height:6px; }
+      .form-tabs::-webkit-scrollbar-thumb{ background:#c2cff6; border-radius:999px; }
       .declaration-box{
         background:#f8f9fa;
         border:1px solid #dbe7ff;
@@ -213,7 +244,8 @@
         .wizard-step{ min-width:150px; }
         .wizard-step .wizard-index{ width:34px; height:34px; }
         .wizard-step .wizard-label{ font-size:.88rem; }
-        .racial-declaration-box{ max-height:200px; }
+      .form-tab-pane{ display:none; }
+      .form-tab-pane.active{ display:block; }
         .wizard-step::before,
         .wizard-step::after{ top:17px; }
       }
@@ -263,7 +295,18 @@
         </div>
       </div>
 
-      <section class="step-panel active" data-step-panel="0" aria-label="Etapa 1 - Documentos">
+      <div class="tab-shell">
+        <div class="form-tabs" role="tablist">
+          <button type="button" class="form-tab-link active" data-tab-target="0" role="tab" aria-selected="true">Documentos</button>
+          <button type="button" class="form-tab-link" data-tab-target="1" role="tab" aria-selected="false">Identificação</button>
+          <button type="button" class="form-tab-link" data-tab-target="2" role="tab" aria-selected="false">Contato &amp; Endereço</button>
+          <button type="button" class="form-tab-link" data-tab-target="3" role="tab" aria-selected="false">Formação &amp; Vínculos</button>
+          <button type="button" class="form-tab-link" data-tab-target="4" role="tab" aria-selected="false">Cotas &amp; Acessibilidade</button>
+          <button type="button" class="form-tab-link" data-tab-target="5" role="tab" aria-selected="false">Revisão final</button>
+        </div>
+      </div>
+
+      <section class="step-panel form-tab-pane active" data-step-panel="0" aria-label="Etapa 1 - Documentos" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h5 mb-0">Documentos</h2>
@@ -372,7 +415,7 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="1" aria-label="Etapa 2 - Identificação">
+      <section class="step-panel form-tab-pane" data-step-panel="1" aria-label="Etapa 2 - Identificação" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Identificação civil</h2>
@@ -489,7 +532,7 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="2" aria-label="Etapa 3 - Contato e endereço">
+      <section class="step-panel form-tab-pane" data-step-panel="2" aria-label="Etapa 3 - Contato e endereço" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Contato</h2>
@@ -564,7 +607,7 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="3" aria-label="Etapa 4 - Formação e vínculos">
+      <section class="step-panel form-tab-pane" data-step-panel="3" aria-label="Etapa 4 - Formação e vínculos" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Escolaridade e formação</h2>
@@ -635,7 +678,7 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="4" aria-label="Etapa 5 - Cotas e acessibilidade">
+      <section class="step-panel form-tab-pane" data-step-panel="4" aria-label="Etapa 5 - Cotas e acessibilidade" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Informações de raça e cotas</h2>
@@ -702,23 +745,13 @@
         </div>
       </section>
 
-      <section class="step-panel" data-step-panel="5" aria-label="Etapa 6 - Revisão e envio">
+      <section class="step-panel form-tab-pane" data-step-panel="5" aria-label="Etapa 6 - Revisão e envio" role="tabpanel">
         <div class="card card-form mb-5">
           <div class="card-header">
             <h2 class="h5 mb-0">Revisão e envio</h2>
           </div>
           <div class="card-body">
             <div id="reviewBlock" class="mb-3"></div>
-
-            <div class="mb-4">
-              <h3 class="h6 section-title mb-2">Autodeclaração étnico-racial</h3>
-              <div id="racialDeclarationText" class="declaration-box" tabindex="0" role="textbox" aria-readonly="true"></div>
-              <div class="form-check declaration-check">
-                <input class="form-check-input" type="checkbox" id="racialDeclarationAgree" disabled>
-                <label class="form-check-label" for="racialDeclarationAgree">Confirmo que a autodeclaração acima corresponde à minha manifestação.</label>
-              </div>
-              <div class="form-text tiny mt-2" id="racialDeclarationHint">Role o texto até o final para habilitar o aceite.</div>
-            </div>
 
             <div class="mb-4">
               <h3 class="h6 section-title mb-2">Declaração de responsabilidade</h3>
@@ -943,14 +976,12 @@
         const str = String(value).trim();
         return str ? esc(str) : reviewPlaceholder;
       };
-      const racialDeclarationBox = $('#racialDeclarationText');
-      const racialCheckbox = $('#racialDeclarationAgree');
-      const racialHint = $('#racialDeclarationHint');
       const responsibilityBox = $('#responsibilityText');
       const responsibilityCheckbox = $('#termoResponsabilidade');
       const responsibilityHint = $('#responsibilityHint');
-      let lastRacialSignature = '';
-      const declarationDateFormatter = new Intl.DateTimeFormat('pt-BR');
+      const declarationConfigs = [
+        { box: responsibilityBox, checkbox: responsibilityCheckbox, hint: responsibilityHint }
+      ].filter(cfg => cfg.box && cfg.checkbox);
 
       function resetDeclaration(box, checkbox, hint){
         if(!box || !checkbox) return;
@@ -980,92 +1011,27 @@
         }
       }
 
-      function updateRacialDeclaration(){
-        if(!racialDeclarationBox) return;
-        const nomeUpper = String($('#nome')?.value || '').trim().toUpperCase();
-        const cpfDigits = onlyDigits($('#cpf')?.value);
-        const cpfFormatted = cpfDigits ? fmtCPF(cpfDigits) : '';
-        const racaSelect = $('#raca');
-        const racaLabel = racaSelect && racaSelect.value ? String(racaSelect.selectedOptions[0]?.textContent || '').trim().toUpperCase() : '';
-        const generoSelect = $('#genero');
-        const generoUpper = generoSelect && generoSelect.value ? String(generoSelect.value).trim().toUpperCase() : '';
-        const autodeclaradoWord = generoUpper === 'FEMININO' ? 'AUTODECLARADA' : generoUpper === 'MASCULINO' ? 'AUTODECLARADO' : 'AUTODECLARANTE';
-        const cidadeUpper = String($('#cidade')?.value || '').trim().toUpperCase();
-        const raceKey = racaLabel ? racaLabel.normalize('NFD').replace(/[\u0300-\u036f]/g,'') : '';
-        const raceGenderMap = {
-          FEMININO: { BRANCA:'BRANCA', PRETA:'PRETA', PARDA:'PARDA', AMARELA:'AMARELA', INDIGENA:'INDÍGENA' },
-          MASCULINO: { BRANCA:'BRANCO', PRETA:'PRETO', PARDA:'PARDO', AMARELA:'AMARELO', INDIGENA:'INDÍGENA' }
-        };
-        let raceDisplay = racaLabel;
-        if(raceKey){
-          const map = raceGenderMap[generoUpper] || null;
-          if(map && map[raceKey]){
-            raceDisplay = map[raceKey];
-          }else if(raceGenderMap.FEMININO[raceKey]){
-            raceDisplay = raceGenderMap.FEMININO[raceKey];
-          }
-        }
-        const signature = [nomeUpper, cpfDigits, raceDisplay, cidadeUpper, autodeclaradoWord].join('|');
-        const nameSegment = nomeUpper ? `<strong>${esc(nomeUpper)}</strong>` : '____________________________';
-        const cpfSegment = cpfFormatted ? `<strong>${esc(cpfFormatted.toUpperCase())}</strong>` : '________________';
-        const raceSegment = raceDisplay ? `<strong>${esc(raceDisplay)}</strong>` : '________________';
-        const autodeclaradoSegment = autodeclaradoWord ? `<strong>${esc(autodeclaradoWord)}</strong>` : '________________';
-        const citySegment = cidadeUpper ? `<strong>${esc(cidadeUpper)}</strong>` : '________________';
-        const dateStr = declarationDateFormatter.format(new Date());
-        const raceSentence = `sou ${autodeclaradoSegment} ${raceSegment}.`;
-        const locationLine = [citySegment, `<strong>${esc(dateStr)}</strong>`].filter(Boolean).join(', ');
-        const template = [
-          'Para fins do disposto na Portaria do Ministério do Trabalho nº3784/2023, em cumprimento da Lei 14.553/02023.',
-          'As informações relativas à etnia e raça devem ser obrigatoriamente prestadas nas inclusões, alterações ou retificações cadastrais dos trabalhadores, respeitando o critério de autodeclaração do trabalhador, em conformidade com a classificação utilizada pelo Instituto Brasileiro de Geografia e Estatística– IBGE.',
-          '',
-          `Eu, ${nameSegment},`,
-          `portador do CPF nº ${cpfSegment}, AUTODECLARO, sob penas de lei que,`,
-          raceSentence,
-          '',
-          'Por ser expressão da verdade, firmo e assino a presente para que a mesma produza seus efeitos legais e de direito.',
-          locationLine
-        ].join('\n');
-        const hasChanged = signature !== lastRacialSignature;
-        if(hasChanged){
-          lastRacialSignature = signature;
-          resetDeclaration(racialDeclarationBox, racialCheckbox, racialHint);
-        }
-        racialDeclarationBox.innerHTML = template;
-      }
-
-      racialDeclarationBox?.addEventListener('scroll', ()=>handleScrollable(racialDeclarationBox, racialCheckbox, racialHint));
-      responsibilityBox?.addEventListener('scroll', ()=>handleScrollable(responsibilityBox, responsibilityCheckbox, responsibilityHint));
-      racialCheckbox?.addEventListener('change', refreshSubmitState);
-      responsibilityCheckbox?.addEventListener('change', refreshSubmitState);
+      declarationConfigs.forEach(cfg =>{
+        cfg.box.addEventListener('scroll', ()=>handleScrollable(cfg.box, cfg.checkbox, cfg.hint));
+        cfg.checkbox.addEventListener('change', refreshSubmitState);
+      });
 
       const acceptAllBtn = $('#acceptAllDeclarations');
       const declineAllBtn = $('#declineAllDeclarations');
       acceptAllBtn?.addEventListener('click', ()=>{
-        if(racialDeclarationBox){
-          racialDeclarationBox.scrollTop = racialDeclarationBox.scrollHeight;
-          handleScrollable(racialDeclarationBox, racialCheckbox, racialHint);
-        }
-        if(responsibilityBox){
-          responsibilityBox.scrollTop = responsibilityBox.scrollHeight;
-          handleScrollable(responsibilityBox, responsibilityCheckbox, responsibilityHint);
-        }
-        if(racialCheckbox){
-          markDeclarationReady(racialCheckbox, racialHint);
-          racialCheckbox.checked = true;
-        }
-        if(responsibilityCheckbox){
-          markDeclarationReady(responsibilityCheckbox, responsibilityHint);
-          responsibilityCheckbox.checked = true;
-        }
+        declarationConfigs.forEach(cfg =>{
+          cfg.box.scrollTop = cfg.box.scrollHeight;
+          handleScrollable(cfg.box, cfg.checkbox, cfg.hint);
+          markDeclarationReady(cfg.checkbox, cfg.hint);
+          cfg.checkbox.checked = true;
+        });
         refreshSubmitState();
       });
       declineAllBtn?.addEventListener('click', ()=>{
-        if(racialCheckbox){
-          racialCheckbox.checked = false;
-        }
-        if(responsibilityCheckbox){
-          responsibilityCheckbox.checked = false;
-        }
+        declarationConfigs.forEach(cfg =>{
+          cfg.checkbox.checked = false;
+          resetDeclaration(cfg.box, cfg.checkbox, cfg.hint);
+        });
         refreshSubmitState();
       });
 
@@ -1193,7 +1159,6 @@
         `;
 
         $('#reviewBlock').innerHTML = reviewSections.map(renderSection).join('\n');
-        updateRacialDeclaration();
       }
 
       // ========= Submit state =========
@@ -1236,9 +1201,8 @@
       }
       function refreshSubmitState(){
         const btn=$('#btnSubmitAll');
-        const termoOk = responsibilityCheckbox ? responsibilityCheckbox.checked : true;
-        const racialOk = racialCheckbox ? racialCheckbox.checked : true;
-        const allOk = baseFieldsOk() && docsRequiredOk() && termoOk && racialOk;
+        const allDeclarationsOk = declarationConfigs.every(cfg => cfg.checkbox.checked);
+        const allOk = baseFieldsOk() && docsRequiredOk() && allDeclarationsOk;
         btn.disabled = !allOk;
         btn.classList.toggle('btn-success', allOk);
         btn.classList.toggle('btn-secondary', !allOk);
@@ -1246,6 +1210,7 @@
 
       const stepPanels = Array.from(document.querySelectorAll('.step-panel'));
       const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
+      const tabButtons = Array.from(document.querySelectorAll('.form-tab-link'));
       const progressBar = $('#wizardProgressBar');
       let currentStepIndex = 0;
 
@@ -1264,6 +1229,12 @@
           item.classList.toggle('completed', i < clamped);
           item.setAttribute('aria-selected', isActive ? 'true' : 'false');
           item.setAttribute('tabindex', isActive ? '0' : '-1');
+        });
+        tabButtons.forEach((btn,i)=>{
+          const isActive = i === clamped;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          btn.setAttribute('tabindex', isActive ? '0' : '-1');
         });
         if(progressBar){
           const percent = stepPanels.length > 1 ? (clamped/(stepPanels.length - 1))*100 : 100;
@@ -1298,6 +1269,15 @@
             if(evt.key === 'Enter' || evt.key === ' '){
               evt.preventDefault();
               activate();
+            }
+          });
+        });
+        tabButtons.forEach((btn,i)=>{
+          btn.addEventListener('click', ()=>{ goToStep(i); });
+          btn.addEventListener('keydown', evt=>{
+            if(evt.key === 'Enter' || evt.key === ' '){
+              evt.preventDefault();
+              goToStep(i);
             }
           });
         });
@@ -1791,8 +1771,6 @@
         fd.append('genero',$('#genero').value);
         fd.append('raca',$('#raca').value);
         fd.append('concorrer_pnp',$('#cotasPNP').value);
-        fd.append('autodeclaracao_racial', racialCheckbox && racialCheckbox.checked ? 'ACEITO' : 'NAO');
-        fd.append('autodeclaracao_racial_texto', (racialDeclarationBox?.innerText || '').trim());
         // pcd
         fd.append('is_pcd',$('#is_pcd').value);
         fd.append('tipo_pcd',$('#tipo_pcd').value.trim());
@@ -1864,7 +1842,7 @@
         togglePcdDetails();
         toggleGeneroDependents();
         bindWizard();
-        resetDeclaration(responsibilityBox, responsibilityCheckbox, responsibilityHint);
+        declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
         attachWatchers();
         updateReview();
         refreshSubmitState();
