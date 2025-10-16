@@ -324,7 +324,7 @@
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label required" for="cpf">CPF</label>
-                <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username ?? '' }}" required>
+                <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ String(($json.cpf ?? $json.preferred_username ?? '')).replace(/\D+/g, '').slice(0,11) }}" required>
                 <div class="help tiny" id="cpfHelp"></div>
               </div>
               <div class="col-md-7">
@@ -339,39 +339,39 @@
             <div class="row g-3 mt-0">
               <div class="col-md-4">
                 <label class="form-label required" for="nacionalidade">Nacionalidade</label>
-                <input type="text" id="nacionalidade" class="form-control" required>
+                <input type="text" id="nacionalidade" class="form-control" value="{{ String($json.nacionalidade ?? $json.nationality ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-5">
                 <label class="form-label required" for="naturalidade_cidade">Naturalidade</label>
-                <input type="text" id="naturalidade_cidade" class="form-control" required>
+                <input type="text" id="naturalidade_cidade" class="form-control" value="{{ String($json.naturalidade ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="naturalidade_uf">UF</label>
-                <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" required>
+                <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" value="{{ String($json.uf_naturalidade ?? '').trim().toUpperCase() }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-3">
                 <label class="form-label required" for="rg_numero">RG</label>
-                <input type="text" id="rg_numero" class="form-control" inputmode="numeric" maxlength="14" required>
+                <input type="text" id="rg_numero" class="form-control" inputmode="numeric" maxlength="14" value="{{ String($json.num_doc ?? '').replace(/\D+/g, '').slice(0,14) }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="rg_orgao">Órgão</label>
-                <input type="text" id="rg_orgao" class="form-control" required>
+                <input type="text" id="rg_orgao" class="form-control" value="{{ String($json.orgao ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="rg_uf">UF</label>
-                <input type="text" id="rg_uf" maxlength="2" class="form-control" required>
+                <input type="text" id="rg_uf" maxlength="2" class="form-control" value="{{ String($json.uf_doc ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="rg_data">Expedição</label>
-                <input type="date" id="rg_data" class="form-control" required>
+                <input type="date" id="rg_data" class="form-control" value="{{ String($json.exp_doc ?? '').split('/').reverse().join('-') }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0 align-items-end">
               <div class="col-md-4 col-lg-3">
                 <label class="form-label required" for="sexo">Sexo</label>
-                <select id="sexo" class="form-select" required>
+                <select id="sexo" class="form-select" data-prefill="{{ $json.gender ?? $json.sexo ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Feminino</option>
                   <option>Masculino</option>
@@ -381,7 +381,7 @@
               </div>
               <div class="col-md-4 col-lg-3">
                 <label class="form-label" for="genero_identidade">Gênero</label>
-                <select id="genero_identidade" class="form-select">
+                <select id="genero_identidade" class="form-select" data-prefill="{{ $json.genero_identidade ?? $json.genderIdentity ?? '' }}">
                   <option value="">Selecione...</option>
                   <option>Mulher cisgênero</option>
                   <option>Mulher trans</option>
@@ -395,13 +395,13 @@
               </div>
               <div class="col-md-4 col-lg-3 d-none" id="generoOutroCol">
                 <label class="form-label" for="genero_outro">Informe o gênero</label>
-                <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80">
+                <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80" value="{{ String($json.genero_outro ?? '').trim() }}">
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4 col-lg-3">
                 <label class="form-label required" for="estado_civil">Estado civil</label>
-                <select id="estado_civil" class="form-select" required>
+                <select id="estado_civil" class="form-select" data-prefill="{{ $json.estado_civil ?? $json.maritalStatus ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Solteiro(a)</option>
                   <option>Casado(a)</option>
@@ -413,21 +413,21 @@
               </div>
               <div class="col-md-4 col-lg-3">
                 <label class="form-label" for="nis">NIS</label>
-                <input type="text" id="nis" class="form-control" inputmode="numeric" maxlength="11">
+                <input type="text" id="nis" class="form-control" inputmode="numeric" maxlength="11" value="{{ String($json.nis ?? $json.pis ?? $json.pis_pasep ?? '').replace(/\D+/g, '').slice(0,11) }}">
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4">
                 <label class="form-label required" for="mae">Nome da mãe</label>
-                <input type="text" id="mae" class="form-control" required>
+                <input type="text" id="mae" class="form-control" value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-4">
                 <label class="form-label" for="pai">Nome do pai</label>
-                <input type="text" id="pai" class="form-control">
+                <input type="text" id="pai" class="form-control" value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}">
               </div>
               <div class="col-md-4">
                 <label class="form-label" for="nome_social">Nome social</label>
-                <input type="text" id="nome_social" class="form-control">
+                <input type="text" id="nome_social" class="form-control" value="{{ String($json.socialName ?? '').trim().toUpperCase() }}">
               </div>
             </div>
           </div>
@@ -499,17 +499,17 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="email">E-mail</label>
-                <input type="email" id="email" class="form-control" value="{{ $json.email ?? '' }}" required>
+                <input type="email" id="email" class="form-control" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
                 <div class="help tiny" id="emailHelp"></div>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="tel1">Telefone 1</label>
-                <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" required>
+                <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}" required>
                 <div class="help tiny" id="tel1Help"></div>
               </div>
               <div class="col-md-3">
                 <label class="form-label" for="tel2">Telefone 2</label>
-                <input type="text" id="tel2" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número">
+                <input type="text" id="tel2" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone2 ?? $json.phone2 ?? '').replace(/\D+/g, '') }}">
                 <div class="help tiny" id="tel2Help"></div>
               </div>
             </div>
@@ -525,35 +525,35 @@
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label required" for="cep">CEP</label>
-                <input type="text" id="cep" class="form-control" placeholder="00000-000" inputmode="numeric" maxlength="8" value="{{ $json.postal_code ?? '' }}" required>
+                <input type="text" id="cep" class="form-control" placeholder="00000-000" inputmode="numeric" maxlength="8" value="{{ String($json.postal_code ?? $json.cep ?? '').replace(/\D+/g, '') }}" required>
               </div>
               <div class="col-md-6">
                 <label class="form-label required" for="logradouro">Logradouro</label>
-                <input type="text" id="logradouro" class="form-control" value="{{ $json.addressStreet ?? '' }}" required>
+                <input type="text" id="logradouro" class="form-control" value="{{ String($json.addressStreet ?? $json.logradouro ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="numero">Número</label>
-                <input type="text" id="numero" class="form-control" value="{{ $json.addressNumber ?? '' }}" required>
+                <input type="text" id="numero" class="form-control" value="{{ String($json.addressNumber ?? '').trim().toUpperCase() }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4">
                 <label class="form-label" for="complemento">Complemento</label>
-                <input type="text" id="complemento" class="form-control" value="{{ $json.addressComplement ?? '' }}">
+                <input type="text" id="complemento" class="form-control" value="{{ String($json.addressComplement ?? '').trim().toUpperCase() }}">
               </div>
               <div class="col-md-4">
                 <label class="form-label required" for="bairro">Bairro</label>
-                <input type="text" id="bairro" class="form-control" value="{{ $json.neighborhood ?? '' }}" required>
+                <input type="text" id="bairro" class="form-control" value="{{ String($json.neighborhood ?? $json.bairro ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-4">
                 <label class="form-label required" for="cidade">Cidade</label>
-                <input type="text" id="cidade" class="form-control" value="{{ $json.locality ?? '' }}" required>
+                <input type="text" id="cidade" class="form-control" value="{{ String($json.locality ?? $json.city ?? '').trim().toUpperCase() }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-3">
                 <label class="form-label required" for="uf">UF</label>
-                <input type="text" id="uf" class="form-control" maxlength="2" value="{{ $json.state ?? '' }}" required>
+                <input type="text" id="uf" class="form-control" maxlength="2" value="{{ String(($json.state ?? $json.addressState ?? $json.uf ?? '')).trim().toUpperCase() }}" required>
               </div>
             </div>
           </div>
@@ -574,7 +574,7 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="nivel">Nível</label>
-                <select id="nivel" class="form-select" required>
+                <select id="nivel" class="form-select" data-prefill="{{ $json.nivel ?? $json.nivel_escolaridade ?? $json.escolaridade ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Fundamental</option>
                   <option>Médio</option>
@@ -587,17 +587,17 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label required" for="ies">Instituição</label>
-                <input type="text" id="ies" class="form-control" required>
+                <input type="text" id="ies" class="form-control" value="{{ String($json.instituicao ?? $json.ies ?? '').trim().toUpperCase() }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-9">
                 <label class="form-label required" for="curso">Curso</label>
-                <input type="text" id="curso" class="form-control" required>
+                <input type="text" id="curso" class="form-control" value="{{ String($json.curso ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="ano_conclusao">Ano de conclusão</label>
-                <input type="text" id="ano_conclusao" class="form-control" inputmode="numeric" maxlength="4" required>
+                <input type="text" id="ano_conclusao" class="form-control" inputmode="numeric" maxlength="4" value="{{ String($json.ano ?? $json.ano_conclusao ?? '').replace(/\D+/g, '').slice(0,4) }}" required>
               </div>
             </div>
           </div>
@@ -618,7 +618,7 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="cargo">Cargo pretendido</label>
-                <select id="cargo" class="form-select" required>
+                <select id="cargo" class="form-select" data-prefill="{{ $json.cargo ?? $json.cargo_pretendido ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option value="Analista em Saúde Animal – Veterinário 40h">Analista em Saúde Animal – Veterinário 40h</option>
                   <option value="Analista em Saúde Animal – Veterinário 20h">Analista em Saúde Animal – Veterinário 20h</option>
@@ -630,7 +630,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label" for="especialidade">Especialidade (quando houver)</label>
-                <input type="text" id="especialidade" class="form-control">
+                <input type="text" id="especialidade" class="form-control" value="{{ String($json.especialidade ?? '').trim().toUpperCase() }}">
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -640,11 +640,11 @@
                   <div class="form-check"><input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_sim" value="SIM" required><label class="form-check-label" for="jurado_sim">Sim</label></div>
                   <div class="form-check"><input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_nao" value="NAO"><label class="form-check-label" for="jurado_nao">Não</label></div>
                 </div>
-                <input type="hidden" id="foi_jurado" value="">
+                <input type="hidden" id="foi_jurado" value="{{ String($json.foi_jurado ?? $json.jurado ?? '').trim().toUpperCase() }}">
               </div>
               <div class="col-md-6 d-none" id="juradoPeriodoWrap">
                 <label class="form-label" for="jurado_periodo">Informações sobre a atuação como jurado(a)</label>
-                <input type="text" id="jurado_periodo" class="form-control" placeholder="Tribunal, período ou outros detalhes">
+                <input type="text" id="jurado_periodo" class="form-control" placeholder="Tribunal, período ou outros detalhes" value="{{ String($json.jurado_periodo ?? '').trim() }}">
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -654,15 +654,15 @@
                   <div class="form-check"><input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_sim" value="Sim" required><label class="form-check-label" for="vinculo_publico_sim">Sim</label></div>
                   <div class="form-check"><input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_nao" value="Não"><label class="form-check-label" for="vinculo_publico_nao">Não</label></div>
                 </div>
-                <input type="hidden" id="vinculo_publico" value="">
+                <input type="hidden" id="vinculo_publico" value="{{ String($json.vinculo_publico ?? '').trim() }}">
               </div>
               <div class="col-md-3 d-none" id="qualVinculoWrap">
                 <label class="form-label" for="qual_vinculo">Qual vínculo</label>
-                <input type="text" id="qual_vinculo" class="form-control">
+                <input type="text" id="qual_vinculo" class="form-control" value="{{ String($json.qual_vinculo ?? '').trim() }}">
               </div>
               <div class="col-md-3 d-none" id="experienciaTempoWrap">
                 <label class="form-label" for="experiencia_tempo">Tempo (meses/anos)</label>
-                <input type="text" id="experiencia_tempo" class="form-control">
+                <input type="text" id="experiencia_tempo" class="form-control" value="{{ String($json.experiencia_tempo ?? '').trim() }}">
               </div>
             </div>
           </div>
@@ -683,7 +683,7 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="raca">Cor/Raça (IBGE)</label>
-                <select id="raca" class="form-select" required>
+                <select id="raca" class="form-select" data-prefill="{{ $json.raca ?? $json.race ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Branca</option>
                   <option>Preta</option>
@@ -694,7 +694,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label required" for="cotasPPNI">Concorrer às vagas PPNI?</label>
-                <select id="cotasPPNI" class="form-select" required>
+                <select id="cotasPPNI" class="form-select" data-prefill="{{ $json.cotasPPNI ?? $json.concorrer_ppni ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Sim</option>
                   <option>Não</option>
@@ -713,7 +713,7 @@
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label required" for="is_pcd">É PCD?</label>
-                <select id="is_pcd" class="form-select" required>
+                <select id="is_pcd" class="form-select" data-prefill="{{ $json.is_pcd ?? $json.withDisability ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Sim</option>
                   <option>Não</option>
@@ -723,11 +723,11 @@
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
-                    <input type="text" id="tipo_pcd" class="form-control">
+                    <input type="text" id="tipo_pcd" class="form-control" value="{{ String($json.tipo_pcd ?? '').trim() }}">
                   </div>
                   <div class="col-md-6">
                     <label class="form-label" for="pcd_cid">CID (se houver)</label>
-                    <input type="text" id="pcd_cid" class="form-control">
+                    <input type="text" id="pcd_cid" class="form-control" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}">
                   </div>
                 </div>
               </div>
@@ -750,7 +750,7 @@
               </div>
               <div class="col-md-8">
                 <label class="form-label" for="necessidade">Descreva a necessidade</label>
-                <textarea id="necessidade" class="form-control" rows="2" placeholder="Informe recursos ou adaptações necessários"></textarea>
+                <textarea id="necessidade" class="form-control" rows="2" placeholder="Informe recursos ou adaptações necessários">{{ String($json.necessidade ?? $json.specialNeedDescription ?? '').trim() }}</textarea>
               </div>
             </div>
           </div>
@@ -1010,6 +1010,7 @@
       const DOC_MAX_MB = 2;
       const VID_OK_EXT = ['mp4','mov'];
       const VID_MAX_MB = 30;
+      const PREFILL = {{ $json ? JSON.stringify($json) : '{}' }};
 
       const recursoWrapper = document.getElementById('recursoWrapper');
       const recursoState = { enabled:false, start:null, end:null };
@@ -1252,6 +1253,203 @@
         .replace(/[^A-Z]/gi, '')
         .toUpperCase();
       const toUpperText = (value) => String(value || '').toUpperCase();
+      const normalizeMatch = (value) => String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z0-9]/gi, '')
+        .toUpperCase();
+      const disabilityLabelMap = {
+        hearingDisability: {
+          surdezBilateral: 'Surdez bilateral',
+          surdezUnilateral: 'Surdez unilateral',
+          perdaAuditiva: 'Perda auditiva',
+          outrasAuditivas: 'Outras deficiências auditivas'
+        },
+        visualDisability: {
+          cegueira: 'Cegueira',
+          baixaVisao: 'Baixa visão',
+          visaoMonocular: 'Visão monocular',
+          outrasVisuais: 'Outras deficiências visuais'
+        },
+        phisicalDisability: {
+          paraplegia: 'Paraplegia',
+          tetraplegia: 'Tetraplegia',
+          hemiplegia: 'Hemiplegia',
+          tetraparesia: 'Tetraparesia',
+          amputacao: 'Amputação',
+          nanismo: 'Nanismo',
+          ostomia: 'Ostomia',
+          paralisiaCerebral: 'Paralisia cerebral',
+          outrasFisicas: 'Outras deficiências físicas'
+        },
+        intellectualDisability: {
+          sindromeDown: 'Síndrome de Down',
+          espectroAutista: 'Transtorno do espectro autista',
+          esquizofrenia: 'Esquizofrenia',
+          transtornoBipolar: 'Transtorno bipolar',
+          transtornosPersonalidade: 'Transtornos de personalidade',
+          depressao: 'Depressão',
+          outrasIntelectuais: 'Outras deficiências intelectuais'
+        }
+      };
+      const humanizeFlag = (key) => {
+        if(!key) return '';
+        return key
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/_/g, ' ')
+          .trim()
+          .replace(/\s+/g, ' ')
+          .toLowerCase()
+          .replace(/\b\w/g, char => char.toUpperCase());
+      };
+      const parseFlagObject = (raw) => {
+        if(!raw) return {};
+        if(typeof raw === 'object' && raw !== null) return raw;
+        if(typeof raw === 'string'){
+          const trimmed = raw.trim();
+          if(!trimmed) return {};
+          try{ return JSON.parse(trimmed); }
+          catch(e){
+            try{ return JSON.parse(trimmed.replace(/&quot;/g, '"')); }
+            catch(err){ return {}; }
+          }
+        }
+        return {};
+      };
+      function setSelectValue(selector, value){
+        const el = $(selector);
+        if(!el) return;
+        const normalizedTarget = normalizeMatch(value);
+        if(!normalizedTarget) return;
+        const options = Array.from(el.options || []);
+        const match = options.find(option => {
+          const optionNorm = normalizeMatch(option.value || option.textContent || '');
+          return optionNorm === normalizedTarget;
+        });
+        if(match){
+          el.value = match.value;
+          ['input','change'].forEach(evt => el.dispatchEvent(new Event(evt,{bubbles:true})));
+        }
+      }
+      function setRadioValue(name, value){
+        const normalizedTarget = normalizeMatch(value);
+        if(!normalizedTarget) return false;
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        let matched = false;
+        radios.forEach(radio => {
+          const norm = normalizeMatch(radio.value);
+          if(!matched && norm === normalizedTarget){
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change',{bubbles:true}));
+            matched = true;
+          }else if(norm !== normalizedTarget){
+            radio.checked = false;
+          }
+        });
+        return matched;
+      }
+      function applyPrefillFromContext(){
+        const data = PREFILL && typeof PREFILL === 'object' ? PREFILL : null;
+        if(!data) return;
+        const assignValue = (selector, rawValue, transform) => {
+          if(rawValue === undefined || rawValue === null) return;
+          const el = $(selector);
+          if(!el) return;
+          const value = transform ? transform(rawValue) : rawValue;
+          if(value === undefined || value === null) return;
+          const str = String(value);
+          if(!str.trim()) return;
+          el.value = str;
+          ['input','change'].forEach(evt => el.dispatchEvent(new Event(evt,{bubbles:true})));
+        };
+        assignValue('#cpf', data.cpf ?? data.preferred_username, value => onlyDigits(value).slice(0,11));
+        assignValue('#nome', data.name ?? data.given_name ?? data.family_name, value => String(value).trim());
+        assignValue('#nome_social', data.socialName, value => String(value).trim().toUpperCase());
+        assignValue('#nasc', data.dob ?? data.data_nascimento, parseToIsoDate);
+        assignValue('#nacionalidade', data.nacionalidade ?? data.nationality, value => String(value).trim().toUpperCase());
+        assignValue('#naturalidade_cidade', data.naturalidade ?? data.naturalidade_cidade, value => String(value).trim().toUpperCase());
+        assignValue('#naturalidade_uf', data.uf_naturalidade ?? data.naturalidade_uf, value => String(value).trim().toUpperCase());
+        assignValue('#rg_numero', data.num_doc ?? data.rg, value => onlyDigits(value).slice(0,14));
+        assignValue('#rg_orgao', data.orgao ?? data.rg_orgao, value => String(value).trim().toUpperCase());
+        assignValue('#rg_uf', data.uf_doc ?? data.rg_uf, value => String(value).trim().toUpperCase());
+        assignValue('#rg_data', data.exp_doc ?? data.rg_data, parseToIsoDate);
+        assignValue('#nis', data.nis ?? data.pis ?? data.pis_pasep, value => onlyDigits(value).slice(0,11));
+        assignValue('#mae', data.mae ?? data.motherName, value => String(value).trim().toUpperCase());
+        assignValue('#pai', data.pai ?? data.fatherName, value => String(value).trim().toUpperCase());
+        assignValue('#email', data.email, value => String(value).trim().toLowerCase());
+        assignValue('#tel1', data.telefone ?? data.phone, fmtPhone);
+        assignValue('#tel2', data.telefone2 ?? data.phone2, fmtPhone);
+        assignValue('#cep', data.postal_code ?? data.cep, value => onlyDigits(value).slice(0,8));
+        assignValue('#logradouro', data.addressStreet ?? data.logradouro, value => String(value).trim().toUpperCase());
+        assignValue('#numero', data.addressNumber, value => String(value).trim().toUpperCase());
+        assignValue('#complemento', data.addressComplement ?? data.complemento, value => String(value).trim().toUpperCase());
+        assignValue('#bairro', data.neighborhood ?? data.bairro, value => String(value).trim().toUpperCase());
+        assignValue('#cidade', data.locality ?? data.city, value => String(value).trim().toUpperCase());
+        assignValue('#uf', data.state ?? data.addressState ?? data.uf, value => String(value).trim().toUpperCase());
+        assignValue('#ies', data.instituicao ?? data.ies, value => String(value).trim().toUpperCase());
+        assignValue('#curso', data.curso, value => String(value).trim().toUpperCase());
+        assignValue('#ano_conclusao', data.ano ?? data.ano_conclusao, value => onlyDigits(value).slice(0,4));
+        assignValue('#especialidade', data.especialidade, value => String(value).trim());
+        assignValue('#jurado_periodo', data.jurado_periodo, value => String(value).trim());
+        assignValue('#qual_vinculo', data.qual_vinculo, value => String(value).trim());
+        assignValue('#experiencia_tempo', data.experiencia_tempo, value => String(value).trim());
+        assignValue('#pcd_cid', data.pcd_cid, value => String(value).trim().toUpperCase());
+        assignValue('#necessidade', data.necessidade ?? data.specialNeedDescription, value => String(value).trim());
+        setSelectValue('#sexo', data.gender ?? data.sexo);
+        setSelectValue('#genero_identidade', data.genero_identidade ?? data.genderIdentity);
+        if($('#genero_identidade')?.value === 'Outro'){
+          assignValue('#genero_outro', data.genero_outro ?? data.generoOutro, value => String(value).trim());
+        }
+        setSelectValue('#estado_civil', data.estado_civil ?? data.maritalStatus);
+        setSelectValue('#nivel', data.nivel ?? data.nivel_escolaridade ?? data.escolaridade);
+        setSelectValue('#raca', data.raca ?? data.race);
+        setSelectValue('#cotasPPNI', data.cotasPPNI ?? data.concorrer_ppni);
+        setSelectValue('#cargo', data.cargo ?? data.cargo_pretendido);
+        const disabilityLabels = [];
+        Object.keys(disabilityLabelMap).forEach(group => {
+          const flags = parseFlagObject(data[group]);
+          Object.entries(flags).forEach(([key, flagValue])=>{
+            if(!flagValue) return;
+            const map = disabilityLabelMap[group] || {};
+            const label = map[key] || humanizeFlag(key);
+            if(label) disabilityLabels.push(label);
+          });
+        });
+        if(disabilityLabels.length){
+          assignValue('#tipo_pcd', disabilityLabels.join(', '));
+        }
+        const withDisability = data.is_pcd ?? data.withDisability;
+        let pcdChoice = '';
+        if(disabilityLabels.length){
+          pcdChoice = 'Sim';
+        }else{
+          const normalized = normalizeMatch(withDisability);
+          if(normalized === 'SIM') pcdChoice = 'Sim';
+          else if(normalized === 'NAO') pcdChoice = 'Não';
+        }
+        if(pcdChoice) setSelectValue('#is_pcd', pcdChoice);
+        assignValue('#foi_jurado', data.foi_jurado ?? data.jurado, value => String(value).trim().toUpperCase());
+        assignValue('#vinculo_publico', data.vinculo_publico, value => String(value).trim());
+        const juradoValue = $('#foi_jurado')?.value;
+        if(juradoValue) setRadioValue('jurado_funcao', juradoValue);
+        const vinculoValue = $('#vinculo_publico')?.value;
+        if(vinculoValue) setRadioValue('vinculo_publico_opcao', vinculoValue);
+        setRadioValue('militar', data.militar);
+        setRadioValue('politicos', data.politicos);
+        const condicaoEspecial = data.condicao_especial ?? data.specialNeeds ?? data.necessidadeEspecial;
+        if(condicaoEspecial){
+          const normalized = normalizeMatch(condicaoEspecial);
+          if(normalized === 'SIM') setRadioValue('condicao_especial','Sim');
+          else if(normalized === 'NAO') setRadioValue('condicao_especial','Não');
+        }
+        const selectorsToTrigger = ['#cpf','#nome','#nome_social','#nasc','#nacionalidade','#naturalidade_cidade','#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis','#mae','#pai','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf','#ies','#curso','#ano_conclusao','#especialidade','#jurado_periodo','#qual_vinculo','#experiencia_tempo','#tipo_pcd','#pcd_cid','#necessidade'];
+        selectorsToTrigger.forEach(selector => {
+          const el = $(selector);
+          if(el && el.value){
+            ['input','change'].forEach(evt => el.dispatchEvent(new Event(evt,{bubbles:true})));
+          }
+        });
+      }
 
       function buildQuotaData(){
         const nome = $('#nome')?.value || '';
@@ -2426,6 +2624,10 @@
         });
       }
       function init(){
+        bindWizard();
+        declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
+        attachWatchers();
+        applyPrefillFromContext();
         toggleVinculoDetails();
         togglePcdDetails();
         toggleSexoDependents();
@@ -2433,9 +2635,6 @@
         toggleJuradoDetails();
         updateNecessidadeRequirement();
         updateResourceAreaVisibility();
-        bindWizard();
-        declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
-        attachWatchers();
         updateReview();
         refreshSubmitState();
         autofillAddressByCep();
