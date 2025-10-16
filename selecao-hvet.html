@@ -285,11 +285,11 @@
           </li>
           <li class="wizard-step" data-step="4" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">5</span>
-            <span class="wizard-label">Documentos</span>
+            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
           </li>
           <li class="wizard-step" data-step="5" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">6</span>
-            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
+            <span class="wizard-label">Documentos</span>
           </li>
           <li class="wizard-step" data-step="6" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">7</span>
@@ -307,8 +307,8 @@
           <button type="button" class="form-tab-link" data-tab-target="1" role="tab" aria-selected="false">Contato &amp; Endereço</button>
           <button type="button" class="form-tab-link" data-tab-target="2" role="tab" aria-selected="false">Formação &amp; Vínculos</button>
           <button type="button" class="form-tab-link" data-tab-target="3" role="tab" aria-selected="false">Dados do certame</button>
-          <button type="button" class="form-tab-link" data-tab-target="4" role="tab" aria-selected="false">Documentos</button>
-          <button type="button" class="form-tab-link" data-tab-target="5" role="tab" aria-selected="false">Cotas &amp; Acessibilidade</button>
+          <button type="button" class="form-tab-link" data-tab-target="4" role="tab" aria-selected="false">Cotas &amp; Acessibilidade</button>
+          <button type="button" class="form-tab-link" data-tab-target="5" role="tab" aria-selected="false">Documentos</button>
           <button type="button" class="form-tab-link" data-tab-target="6" role="tab" aria-selected="false">Revisão final</button>
         </div>
       </div>
@@ -674,7 +674,109 @@
         </div>
       </section>
 
-      <section class="step-panel form-tab-pane" data-step-panel="4" aria-label="Etapa 5 - Documentos" role="tabpanel">
+      <section class="step-panel form-tab-pane" data-step-panel="4" aria-label="Etapa 5 - Cotas e acessibilidade" role="tabpanel">
+        <div class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Informações de raça e cotas</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label required" for="raca">Cor/Raça (IBGE)</label>
+                <select id="raca" class="form-select" required>
+                  <option value="">Selecione...</option>
+                  <option>Branca</option>
+                  <option>Preta</option>
+                  <option>Parda</option>
+                  <option>Amarela</option>
+                  <option>Indígena</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="cotasPPNI">Concorrer às vagas PPNI?</label>
+                <select id="cotasPPNI" class="form-select" required>
+                  <option value="">Selecione...</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </div>
+            </div>
+            <div class="help tiny mt-2">Se optar por PPNI, serão exigidos arquivos de heteroidentificação abaixo.</div>
+          </div>
+        </div>
+
+        <div class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Pessoa com Deficiência (PCD)</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label required" for="is_pcd">É PCD?</label>
+                <select id="is_pcd" class="form-select" required>
+                  <option value="">Selecione...</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </div>
+              <div id="pcdDetalhes" class="col-md-9 d-none">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
+                    <input type="text" id="tipo_pcd" class="form-control">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="pcd_cid">CID (se houver)</label>
+                    <input type="text" id="pcd_cid" class="form-control">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Condições especiais para as etapas</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label required d-block">Necessita de condições especiais para a realização das etapas da seleção?</label>
+                <div class="d-flex gap-3">
+                  <div class="form-check"><input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_sim" value="Sim" required><label class="form-check-label" for="condicao_especial_sim">Sim</label></div>
+                  <div class="form-check"><input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_nao" value="Não"><label class="form-check-label" for="condicao_especial_nao">Não</label></div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <label class="form-label" for="necessidade">Descreva a necessidade</label>
+                <textarea id="necessidade" class="form-control" rows="2" placeholder="Informe recursos ou adaptações necessários"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-form mb-4 d-none" id="quotaFormsCard">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Formulários de cotas</h2>
+            <span class="badge badge-soft">Preenchimento automático</span>
+          </div>
+          <div class="card-body">
+            <div class="form-tabs" id="quotaFormsTabs" role="tablist"></div>
+            <div id="quotaFormsPanels"></div>
+            <p class="tiny text-muted mt-3" id="quotaFormsEmptyHint">Os formulários serão exibidos quando houver enquadramento em alguma cota.</p>
+          </div>
+        </div>
+
+        <div class="wizard-controls">
+          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
+          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
+        </div>
+      </section>
+
+
+
+      <section class="step-panel form-tab-pane" data-step-panel="5" aria-label="Etapa 6 - Documentos" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h5 mb-0">Documentos</h2>
@@ -823,109 +925,8 @@
         </div>
       </section>
 
-<section class="step-panel form-tab-pane" data-step-panel="5" aria-label="Etapa 6 - Cotas e acessibilidade" role="tabpanel">
-        <div class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Informações de raça e cotas</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label required" for="raca">Cor/Raça (IBGE)</label>
-                <select id="raca" class="form-select" required>
-                  <option value="">Selecione...</option>
-                  <option>Branca</option>
-                  <option>Preta</option>
-                  <option>Parda</option>
-                  <option>Amarela</option>
-                  <option>Indígena</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label required" for="cotasPPNI">Concorrer às vagas PPNI?</label>
-                <select id="cotasPPNI" class="form-select" required>
-                  <option value="">Selecione...</option>
-                  <option>Sim</option>
-                  <option>Não</option>
-                </select>
-              </div>
-            </div>
-            <div class="help tiny mt-2">Se optar por PPNI, serão exigidos arquivos de heteroidentificação abaixo.</div>
-          </div>
-        </div>
 
-        <div class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Pessoa com Deficiência (PCD)</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label class="form-label required" for="is_pcd">É PCD?</label>
-                <select id="is_pcd" class="form-select" required>
-                  <option value="">Selecione...</option>
-                  <option>Sim</option>
-                  <option>Não</option>
-                </select>
-              </div>
-              <div id="pcdDetalhes" class="col-md-9 d-none">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
-                    <input type="text" id="tipo_pcd" class="form-control">
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label" for="pcd_cid">CID (se houver)</label>
-                    <input type="text" id="pcd_cid" class="form-control">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Condições especiais para as etapas</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label required d-block">Necessita de condições especiais para a realização das etapas da seleção?</label>
-                <div class="d-flex gap-3">
-                  <div class="form-check"><input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_sim" value="Sim" required><label class="form-check-label" for="condicao_especial_sim">Sim</label></div>
-                  <div class="form-check"><input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_nao" value="Não"><label class="form-check-label" for="condicao_especial_nao">Não</label></div>
-                </div>
-              </div>
-              <div class="col-md-8">
-                <label class="form-label" for="necessidade">Descreva a necessidade</label>
-                <textarea id="necessidade" class="form-control" rows="2" placeholder="Informe recursos ou adaptações necessários"></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-form mb-4 d-none" id="quotaFormsCard">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0">Formulários de cotas</h2>
-            <span class="badge badge-soft">Preenchimento automático</span>
-          </div>
-          <div class="card-body">
-            <div class="form-tabs" id="quotaFormsTabs" role="tablist"></div>
-            <div id="quotaFormsPanels"></div>
-            <p class="tiny text-muted mt-3" id="quotaFormsEmptyHint">Os formulários serão exibidos quando houver enquadramento em alguma cota.</p>
-          </div>
-        </div>
-
-        <div class="wizard-controls">
-          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
-          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
-        </div>
-      </section>
-
-
-
-      <section class="step-panel form-tab-pane" data-step-panel="6" aria-label="Etapa 7 - Revisão e envio" role="tabpanel">
+<section class="step-panel form-tab-pane" data-step-panel="6" aria-label="Etapa 7 - Revisão e envio" role="tabpanel">
         <div class="card card-form mb-5">
           <div class="card-header">
             <h2 class="h5 mb-0">Revisão e envio</h2>
