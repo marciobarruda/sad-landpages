@@ -368,8 +368,8 @@
                 <input type="date" id="rg_data" class="form-control" required>
               </div>
             </div>
-            <div class="row g-3 mt-0">
-              <div class="col-md-3">
+            <div class="row g-3 mt-0 align-items-end">
+              <div class="col-md-4 col-lg-3">
                 <label class="form-label required" for="sexo">Sexo</label>
                 <select id="sexo" class="form-select" required>
                   <option value="">Selecione...</option>
@@ -379,7 +379,7 @@
                   <option>Prefiro não informar</option>
                 </select>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4 col-lg-3">
                 <label class="form-label" for="genero_identidade">Gênero</label>
                 <select id="genero_identidade" class="form-select">
                   <option value="">Selecione...</option>
@@ -393,7 +393,13 @@
                   <option>Prefiro não informar</option>
                 </select>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4 col-lg-3 d-none" id="generoOutroCol">
+                <label class="form-label" for="genero_outro">Informe o gênero</label>
+                <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80">
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-4 col-lg-3">
                 <label class="form-label required" for="estado_civil">Estado civil</label>
                 <select id="estado_civil" class="form-select" required>
                   <option value="">Selecione...</option>
@@ -405,15 +411,9 @@
                   <option>Separado(a)</option>
                 </select>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4 col-lg-3">
                 <label class="form-label" for="nis">NIS</label>
                 <input type="text" id="nis" class="form-control" inputmode="numeric" maxlength="11">
-              </div>
-            </div>
-            <div class="row g-3 mt-0 d-none" id="generoOutroRow">
-              <div class="col-md-4">
-                <label class="form-label" for="genero_outro">Informe o gênero</label>
-                <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80">
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -1872,10 +1872,10 @@
 
       function toggleGeneroOutro(){
         const generoSelect = $('#genero_identidade');
-        const outroRow = $('#generoOutroRow');
+        const outroCol = $('#generoOutroCol');
         const outroInput = $('#genero_outro');
         const isOutro = (generoSelect?.value || '') === 'Outro';
-        outroRow?.classList.toggle('d-none', !isOutro);
+        outroCol?.classList.toggle('d-none', !isOutro);
         if(outroInput){
           outroInput.required = isOutro;
           if(!isOutro){
