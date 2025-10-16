@@ -321,11 +321,11 @@
                 <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ $json.preferred_username ?? '' }}" required>
                 <div class="help tiny" id="cpfHelp"></div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-7">
                 <label class="form-label required" for="nome">Nome completo</label>
                 <input type="text" id="nome" class="form-control" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" required>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <label class="form-label required" for="nasc">Data de nascimento</label>
                 <input type="date" id="nasc" class="form-control" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" required>
               </div>
@@ -342,17 +342,6 @@
               <div class="col-md-3">
                 <label class="form-label required" for="naturalidade_uf">UF</label>
                 <input type="text" id="naturalidade_uf" maxlength="2" class="form-control" required>
-              </div>
-            </div>
-            <div class="row g-3 mt-0">
-              <div class="col-md-4">
-                <label class="form-label required" for="genero">Gênero</label>
-                <select id="genero" class="form-select" required>
-                  <option value="">Selecione...</option>
-                  <option>Feminino</option>
-                  <option>Masculino</option>
-                  <option>Outro</option>
-                </select>
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -374,9 +363,67 @@
               </div>
             </div>
             <div class="row g-3 mt-0">
+              <div class="col-md-3">
+                <label class="form-label required" for="sexo">Sexo</label>
+                <select id="sexo" class="form-select" required>
+                  <option value="">Selecione...</option>
+                  <option>Feminino</option>
+                  <option>Masculino</option>
+                  <option>Intersexo</option>
+                  <option>Prefiro não informar</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="genero_identidade">Gênero</label>
+                <select id="genero_identidade" class="form-select">
+                  <option value="">Selecione...</option>
+                  <option>Mulher cisgênero</option>
+                  <option>Mulher trans</option>
+                  <option>Homem cisgênero</option>
+                  <option>Homem trans</option>
+                  <option>Pessoa não binária</option>
+                  <option>Travesti</option>
+                  <option>Outro</option>
+                  <option>Prefiro não informar</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label required" for="estado_civil">Estado civil</label>
+                <select id="estado_civil" class="form-select" required>
+                  <option value="">Selecione...</option>
+                  <option>Solteiro(a)</option>
+                  <option>Casado(a)</option>
+                  <option>União estável</option>
+                  <option>Divorciado(a)</option>
+                  <option>Viúvo(a)</option>
+                  <option>Separado(a)</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="nis">NIS</label>
+                <input type="text" id="nis" class="form-control" inputmode="numeric" maxlength="11">
+              </div>
+            </div>
+            <div class="row g-3 mt-0 d-none" id="generoOutroRow">
               <div class="col-md-4">
-                <label class="form-label" for="pis_pasep">PIS/PASEP</label>
-                <input type="text" id="pis_pasep" class="form-control">
+                <label class="form-label" for="genero_outro">Informe o gênero</label>
+                <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80">
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-6">
+                <label class="form-label" for="filiacao1">Filiação 1</label>
+                <input type="text" id="filiacao1" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="filiacao2">Filiação 2</label>
+                <input type="text" id="filiacao2" class="form-control">
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-6">
+                <label class="form-label" for="nome_social">Nome social</label>
+                <input type="text" id="nome_social" class="form-control">
               </div>
             </div>
           </div>
@@ -401,6 +448,16 @@
                   <div class="form-check"><input class="form-check-input" type="radio" name="politicos" id="politicos_sim" value="SIM"><label class="form-check-label" for="politicos_sim">Sim</label></div>
                   <div class="form-check"><input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO"><label class="form-check-label" for="politicos_nao">Não</label></div>
                 </div>
+              </div>
+            </div>
+            <div class="row g-3 mt-0 d-none" id="alistamentoWrap">
+              <div class="col-md-6">
+                <label class="form-label" for="alistamento_numero">Número do Certificado de Alistamento Militar</label>
+                <input type="text" id="alistamento_numero" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="alistamento_data">Data de alistamento</label>
+                <input type="date" id="alistamento_data" class="form-control">
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -514,8 +571,9 @@
                   <option>Fundamental</option>
                   <option>Médio</option>
                   <option>Técnico</option>
-                  <option>Superior</option>
+                  <option>Graduação</option>
                   <option>Pós-graduação</option>
+                  <option>Mestrado</option>
                   <option>Doutorado</option>
                 </select>
               </div>
@@ -530,7 +588,7 @@
                 <input type="text" id="curso" class="form-control" required>
               </div>
               <div class="col-md-3">
-                <label class="form-label required" for="ano_conclusao">Ano</label>
+                <label class="form-label required" for="ano_conclusao">Ano de conclusão</label>
                 <input type="text" id="ano_conclusao" class="form-control" inputmode="numeric" maxlength="4" required>
               </div>
             </div>
@@ -539,25 +597,53 @@
 
         <div class="card card-form mb-4">
           <div class="card-header">
-            <h2 class="h5 mb-0">Experiência e vínculos</h2>
+            <h2 class="h5 mb-0">Dados do certame</h2>
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label required" for="vinculo_publico">Vínculo com serviço público?</label>
-                <select id="vinculo_publico" class="form-select" required>
+              <div class="col-md-6">
+                <label class="form-label required" for="cargo">Cargo pretendido</label>
+                <select id="cargo" class="form-select" required>
                   <option value="">Selecione...</option>
-                  <option>Sim</option>
-                  <option>Não</option>
+                  <option>Médico Veterinário</option>
+                  <option>Assistente Administrativo</option>
+                  <option>Auxiliar de Veterinária</option>
+                  <option>Outro cargo</option>
                 </select>
               </div>
-            </div>
-            <div id="vinculoDetalhes" class="row g-3 mt-0 d-none">
               <div class="col-md-6">
+                <label class="form-label" for="especialidade">Especialidade (quando houver)</label>
+                <input type="text" id="especialidade" class="form-control">
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-6">
+                <label class="form-label required d-block">Exerceu efetivamente a função de jurado(a), nos termos do art. 440 do Código de Processo Penal, no período previsto pelo edital?</label>
+                <div class="d-flex gap-3">
+                  <div class="form-check"><input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_sim" value="SIM" required><label class="form-check-label" for="jurado_sim">Sim</label></div>
+                  <div class="form-check"><input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_nao" value="NAO"><label class="form-check-label" for="jurado_nao">Não</label></div>
+                </div>
+                <input type="hidden" id="foi_jurado" value="">
+              </div>
+              <div class="col-md-6 d-none" id="juradoPeriodoWrap">
+                <label class="form-label" for="jurado_periodo">Informações sobre a atuação como jurado(a)</label>
+                <input type="text" id="jurado_periodo" class="form-control" placeholder="Tribunal, período ou outros detalhes">
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-6">
+                <label class="form-label required d-block">Possui vínculo anterior ou atual com o Serviço Público (Federal, Estadual ou Municipal)?</label>
+                <div class="d-flex gap-3">
+                  <div class="form-check"><input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_sim" value="Sim" required><label class="form-check-label" for="vinculo_publico_sim">Sim</label></div>
+                  <div class="form-check"><input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_nao" value="Não"><label class="form-check-label" for="vinculo_publico_nao">Não</label></div>
+                </div>
+                <input type="hidden" id="vinculo_publico" value="">
+              </div>
+              <div class="col-md-3 d-none" id="qualVinculoWrap">
                 <label class="form-label" for="qual_vinculo">Qual vínculo</label>
                 <input type="text" id="qual_vinculo" class="form-control">
               </div>
-              <div class="col-md-6">
+              <div class="col-md-3 d-none" id="experienciaTempoWrap">
                 <label class="form-label" for="experiencia_tempo">Tempo (meses/anos)</label>
                 <input type="text" id="experiencia_tempo" class="form-control">
               </div>
@@ -590,15 +676,15 @@
                 </select>
               </div>
               <div class="col-md-6">
-                <label class="form-label required" for="cotasPNP">Concorrer às vagas PNP?</label>
-                <select id="cotasPNP" class="form-select" required>
+                <label class="form-label required" for="cotasPPNI">Concorrer às vagas PPNI?</label>
+                <select id="cotasPPNI" class="form-select" required>
                   <option value="">Selecione...</option>
                   <option>Sim</option>
                   <option>Não</option>
                 </select>
               </div>
             </div>
-            <div class="help tiny mt-2">Se optar por PNP, serão exigidos arquivos de heteroidentificação abaixo.</div>
+            <div class="help tiny mt-2">Se optar por PPNI, serão exigidos arquivos de heteroidentificação abaixo.</div>
           </div>
         </div>
 
@@ -618,15 +704,36 @@
               </div>
               <div id="pcdDetalhes" class="col-md-9 d-none">
                 <div class="row g-3">
-                  <div class="col-md-5">
+                  <div class="col-md-6">
                     <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
                     <input type="text" id="tipo_pcd" class="form-control">
                   </div>
-                  <div class="col-md-7">
-                    <label class="form-label" for="necessidade">Necessidade especial (provas/etapas)</label>
-                    <input type="text" id="necessidade" class="form-control">
+                  <div class="col-md-6">
+                    <label class="form-label" for="pcd_cid">CID (se houver)</label>
+                    <input type="text" id="pcd_cid" class="form-control">
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Condições especiais para as etapas</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label required d-block">Necessita de condições especiais para a realização das etapas da seleção?</label>
+                <div class="d-flex gap-3">
+                  <div class="form-check"><input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_sim" value="Sim" required><label class="form-check-label" for="condicao_especial_sim">Sim</label></div>
+                  <div class="form-check"><input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_nao" value="Não"><label class="form-check-label" for="condicao_especial_nao">Não</label></div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <label class="form-label" for="necessidade">Descreva a necessidade</label>
+                <textarea id="necessidade" class="form-control" rows="2" placeholder="Informe recursos ou adaptações necessários"></textarea>
               </div>
             </div>
           </div>
@@ -678,6 +785,12 @@
                 <div class="col-md-4"><div id="status_doc_id_verso" class="uploader-status ms-auto"></div></div>
 
                 <div class="col-md-8">
+                  <label class="form-label required">CPF</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_cpf" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_cpf" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
                   <label class="form-label required">Comprovante de residência</label>
                   <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
                 </div>
@@ -696,6 +809,19 @@
                 </div>
                 <div class="col-md-4 d-none" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
 
+                <div class="col-md-8 d-none" id="doc_jurado_wrap">
+                  <label class="form-label" id="docJuradoLabel">Certidão de atuação na função de jurado</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_jurado" accept=".pdf,image/*"></div>
+                </div>
+                <div class="col-md-4 d-none" id="status_doc_jurado_wrap"><div id="status_doc_jurado" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8 d-none" id="doc_jurado_440_wrap">
+                  <label class="form-label">Certidão de atuação na função de jurado (art. 440 do CPP)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_jurado_440" accept=".pdf,image/*"></div>
+                  <div class="help tiny">Anexar quando houver atuação no período previsto em lei.</div>
+                </div>
+                <div class="col-md-4 d-none" id="status_doc_jurado_440_wrap"><div id="status_doc_jurado_440" class="uploader-status ms-auto"></div></div>
+
                 <div class="col-md-8">
                   <label class="form-label required">Comprovação da escolaridade</label>
                   <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
@@ -713,8 +839,14 @@
             <hr>
 
             <section class="mb-4">
-              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PNP)</h3>
+              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PPNI)</h3>
               <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Declaração de heteroidentificação</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_declaracao" accept=".pdf,image/*"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_het_declaracao" class="uploader-status ms-auto"></div></div>
+
                 <div class="col-md-8">
                   <label class="form-label">Documento de identidade (frente/verso)</label>
                   <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
@@ -748,6 +880,16 @@
                   <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
                 </div>
                 <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
+                <div class="col-md-8">
+                  <label class="form-label">Declaração de deficiência (modelo do edital)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="pcd_declaracao" accept=".pdf,image/*"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_declaracao" class="uploader-status ms-auto"></div></div>
+                <div class="col-md-8">
+                  <label class="form-label">Exames complementares (opcional)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="pcd_exames" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_exames" class="uploader-status ms-auto"></div></div>
               </div>
             </section>
           </div>
@@ -770,7 +912,8 @@
             <div class="mb-4">
               <h3 class="h6 section-title mb-2">Declaração de responsabilidade</h3>
               <div id="responsibilityText" class="declaration-box" tabindex="0" role="textbox" aria-readonly="true">
-                DECLARO que todas as informações fornecidas são verdadeiras e exatas, DECLARO, ainda, estar ciente de que prestar declaração falsa caracteriza o crime de falsidade ideológica previsto no art. 299 do Código Penal Brasileiro, e que por tal crime serei responsabilizado, independentemente das sanções administrativas, caso se comprove a inveracidade do declarado neste documento. DECLARO estar ciente e de acordo com os termos da Política de Privacidade, nos termos da Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais – LGPD). DECLARO, por fim, que tomo ciência, neste ato, de toda a legislação mencionada acima.
+                <p>Declaro, sob as penas da Lei, que concordo com os termos que constam do Edital n° XXXX/2025 de Abertura de Inscrições bem como declaro que aceito que os meus dados pessoais, sensíveis ou não, sejam tratados e processados, de forma a possibilitar a efetiva execução da seleção simplificada, com a aplicação dos critérios de avaliação e seleção, autorizando expressamente a divulgação dos meus nomes, números de inscrição, critérios de desempate e das minhas notas, em observância aos princípios da publicidade e da transparência que regem a Administração Pública e nos termos da Lei federal n° 13.709, de 14 de agosto de 2018; e que não serão fornecidas a terceiros informações e/ou dados pessoais, sensíveis ou não de candidatos.</p>
+                <p>Declaro, sob as penas da Lei, que os dados informados neste formulário são verdadeiros e que conheço e aceito todas as regras pertinentes ao concurso consignadas no Edital n° xx/2025 de Abertura de Inscrições.</p>
               </div>
               <div class="form-check declaration-check">
                 <input class="form-check-input" type="checkbox" id="termoResponsabilidade" disabled>
@@ -798,6 +941,34 @@
         </div>
       </section>
 
+      <div id="recursoWrapper" class="card card-form mb-5 d-none" aria-hidden="true">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Interposição de recursos</h2>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info tiny" role="status" id="recursoInfo">Área disponível apenas durante o período de recursos divulgado no cronograma.</div>
+          <div class="row g-3 mt-0">
+            <div class="col-md-6">
+              <label class="form-label" for="recurso_tipo">Tipo de recurso</label>
+              <select id="recurso_tipo" class="form-select">
+                <option value="">Selecione...</option>
+                <option value="analise_curricular">Resultado Preliminar da Análise Curricular</option>
+                <option value="heteroidentificacao">Resultado Preliminar do Procedimento de Heteroidentificação</option>
+                <option value="biopsicossocial">Resultado Preliminar da Avaliação Biopsicossocial</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="recurso_texto">Justificativa</label>
+              <textarea id="recurso_texto" class="form-control" rows="4" placeholder="Descreva o motivo do recurso"></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="recurso_anexo">Anexo (opcional)</label>
+              <div class="dropzone"><input class="form-control" type="file" id="recurso_anexo" accept=".pdf,image/*"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="text-center text-muted tiny mb-5">Pré-validações locais. A conferência oficial seguirá o Edital do certame.</div>
     </main>
 
@@ -814,6 +985,38 @@
       const DOC_MAX_MB = 2;
       const VID_OK_EXT = ['mp4','mov'];
       const VID_MAX_MB = 30;
+
+      const recursoWrapper = document.getElementById('recursoWrapper');
+      const recursoState = { enabled:false, start:null, end:null };
+      const parseResourceDate = (value) => {
+        if(!value) return null;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      };
+      function updateResourceAreaVisibility(){
+        if(!recursoWrapper) return;
+        let show = false;
+        if(recursoState.enabled){
+          if(recursoState.start && recursoState.end){
+            const now = new Date();
+            show = now >= recursoState.start && now <= recursoState.end;
+          }else{
+            show = true;
+          }
+        }
+        recursoWrapper.classList.toggle('d-none', !show);
+        recursoWrapper.setAttribute('aria-hidden', show ? 'false' : 'true');
+      }
+      window.configureResourceWindow = function(config={}){
+        recursoState.enabled = Boolean(config.enabled);
+        recursoState.start = parseResourceDate(config.start);
+        recursoState.end = parseResourceDate(config.end);
+        updateResourceAreaVisibility();
+      };
+      window.toggleResourceArea = function(flag){
+        recursoState.enabled = Boolean(flag);
+        updateResourceAreaVisibility();
+      };
 
       // ========= Utils =========
       const $ = (sel) => document.querySelector(sel);
@@ -951,7 +1154,14 @@
         return age >= 18;
       };
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
-      const isGeneroMasculino = () => String($('#genero')?.value || '').trim().toUpperCase() === 'MASCULINO';
+      const isSexoMasculino = () => String($('#sexo')?.value || '').trim().toUpperCase() === 'MASCULINO';
+      const getGeneroIdentidadeValue = () => {
+        const selected = String($('#genero_identidade')?.value || '').trim();
+        if(selected === 'Outro'){
+          return String($('#genero_outro')?.value || '').trim();
+        }
+        return selected;
+      };
       const pickDataValue = (source, keys=[]) => {
         if(!source || typeof source !== 'object') return '';
         for(const key of keys){
@@ -1014,9 +1224,11 @@
         const nacionalidade = $('#nacionalidade')?.value || '';
         const naturalidadeCidade = $('#naturalidade_cidade')?.value || '';
         const naturalidadeUf = $('#naturalidade_uf')?.value || '';
-        const genero = $('#genero')?.value || '';
+        const sexo = $('#sexo')?.value || '';
+        const generoIdentidade = getGeneroIdentidadeValue();
+        const genero = generoIdentidade || sexo;
         const raca = $('#raca')?.value || '';
-        const concorrerPNP = ($('#cotasPNP')?.value || '').trim() === 'Sim';
+        const concorrerPPNI = ($('#cotasPPNI')?.value || '').trim() === 'Sim';
         const isPCD = ($('#is_pcd')?.value || '').trim() === 'Sim';
         const tipoPcd = $('#tipo_pcd')?.value || '';
         const necessidade = $('#necessidade')?.value || '';
@@ -1036,7 +1248,7 @@
           raca,
           racaUpper: toUpperText(raca),
           raceEligible: ['PRETA','PARDA','NEGRA','INDIGENA'].includes(normalizePlain(raca)),
-          concorrerPNP,
+          concorrerPPNI,
           isPCD,
           tipoPcdUpper: toUpperText(tipoPcd),
           necessidadeUpper: toUpperText(necessidade),
@@ -1048,11 +1260,11 @@
         {
           id:'quotaRacial',
           label:'Termo de cota racial',
-          condition:data => data.concorrerPNP && data.raceEligible,
+          condition:data => data.concorrerPPNI && data.raceEligible,
           template:data => {
             return `
               <div class="mb-3">
-                <p>Eu, <strong>${esc(data.nomeUpper)}</strong>, inscrito(a) no CPF nº <strong>${esc(data.cpfFormatted)}</strong>, nascido(a) em <strong>${esc(data.nascimentoBr)}</strong>, natural de <strong>${esc(data.naturalidadeUpper)}</strong>, declaro, sob as penas da lei, que me autodeclaro <strong>${esc(data.racaUpper)}</strong> para fins de participação nas vagas reservadas a pessoas negras (pretas e pardas) e indígenas.</p>
+                <p>Eu, <strong>${esc(data.nomeUpper)}</strong>, inscrito(a) no CPF nº <strong>${esc(data.cpfFormatted)}</strong>, nascido(a) em <strong>${esc(data.nascimentoBr)}</strong>, natural de <strong>${esc(data.naturalidadeUpper)}</strong>, declaro, sob as penas da lei, que me autodeclaro <strong>${esc(data.racaUpper)}</strong> para fins de participação nas vagas reservadas às pessoas negras (pretas e pardas) e indígenas (PPNI).</p>
                 <p>Estou ciente de que a falsidade desta declaração implicará nas sanções administrativas, civis e penais cabíveis.</p>
               </div>
               <div class="tiny text-muted">Declaração preenchida automaticamente com os dados informados na inscrição.</div>
@@ -1163,20 +1375,29 @@
 
       function updateReview(){
         const nome=$('#nome').value;
+        const nomeSocial=$('#nome_social').value;
         const email=($('#email').value||'').toLowerCase();
         const cpf=fmtCPF($('#cpf').value);
+        const nis=$('#nis').value;
         const telPrincipal = fmtPhone($('#tel1').value);
         const telAdicional = fmtPhone($('#tel2').value);
         const nasc = fmtDateBr($('#nasc').value);
+        const sexo=$('#sexo').value;
+        const generoIdentidade=getGeneroIdentidadeValue();
+        const estadoCivil=$('#estado_civil').value;
         const nacionalidade = $('#nacionalidade').value;
         const naturalidade = joinParts([
           $('#naturalidade_cidade').value,
           ($('#naturalidade_uf').value||'').toUpperCase()
         ]);
+        const filiacao1=$('#filiacao1').value;
+        const filiacao2=$('#filiacao2').value;
         const rgNumero = $('#rg_numero').value;
         const rgOrgao = $('#rg_orgao').value;
         const rgUf = ($('#rg_uf').value||'').toUpperCase();
         const rgData = fmtDateBr($('#rg_data').value);
+        const alistamentoNumero=$('#alistamento_numero')?.value || '';
+        const alistamentoData=fmtDateBr($('#alistamento_data')?.value || '');
         const cep=fmtCEP($('#cep').value);
         const logradouro = joinParts([
           $('#logradouro').value,
@@ -1188,13 +1409,17 @@
           $('#cidade').value,
           ($('#uf').value||'').toUpperCase()
         ], ' / ');
-        const genero=$('#genero').value;
-        const raca=$('#raca').value;
-        const pnp=$('#cotasPNP').value;
         const nivel=$('#nivel').value;
         const ies=$('#ies').value;
         const curso=$('#curso').value;
         const ano=$('#ano_conclusao').value;
+        const raca=$('#raca').value;
+        const cotasPPNI=$('#cotasPPNI').value;
+        const isPcd=$('#is_pcd').value;
+        const tipoPcd=$('#tipo_pcd').value;
+        const pcdCid=$('#pcd_cid').value;
+        const condicaoEspecial=document.querySelector('input[name="condicao_especial"]:checked')?.value || '';
+        const necessidade=$('#necessidade').value;
         const militarValue=document.querySelector('input[name="militar"]:checked')?.value || '';
         const militar = militarValue==='SIM' ? 'Sim' : militarValue==='NAO' ? 'Não' : '';
         const politicosValue=document.querySelector('input[name="politicos"]:checked')?.value || '';
@@ -1202,27 +1427,36 @@
         const titulo=$('#titulo').value;
         const zona=$('#zona').value;
         const secao=$('#secao').value;
-        const isPcd=$('#is_pcd').value;
-        const tipoPcd=$('#tipo_pcd').value;
-        const necessidade=$('#necessidade').value;
-        const vinculoPublico=$('#vinculo_publico').value;
+        const cargo=$('#cargo').value;
+        const especialidade=$('#especialidade').value;
+        const foiJuradoValor=$('#foi_jurado').value;
+        const foiJurado = foiJuradoValor==='SIM' ? 'Sim' : foiJuradoValor==='NAO' ? 'Não' : '';
+        const juradoPeriodo=$('#jurado_periodo').value;
+        const vinculoPublicoValor=$('#vinculo_publico').value;
+        const vinculoPublico = vinculoPublicoValor==='Sim' ? 'Sim' : vinculoPublicoValor==='Não' ? 'Não' : vinculoPublicoValor;
         const qualVinculo=$('#qual_vinculo').value;
-        const pisPasep=$('#pis_pasep').value;
         const experienciaTempo=$('#experiencia_tempo').value;
 
         const reviewSections = [
           { title:'Dados pessoais', rows:[
             {label:'Nome completo', value: present(nome)},
+            {label:'Nome social', value: present(nomeSocial)},
             {label:'Data de nascimento', value: present(nasc)},
+            {label:'Sexo', value: present(sexo)},
+            {label:'Identidade de gênero', value: present(generoIdentidade)},
+            {label:'Estado civil', value: present(estadoCivil)},
             {label:'Nacionalidade', value: present(nacionalidade)},
-            {label:'Naturalidade', value: present(naturalidade)}
+            {label:'Naturalidade', value: present(naturalidade)},
+            {label:'Filiação 1', value: present(filiacao1)},
+            {label:'Filiação 2', value: present(filiacao2)}
           ]},
           { title:'Documentos', rows:[
             {label:'RG', value: present(rgNumero)},
             {label:'Órgão expedidor', value: present(rgOrgao)},
             {label:'UF do RG', value: present(rgUf)},
             {label:'Data de expedição', value: present(rgData)},
-            {label:'CPF', value: present(cpf)}
+            {label:'CPF', value: present(cpf)},
+            {label:'NIS', value: present(nis)}
           ]},
           { title:'Contatos', rows:[
             {label:'E-mail', value: present(email)},
@@ -1242,27 +1476,31 @@
             {label:'Instituição', value: present(ies)},
             {label:'Ano de conclusão', value: present(ano)}
           ]},
-          { title:'Raça e gênero', rows:[
-            {label:'Gênero', value: present(genero)},
+          { title:'Cotas e acessibilidade', rows:[
             {label:'Cor/Raça (IBGE)', value: present(raca)},
-            {label:'Concorrer às vagas PNP?', value: present(pnp)}
+            {label:'Concorrer às vagas PPNI?', value: present(cotasPPNI)},
+            {label:'É PCD?', value: present(isPcd)},
+            {label:'Tipo de deficiência', value: present(tipoPcd)},
+            {label:'CID', value: present(pcdCid)},
+            {label:'Necessita condições especiais?', value: present(condicaoEspecial)},
+            {label:'Descrição da necessidade', value: present(necessidade)}
           ]},
           { title:'Situação militar e eleitoral', rows:[
             {label:'Obrigações militares', value: present(militar)},
+            {label:'Número do alistamento', value: present(alistamentoNumero)},
+            {label:'Data do alistamento', value: present(alistamentoData)},
             {label:'Direitos políticos', value: present(politicos)},
             {label:'Título de eleitor', value: present(titulo)},
             {label:'Zona', value: present(zona)},
             {label:'Seção', value: present(secao)}
           ]},
-          { title:'Pessoa com deficiência (PCD)', rows:[
-            {label:'É PCD?', value: present(isPcd)},
-            {label:'Tipo de deficiência', value: present(tipoPcd)},
-            {label:'Necessidade especial', value: present(necessidade)}
-          ]},
-          { title:'Vínculos e experiência', rows:[
+          { title:'Dados do certame', rows:[
+            {label:'Cargo', value: present(cargo)},
+            {label:'Especialidade', value: present(especialidade)},
+            {label:'Atuou como jurado(a)?', value: present(foiJurado)},
+            {label:'Detalhes da atuação', value: present(juradoPeriodo)},
             {label:'Vínculo com serviço público?', value: present(vinculoPublico)},
             {label:'Qual vínculo', value: present(qualVinculo)},
-            {label:'PIS/PASEP', value: present(pisPasep)},
             {label:'Tempo de experiência', value: present(experienciaTempo)}
           ]}
         ];
@@ -1290,7 +1528,7 @@
 
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','raca','cotasPNP','is_pcd','vinculo_publico'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
@@ -1298,6 +1536,13 @@
         if(!isValidPhone($('#tel1').value)) return false;
         const tel2Val = $('#tel2')?.value || '';
         if(tel2Val && !isValidPhone(tel2Val)) return false;
+        if((document.getElementById('genero_identidade')?.value || '') === 'Outro'){
+          if(!String(document.getElementById('genero_outro')?.value || '').trim()) return false;
+        }
+        if(!$('#foi_jurado').value.trim()) return false;
+        const condicaoEspecial = document.querySelector('input[name="condicao_especial"]:checked');
+        if(!condicaoEspecial) return false;
+        if($('#foi_jurado').value === 'SIM' && !String($('#jurado_periodo').value||'').trim()) return false;
         if($('#vinculo_publico').value === 'Sim'){
           if(!String($('#qual_vinculo').value||'').trim()) return false;
           if(!String($('#experiencia_tempo').value||'').trim()) return false;
@@ -1306,23 +1551,36 @@
           if(!String($('#tipo_pcd').value||'').trim()) return false;
           if(!String($('#necessidade').value||'').trim()) return false;
         }
+        if(condicaoEspecial.value === 'Sim' && !String($('#necessidade').value||'').trim()) return false;
         return true;
       }
       function docsRequiredOk(){
-        const req = ['doc_id_frente','doc_id_verso','doc_residencia','doc_quitacao_eleitoral','doc_escolaridade'];
+        const req = ['doc_id_frente','doc_id_verso','doc_cpf','doc_residencia','doc_quitacao_eleitoral','doc_escolaridade'];
         for(const id of req){ const el=document.getElementById(id); const ok=checkFiles(el,{required:true}).ok; if(!ok) return false; }
-        if(isGeneroMasculino()){
+        if(isSexoMasculino()){
           const militarOk = checkFiles(document.getElementById('doc_militar'), {required:true}).ok;
           if(!militarOk) return false;
         }
-        if($('#cotasPNP').value==='Sim'){
+        if($('#foi_jurado').value === 'SIM'){
+          const jurado = checkFiles($('#doc_jurado'), {required:true});
+          if(!jurado.ok) return false;
+          const jurado440 = $('#doc_jurado_440');
+          if(jurado440?.files?.length){
+            const jurado440Check = checkFiles(jurado440, {});
+            if(!jurado440Check.ok) return false;
+          }
+        }
+        if($('#cotasPPNI').value==='Sim'){
+          const declaracao = checkFiles($('#het_declaracao'), {required:true});
+          if(!declaracao.ok) return false;
           const hv = checkFiles($('#het_video'), {video:true});
           const hf = checkFiles($('#het_frente'), {});
           if(!hv.ok || !hf.ok) return false;
         }
         if($('#is_pcd').value==='Sim'){
           const lp = checkFiles($('#pcd_laudo'), {required:true});
-          if(!lp.ok) return false;
+          const decl = checkFiles($('#pcd_declaracao'), {required:true});
+          if(!lp.ok || !decl.ok) return false;
         }
         return true;
       }
@@ -1478,7 +1736,8 @@
       bindNumeric('#rg_numero',14);
       bindNumeric('#cep',8);
       bindNumeric('#ano_conclusao',4);
-      bindNumeric('#pis_pasep',11);
+      bindNumeric('#nis',11);
+      bindNumeric('#alistamento_numero',20);
       bindNumeric('#titulo',12);
       bindNumeric('#zona',4);
       bindNumeric('#secao',4);
@@ -1488,12 +1747,13 @@
       bindUppercase('#rg_uf');
       bindUppercase('#naturalidade_uf');
       bindUppercase('#uf');
+      bindUppercase('#pcd_cid');
 
       function updateDocMilitarStatus(){
         const input = $('#doc_militar');
         const status = document.getElementById('status_doc_militar');
         if(!input || !status) return;
-        if(!isGeneroMasculino()){
+        if(!isSexoMasculino()){
           resetUploaderStatus('status_doc_militar');
           return;
         }
@@ -1501,8 +1761,8 @@
         if(res.ok) ok(status, res.msg); else bad(status, res.msg);
       }
 
-      function toggleGeneroDependents(){
-        const isMasc = isGeneroMasculino();
+      function toggleSexoDependents(){
+        const isMasc = isSexoMasculino();
         document.querySelectorAll('input[name="militar"]').forEach(radio=>{
           radio.required = isMasc;
           if(!isMasc) radio.checked = false;
@@ -1537,14 +1797,79 @@
             updateDocMilitarStatus();
           }
         }
+        const alistamentoWrap = $('#alistamentoWrap');
+        if(alistamentoWrap){
+          alistamentoWrap.classList.toggle('d-none', !isMasc);
+          if(!isMasc){
+            const numero = $('#alistamento_numero');
+            const data = $('#alistamento_data');
+            if(numero) numero.value='';
+            if(data) data.value='';
+          }
+        }
         refreshSubmitState();
       }
-      $('#genero')?.addEventListener('change', toggleGeneroDependents);
+      $('#sexo')?.addEventListener('change', toggleSexoDependents);
+
+      function toggleGeneroOutro(){
+        const generoSelect = $('#genero_identidade');
+        const outroRow = $('#generoOutroRow');
+        const outroInput = $('#genero_outro');
+        const isOutro = (generoSelect?.value || '') === 'Outro';
+        outroRow?.classList.toggle('d-none', !isOutro);
+        if(outroInput){
+          outroInput.required = isOutro;
+          if(!isOutro){
+            outroInput.value='';
+          }
+        }
+        updateReview();
+        refreshSubmitState();
+      }
+      $('#genero_identidade')?.addEventListener('change', toggleGeneroOutro);
+      $('#genero_outro')?.addEventListener('input', ()=>{ updateReview(); refreshSubmitState(); });
+
+      function toggleJuradoDetails(){
+        const value = $('#foi_jurado')?.value || '';
+        const show = value === 'SIM';
+        const periodoWrap = $('#juradoPeriodoWrap');
+        const periodo = $('#jurado_periodo');
+        periodoWrap?.classList.toggle('d-none', !show);
+        if(periodo){
+          periodo.required = show;
+          if(!show){ periodo.value=''; }
+        }
+        ['#doc_jurado_wrap','#status_doc_jurado_wrap','#doc_jurado_440_wrap','#status_doc_jurado_440_wrap'].forEach(sel=>{
+          const wrap=$(sel);
+          if(wrap){ wrap.classList.toggle('d-none', !show); }
+        });
+        const juradoInput=$('#doc_jurado');
+        const jurado440Input=$('#doc_jurado_440');
+        if(juradoInput){ juradoInput.required = show; }
+        if(jurado440Input){ jurado440Input.required = false; }
+        if(!show){
+          [juradoInput,jurado440Input].forEach(input=>{
+            if(input){ input.value=''; }
+          });
+          ['status_doc_jurado','status_doc_jurado_440'].forEach(resetUploaderStatus);
+        }else{
+          const status=$('#status_doc_jurado');
+          if(juradoInput && status){
+            const res=checkFiles(juradoInput,{required:true});
+            if(res.ok) ok(status,res.msg); else bad(status,res.msg);
+          }
+        }
+        updateReview();
+        refreshSubmitState();
+      }
 
       function toggleVinculoDetails(){
-        const wrap = $('#vinculoDetalhes');
-        const show = $('#vinculo_publico')?.value === 'Sim';
-        wrap?.classList.toggle('d-none', !show);
+        const value = $('#vinculo_publico')?.value || '';
+        const show = value === 'Sim';
+        ['#qualVinculoWrap','#experienciaTempoWrap'].forEach(sel=>{
+          const wrap=$(sel);
+          if(wrap){ wrap.classList.toggle('d-none', !show); }
+        });
         ['#qual_vinculo','#experiencia_tempo'].forEach(sel=>{
           const field=$(sel);
           if(!field) return;
@@ -1554,7 +1879,15 @@
         updateReview();
         refreshSubmitState();
       }
-      $('#vinculo_publico')?.addEventListener('change', toggleVinculoDetails);
+
+      function updateNecessidadeRequirement(){
+        const needField=$('#necessidade');
+        if(!needField) return;
+        const condicao = document.querySelector('input[name="condicao_especial"]:checked');
+        const isPcd = $('#is_pcd')?.value === 'Sim';
+        const required = (condicao?.value === 'Sim') || isPcd;
+        needField.required = required;
+      }
 
       function togglePcdDetails(){
         const isSim = $('#is_pcd')?.value === 'Sim';
@@ -1562,28 +1895,72 @@
         const docs = $('#pcdDocsSection');
         wrap?.classList.toggle('d-none', !isSim);
         docs?.classList.toggle('d-none', !isSim);
-        ['#tipo_pcd','#necessidade'].forEach(sel=>{
-          const field=$(sel);
-          if(!field) return;
-          field.required = isSim;
-          if(!isSim){ field.value=''; }
-        });
+        const tipoField=$('#tipo_pcd');
+        if(tipoField){
+          tipoField.required = isSim;
+          if(!isSim){ tipoField.value=''; }
+        }
+        const cidField=$('#pcd_cid');
+        if(cidField && !isSim){ cidField.value=''; }
+        const needField=$('#necessidade');
+        if(!isSim && needField && document.querySelector('input[name="condicao_especial"]:checked')?.value !== 'Sim'){
+          needField.value='';
+        }
+        updateNecessidadeRequirement();
         const laudo=$('#pcd_laudo');
         if(laudo){
           laudo.required = isSim;
         }
         const status=$('#status_pcd_laudo');
+        const decl=$('#pcd_declaracao');
+        const declStatus=$('#status_pcd_declaracao');
+        const exames=$('#pcd_exames');
+        if(decl){
+          decl.required = isSim;
+        }
         if(!isSim){
           if(laudo){ laudo.value=''; }
-          if(status){ status.textContent=''; status.className='uploader-status ms-auto'; }
-        }else if(status && laudo){
-          const result = checkFiles(laudo, {required:true});
-          if(result.ok) ok(status, result.msg); else bad(status, result.msg);
+          if(decl){ decl.value=''; }
+          if(exames){ exames.value=''; }
+          [status, declStatus, $('#status_pcd_exames')].forEach(el=>{ if(el){ el.textContent=''; el.className='uploader-status ms-auto'; }});
+        }else{
+          if(status && laudo){
+            const result = checkFiles(laudo, {required:true});
+            if(result.ok) ok(status, result.msg); else bad(status, result.msg);
+          }
+          if(decl && declStatus){
+            const result = checkFiles(decl, {required:true});
+            if(result.ok) ok(declStatus, result.msg); else bad(declStatus, result.msg);
+          }
         }
         updateReview();
         refreshSubmitState();
       }
       $('#is_pcd')?.addEventListener('change', togglePcdDetails);
+
+      document.querySelectorAll('input[name="jurado_funcao"]').forEach(radio=>{
+        radio.addEventListener('change', ()=>{
+          if(radio.checked){
+            $('#foi_jurado').value = radio.value;
+            toggleJuradoDetails();
+          }
+        });
+      });
+      document.querySelectorAll('input[name="vinculo_publico_opcao"]').forEach(radio=>{
+        radio.addEventListener('change', ()=>{
+          if(radio.checked){
+            $('#vinculo_publico').value = radio.value;
+            toggleVinculoDetails();
+          }
+        });
+      });
+      document.querySelectorAll('input[name="condicao_especial"]').forEach(radio=>{
+        radio.addEventListener('change', ()=>{
+          updateNecessidadeRequirement();
+          updateReview();
+          refreshSubmitState();
+        });
+      });
 
       const nascInput = $('#nasc');
       nascInput?.addEventListener('change', e=>{
@@ -1627,15 +2004,21 @@
       }
       bindChecker('doc_id_frente','status_doc_id_frente',{required:true});
       bindChecker('doc_id_verso','status_doc_id_verso',{required:true});
+      bindChecker('doc_cpf','status_doc_cpf',{required:true});
       bindChecker('doc_residencia','status_doc_res',{required:true});
       bindChecker('doc_quitacao_eleitoral','status_doc_eleitoral',{required:true});
-      bindChecker('doc_militar','status_doc_militar',()=>({required: isGeneroMasculino()}));
+      bindChecker('doc_militar','status_doc_militar',()=>({required: isSexoMasculino()}));
+      bindChecker('doc_jurado','status_doc_jurado',()=>({required: $('#foi_jurado')?.value === 'SIM'}));
+      bindChecker('doc_jurado_440','status_doc_jurado_440',{});
       bindChecker('doc_escolaridade','status_doc_escolaridade',{required:true});
       bindChecker('doc_curriculo','status_doc_curriculo',{});
+      bindChecker('het_declaracao','status_het_declaracao',()=>({required: $('#cotasPPNI')?.value === 'Sim'}));
       bindChecker('het_id','status_het_id',{});
       const hetVideo=$('#het_video'); const statusHetVideo=document.createElement('div'); hetVideo?.parentElement?.appendChild(statusHetVideo);
       hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
       bindChecker('pcd_laudo','status_pcd_laudo',()=>({required: $('#is_pcd')?.value === 'Sim'}));
+      bindChecker('pcd_declaracao','status_pcd_declaracao',()=>({required: $('#is_pcd')?.value === 'Sim'}));
+      bindChecker('pcd_exames','status_pcd_exames',{});
 
       function populateDocIdFields(payload){
         const entry = Array.isArray(payload)
@@ -1677,7 +2060,7 @@
         const rgData = parseToIsoDate(pickDataValue(entry,['rg_expedicao','data_expedicao','rg_data','exp_doc']));
         if(rgData) applyIfEmpty('#rg_data', rgData);
         const pisValue = pickDataValue(entry,['pis','pis_pasep']);
-        if(pisValue) applyIfEmpty('#pis_pasep', onlyDigits(pisValue).slice(0,11));
+        if(pisValue) applyIfEmpty('#nis', onlyDigits(pisValue).slice(0,11));
         updateReview();
         refreshSubmitState();
       }
@@ -1839,7 +2222,16 @@
         const fd=new FormData();
         // pessoais
         fd.append('nome',$('#nome').value.trim());
+        fd.append('nome_social',$('#nome_social').value.trim());
         fd.append('data_nascimento',$('#nasc').value);
+        const generoSelect = $('#genero_identidade').value;
+        const generoOutro = $('#genero_outro').value.trim();
+        fd.append('sexo',$('#sexo').value);
+        fd.append('genero_identidade',generoSelect);
+        fd.append('genero_outro', generoSelect === 'Outro' ? generoOutro : '');
+        fd.append('estado_civil',$('#estado_civil').value);
+        fd.append('filiacao1',$('#filiacao1').value.trim());
+        fd.append('filiacao2',$('#filiacao2').value.trim());
         fd.append('nacionalidade',$('#nacionalidade').value.trim());
         fd.append('naturalidade_cidade',$('#naturalidade_cidade').value.trim());
         fd.append('naturalidade_uf',$('#naturalidade_uf').value.trim().toUpperCase());
@@ -1848,6 +2240,7 @@
         fd.append('rg_uf',$('#rg_uf').value.trim().toUpperCase());
         fd.append('rg_data',$('#rg_data').value);
         fd.append('cpf', onlyDigits($('#cpf').value));
+        fd.append('nis',$('#nis').value.trim());
         fd.append('email',$('#email').value.trim().toLowerCase());
         fd.append('telefone1',onlyDigits($('#tel1').value));
         fd.append('telefone2',onlyDigits($('#tel2').value));
@@ -1859,18 +2252,21 @@
         fd.append('bairro',$('#bairro').value.trim());
         fd.append('cidade',$('#cidade').value.trim());
         fd.append('uf',$('#uf').value.trim().toUpperCase());
+        fd.append('alistamento_numero',$('#alistamento_numero').value.trim());
+        fd.append('alistamento_data',$('#alistamento_data').value);
         // formação
         fd.append('nivel_minimo',$('#nivel').value);
         fd.append('ies',$('#ies').value.trim());
         fd.append('curso',$('#curso').value.trim());
         fd.append('ano_conclusao',$('#ano_conclusao').value.trim());
         // raça/gênero
-        fd.append('genero',$('#genero').value);
         fd.append('raca',$('#raca').value);
-        fd.append('concorrer_pnp',$('#cotasPNP').value);
+        fd.append('concorrer_ppni',$('#cotasPPNI').value);
         // pcd
         fd.append('is_pcd',$('#is_pcd').value);
         fd.append('tipo_pcd',$('#tipo_pcd').value.trim());
+        fd.append('pcd_cid',$('#pcd_cid').value.trim());
+        fd.append('condicao_especial', document.querySelector('input[name="condicao_especial"]:checked')?.value || '');
         fd.append('necessidade',$('#necessidade').value.trim());
         // militar/eleitoral
         fd.append('militar', document.querySelector('input[name="militar"]:checked')?.value || '');
@@ -1878,26 +2274,39 @@
         fd.append('titulo',onlyDigits($('#titulo').value));
         fd.append('zona',onlyDigits($('#zona').value));
         fd.append('secao',onlyDigits($('#secao').value));
+        // certame
+        fd.append('cargo',$('#cargo').value);
+        fd.append('especialidade',$('#especialidade').value.trim());
+        fd.append('foi_jurado',$('#foi_jurado').value);
+        fd.append('jurado_periodo',$('#jurado_periodo').value.trim());
         // vínculos
         fd.append('vinculo_publico',$('#vinculo_publico').value);
         fd.append('qual_vinculo',$('#qual_vinculo').value.trim());
-        fd.append('pis_pasep',$('#pis_pasep').value.trim());
         fd.append('experiencia_tempo',$('#experiencia_tempo').value.trim());
         fd.append('termo_responsabilidade', responsibilityCheckbox && responsibilityCheckbox.checked ? 'ACEITO' : 'NAO');
+        fd.append('recurso_tipo',$('#recurso_tipo')?.value || '');
+        fd.append('recurso_texto',$('#recurso_texto')?.value.trim() || '');
 
         // uploads
         appendIfFile(fd,'doc_id_frente','doc_id_frente');
         appendIfFile(fd,'doc_id_verso','doc_id_verso');
+        appendIfFile(fd,'doc_cpf','doc_cpf');
         appendIfFile(fd,'doc_residencia','doc_residencia');
         appendIfFile(fd,'doc_quitacao_eleitoral','doc_quitacao_eleitoral');
         appendIfFile(fd,'doc_militar','doc_militar');
+        appendIfFile(fd,'doc_jurado','doc_jurado');
+        appendIfFile(fd,'doc_jurado_440','doc_jurado_440');
         appendIfFile(fd,'doc_escolaridade','doc_escolaridade');
         appendIfFile(fd,'doc_curriculo','doc_curriculo');
+        appendIfFile(fd,'het_declaracao','het_declaracao');
         appendIfFile(fd,'het_id','het_id');
         appendIfFile(fd,'het_frente','het_frente');
         appendIfFile(fd,'het_perfil','het_perfil');
         appendIfFile(fd,'het_video','het_video');
         appendIfFile(fd,'pcd_laudo','pcd_laudo');
+        appendIfFile(fd,'pcd_declaracao','pcd_declaracao');
+        appendIfFile(fd,'pcd_exames','pcd_exames');
+        appendIfFile(fd,'recurso_anexo','recurso_anexo');
 
         return fd;
       }
@@ -1936,7 +2345,11 @@
       function init(){
         toggleVinculoDetails();
         togglePcdDetails();
-        toggleGeneroDependents();
+        toggleSexoDependents();
+        toggleGeneroOutro();
+        toggleJuradoDetails();
+        updateNecessidadeRequirement();
+        updateResourceAreaVisibility();
         bindWizard();
         declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
         attachWatchers();
