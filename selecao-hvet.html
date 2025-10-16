@@ -161,7 +161,6 @@
       .wizard-controls .spacer{ flex:1; }
       .wizard-controls .btn{ min-width:140px; }
       .subtle{ color:#6c757d; font-weight:500; letter-spacing:.2px; }
-      .floating-save{ position:fixed; right:1rem; bottom:1rem; z-index:50; }
       .tiny{ font-size:.85rem; }
       .pill{ border-radius:999px; padding:.25rem .6rem; border:1px solid #dee2e6; }
       .uploader-status{ min-height:1.75rem; }
@@ -212,6 +211,8 @@
       .declaration-box::-webkit-scrollbar-thumb{ background:#c7d5f8; border-radius:999px; }
       .declaration-check{ margin-top:1rem; }
       .declaration-actions .btn{ min-width:140px; }
+      .quota-tab-pane{ display:none; }
+      .quota-tab-pane.active{ display:block; animation:fadeIn .3s ease; }
       @media (max-width: 992px){
         :root{ --stage-w:100vw; --pattern-w:100vw; }
         .stage, .pattern-strip{ left:0; }
@@ -267,23 +268,23 @@
         <ol class="wizard-steps" role="tablist">
           <li class="wizard-step active" data-step="0" role="tab" aria-selected="true" tabindex="0">
             <span class="wizard-index">1</span>
-            <span class="wizard-label">Documentos</span>
+            <span class="wizard-label">Identificação</span>
           </li>
           <li class="wizard-step" data-step="1" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">2</span>
-            <span class="wizard-label">Identificação</span>
+            <span class="wizard-label">Contato &amp; Endereço</span>
           </li>
           <li class="wizard-step" data-step="2" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">3</span>
-            <span class="wizard-label">Contato &amp; Endereço</span>
+            <span class="wizard-label">Formação &amp; Vínculos</span>
           </li>
           <li class="wizard-step" data-step="3" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">4</span>
-            <span class="wizard-label">Formação &amp; Vínculos</span>
+            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
           </li>
           <li class="wizard-step" data-step="4" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">5</span>
-            <span class="wizard-label">Cotas &amp; Acessibilidade</span>
+            <span class="wizard-label">Documentos</span>
           </li>
           <li class="wizard-step" data-step="5" role="tab" aria-selected="false" tabindex="-1">
             <span class="wizard-index">6</span>
@@ -297,125 +298,18 @@
 
       <div class="tab-shell">
         <div class="form-tabs" role="tablist">
-          <button type="button" class="form-tab-link active" data-tab-target="0" role="tab" aria-selected="true">Documentos</button>
-          <button type="button" class="form-tab-link" data-tab-target="1" role="tab" aria-selected="false">Identificação</button>
-          <button type="button" class="form-tab-link" data-tab-target="2" role="tab" aria-selected="false">Contato &amp; Endereço</button>
-          <button type="button" class="form-tab-link" data-tab-target="3" role="tab" aria-selected="false">Formação &amp; Vínculos</button>
-          <button type="button" class="form-tab-link" data-tab-target="4" role="tab" aria-selected="false">Cotas &amp; Acessibilidade</button>
+          <button type="button" class="form-tab-link active" data-tab-target="0" role="tab" aria-selected="true">Identificação</button>
+          <button type="button" class="form-tab-link" data-tab-target="1" role="tab" aria-selected="false">Contato &amp; Endereço</button>
+          <button type="button" class="form-tab-link" data-tab-target="2" role="tab" aria-selected="false">Formação &amp; Vínculos</button>
+          <button type="button" class="form-tab-link" data-tab-target="3" role="tab" aria-selected="false">Cotas &amp; Acessibilidade</button>
+          <button type="button" class="form-tab-link" data-tab-target="4" role="tab" aria-selected="false">Documentos</button>
           <button type="button" class="form-tab-link" data-tab-target="5" role="tab" aria-selected="false">Revisão final</button>
         </div>
       </div>
 
-      <section class="step-panel form-tab-pane active" data-step-panel="0" aria-label="Etapa 1 - Documentos" role="tabpanel">
-        <div class="card card-form mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h5 mb-0">Documentos</h2>
-            <span class="badge badge-soft">2 MB por doc/foto • 30 MB vídeo</span>
-          </div>
-          <div class="card-body">
-            <ul class="tiny mb-3">
-              <li>Documentos/fotos: PDF, JPG, JPEG, PNG (até 2 MB cada).</li>
-              <li>Vídeo (heteroidentificação): MP4, MOV (até 30 MB).</li>
-            </ul>
 
-            <section class="mb-4">
-              <h3 class="h6 section-title mb-2">1) Cadastro</h3>
-              <div class="row g-3 align-items-end">
-                <div class="col-md-8">
-                  <label class="form-label required">Documento de identificação oficial com foto (frente)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_frente" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_id_frente" class="uploader-status ms-auto"></div></div>
 
-                <div class="col-md-8">
-                  <label class="form-label required">Documento de identificação oficial com foto (verso)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_verso" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_id_verso" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Comprovante de residência</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_res" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Quitação eleitoral</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_quitacao_eleitoral" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_eleitoral" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8 d-none" id="docMilitarWrap">
-                  <label class="form-label" id="docMilitarLabel">Quitação do serviço militar</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
-                  <div class="help tiny">CAM / CDI / CI / CRM.</div>
-                </div>
-                <div class="col-md-4 d-none" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label required">Comprovação da escolaridade</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_escolaridade" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-8">
-                  <label class="form-label">Experiência / títulos / certificados</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="doc_curriculo" accept=".pdf,image/*" multiple></div>
-                </div>
-                <div class="col-md-4"><div id="status_doc_curriculo" class="uploader-status ms-auto"></div></div>
-              </div>
-            </section>
-
-            <hr>
-
-            <section class="mb-4">
-              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PNP)</h3>
-              <div class="row g-3">
-                <div class="col-md-8">
-                  <label class="form-label">Documento de identidade (frente/verso)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_het_id" class="uploader-status ms-auto"></div></div>
-
-                <div class="col-md-6">
-                  <label class="form-label">Foto de frente</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_frente" accept="image/*"></div>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Foto de perfil</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_perfil" accept="image/*"></div>
-                </div>
-
-                <div class="col-md-12">
-                  <label class="form-label">Vídeo (até 20s)</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
-                  <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
-                </div>
-              </div>
-            </section>
-
-            <hr>
-
-            <section id="pcdDocsSection" class="mb-2 d-none">
-              <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
-              <div class="row g-3">
-                <div class="col-md-8">
-                  <label class="form-label">Laudo médico</label>
-                  <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
-                </div>
-                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <div class="wizard-controls">
-          <span class="spacer"></span>
-          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
-        </div>
-      </section>
-
-      <section class="step-panel form-tab-pane" data-step-panel="1" aria-label="Etapa 2 - Identificação" role="tabpanel">
+      <section class="step-panel form-tab-pane active" data-step-panel="0" aria-label="Etapa 1 - Identificação" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Identificação civil</h2>
@@ -525,14 +419,13 @@
             </div>
           </div>
         </div>
-
         <div class="wizard-controls">
-          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
+          <span class="spacer"></span>
           <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
         </div>
       </section>
 
-      <section class="step-panel form-tab-pane" data-step-panel="2" aria-label="Etapa 3 - Contato e endereço" role="tabpanel">
+      <section class="step-panel form-tab-pane" data-step-panel="1" aria-label="Etapa 2 - Contato e endereço" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Contato</h2>
@@ -607,7 +500,7 @@
         </div>
       </section>
 
-      <section class="step-panel form-tab-pane" data-step-panel="3" aria-label="Etapa 4 - Formação e vínculos" role="tabpanel">
+      <section class="step-panel form-tab-pane" data-step-panel="2" aria-label="Etapa 3 - Formação e vínculos" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Escolaridade e formação</h2>
@@ -678,7 +571,7 @@
         </div>
       </section>
 
-      <section class="step-panel form-tab-pane" data-step-panel="4" aria-label="Etapa 5 - Cotas e acessibilidade" role="tabpanel">
+      <section class="step-panel form-tab-pane" data-step-panel="3" aria-label="Etapa 4 - Cotas e acessibilidade" role="tabpanel">
         <div class="card card-form mb-4">
           <div class="card-header">
             <h2 class="h5 mb-0">Informações de raça e cotas</h2>
@@ -739,6 +632,127 @@
           </div>
         </div>
 
+        <div class="card card-form mb-4 d-none" id="quotaFormsCard">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Formulários de cotas</h2>
+            <span class="badge badge-soft">Preenchimento automático</span>
+          </div>
+          <div class="card-body">
+            <div class="form-tabs" id="quotaFormsTabs" role="tablist"></div>
+            <div id="quotaFormsPanels"></div>
+            <p class="tiny text-muted mt-3" id="quotaFormsEmptyHint">Os formulários serão exibidos quando houver enquadramento em alguma cota.</p>
+          </div>
+        </div>
+
+        <div class="wizard-controls">
+          <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
+          <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
+        </div>
+      </section>
+
+      <section class="step-panel form-tab-pane" data-step-panel="4" aria-label="Etapa 5 - Documentos" role="tabpanel">
+        <div class="card card-form mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Documentos</h2>
+            <span class="badge badge-soft">2 MB por doc/foto • 30 MB vídeo</span>
+          </div>
+          <div class="card-body">
+            <ul class="tiny mb-3">
+              <li>Documentos/fotos: PDF, JPG, JPEG, PNG (até 2 MB cada).</li>
+              <li>Vídeo (heteroidentificação): MP4, MOV (até 30 MB).</li>
+            </ul>
+
+            <section class="mb-4">
+              <h3 class="h6 section-title mb-2">1) Cadastro</h3>
+              <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                  <label class="form-label required">Documento de identificação oficial com foto (frente)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_frente" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_id_frente" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Documento de identificação oficial com foto (verso)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_id_verso" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_id_verso" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Comprovante de residência</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_residencia" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_res" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Quitação eleitoral</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_quitacao_eleitoral" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_eleitoral" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8 d-none" id="docMilitarWrap">
+                  <label class="form-label" id="docMilitarLabel">Quitação do serviço militar</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
+                  <div class="help tiny">CAM / CDI / CI / CRM.</div>
+                </div>
+                <div class="col-md-4 d-none" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label required">Comprovação da escolaridade</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_escolaridade" accept=".pdf,image/*" required></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_escolaridade" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-8">
+                  <label class="form-label">Experiência / títulos / certificados</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="doc_curriculo" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4"><div id="status_doc_curriculo" class="uploader-status ms-auto"></div></div>
+              </div>
+            </section>
+
+            <hr>
+
+            <section class="mb-4">
+              <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PNP)</h3>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Documento de identidade (frente/verso)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_id" accept=".pdf,image/*" multiple></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_het_id" class="uploader-status ms-auto"></div></div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Foto de frente</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_frente" accept="image/*"></div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Foto de perfil</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_perfil" accept="image/*"></div>
+                </div>
+
+                <div class="col-md-12">
+                  <label class="form-label">Vídeo (até 20s)</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
+                  <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
+                </div>
+              </div>
+            </section>
+
+            <hr>
+
+            <section id="pcdDocsSection" class="mb-2 d-none">
+              <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Laudo médico</label>
+                  <div class="dropzone"><input class="form-control" type="file" id="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif"></div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end"><div id="status_pcd_laudo" class="uploader-status ms-auto"></div></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
         <div class="wizard-controls">
           <button type="button" class="btn btn-outline-secondary" data-step-nav="prev">Voltar</button>
           <button type="button" class="btn btn-primary" data-step-nav="next">Avançar</button>
@@ -788,7 +802,6 @@
     </main>
 
     <div class="pattern-strip pattern-bottom"></div>
-    <button class="btn btn-primary rounded-pill shadow floating-save" id="quickSave" type="button">Salvar rascunho</button>
 
     <script>
       // ========= Config =========
@@ -983,6 +996,119 @@
         { box: responsibilityBox, checkbox: responsibilityCheckbox, hint: responsibilityHint }
       ].filter(cfg => cfg.box && cfg.checkbox);
 
+      const quotaCard = document.getElementById('quotaFormsCard');
+      const quotaTabsContainer = document.getElementById('quotaFormsTabs');
+      const quotaPanelsContainer = document.getElementById('quotaFormsPanels');
+      const quotaEmptyHint = document.getElementById('quotaFormsEmptyHint');
+      const normalizePlain = (value) => String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z]/gi, '')
+        .toUpperCase();
+      const toUpperText = (value) => String(value || '').toUpperCase();
+
+      function buildQuotaData(){
+        const nome = $('#nome')?.value || '';
+        const cpfDigits = onlyDigits($('#cpf')?.value || '');
+        const nascIso = $('#nasc')?.value || '';
+        const nacionalidade = $('#nacionalidade')?.value || '';
+        const naturalidadeCidade = $('#naturalidade_cidade')?.value || '';
+        const naturalidadeUf = $('#naturalidade_uf')?.value || '';
+        const genero = $('#genero')?.value || '';
+        const raca = $('#raca')?.value || '';
+        const concorrerPNP = ($('#cotasPNP')?.value || '').trim() === 'Sim';
+        const isPCD = ($('#is_pcd')?.value || '').trim() === 'Sim';
+        const tipoPcd = $('#tipo_pcd')?.value || '';
+        const necessidade = $('#necessidade')?.value || '';
+        const cidade = $('#cidade')?.value || '';
+        const naturalidade = [toUpperText(naturalidadeCidade), toUpperText(naturalidadeUf)].filter(Boolean).join(' / ');
+        return {
+          nome,
+          nomeUpper: toUpperText(nome),
+          cpfDigits,
+          cpfFormatted: fmtCPF(cpfDigits),
+          nascimentoIso: nascIso,
+          nascimentoBr: fmtDateBr(nascIso),
+          nacionalidadeUpper: toUpperText(nacionalidade),
+          naturalidadeUpper: naturalidade,
+          genero,
+          generoUpper: toUpperText(genero),
+          raca,
+          racaUpper: toUpperText(raca),
+          raceEligible: ['PRETA','PARDA','NEGRA','INDIGENA'].includes(normalizePlain(raca)),
+          concorrerPNP,
+          isPCD,
+          tipoPcdUpper: toUpperText(tipoPcd),
+          necessidadeUpper: toUpperText(necessidade),
+          cidadeUpper: toUpperText(cidade)
+        };
+      }
+
+      const quotaFormConfigs = [
+        {
+          id:'quotaRacial',
+          label:'Termo de cota racial',
+          condition:data => data.concorrerPNP && data.raceEligible,
+          template:data => {
+            return `
+              <div class="mb-3">
+                <p>Eu, <strong>${esc(data.nomeUpper)}</strong>, inscrito(a) no CPF nº <strong>${esc(data.cpfFormatted)}</strong>, nascido(a) em <strong>${esc(data.nascimentoBr)}</strong>, natural de <strong>${esc(data.naturalidadeUpper)}</strong>, declaro, sob as penas da lei, que me autodeclaro <strong>${esc(data.racaUpper)}</strong> para fins de participação nas vagas reservadas a pessoas negras (pretas e pardas) e indígenas.</p>
+                <p>Estou ciente de que a falsidade desta declaração implicará nas sanções administrativas, civis e penais cabíveis.</p>
+              </div>
+              <div class="tiny text-muted">Declaração preenchida automaticamente com os dados informados na inscrição.</div>
+            `;
+          }
+        },
+        {
+          id:'quotaPCD',
+          label:'Termo de cota PCD',
+          condition:data => data.isPCD,
+          template:data => {
+            return `
+              <div class="mb-3">
+                <p>Eu, <strong>${esc(data.nomeUpper)}</strong>, inscrito(a) no CPF nº <strong>${esc(data.cpfFormatted)}</strong>, nascido(a) em <strong>${esc(data.nascimentoBr)}</strong>, natural de <strong>${esc(data.naturalidadeUpper)}</strong>, declaro que desejo concorrer às vagas reservadas a pessoas com deficiência.</p>
+                <p>Informo possuir deficiência do tipo <strong>${esc(data.tipoPcdUpper)}</strong> e necessitar de <strong>${esc(data.necessidadeUpper)}</strong> para a realização das etapas, comprometendo-me a apresentar documentação comprobatória conforme edital.</p>
+              </div>
+              <div class="tiny text-muted">Declaração preenchida automaticamente com os dados informados na inscrição.</div>
+            `;
+          }
+        }
+      ];
+
+      function updateQuotaForms(){
+        if(!quotaCard || !quotaTabsContainer || !quotaPanelsContainer) return;
+        const data = buildQuotaData();
+        const activeForms = quotaFormConfigs.filter(cfg => cfg.condition(data));
+        if(!activeForms.length){
+          quotaCard.classList.add('d-none');
+          quotaTabsContainer.innerHTML = '';
+          quotaPanelsContainer.innerHTML = '';
+          quotaEmptyHint?.classList.remove('d-none');
+          return;
+        }
+        quotaCard.classList.remove('d-none');
+        quotaEmptyHint?.classList.add('d-none');
+        quotaTabsContainer.innerHTML = activeForms.map((cfg,i)=>`
+          <button type="button" class="form-tab-link${i===0?' active':''}" data-quota-tab="${cfg.id}" role="tab" aria-selected="${i===0?'true':'false'}">${cfg.label}</button>
+        `).join('');
+        quotaPanelsContainer.innerHTML = activeForms.map((cfg,i)=>`
+          <div class="quota-tab-pane${i===0?' active':''}" data-quota-panel="${cfg.id}" role="tabpanel">${cfg.template(data)}</div>
+        `).join('');
+        quotaTabsContainer.querySelectorAll('[data-quota-tab]').forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            const target = btn.getAttribute('data-quota-tab');
+            quotaTabsContainer.querySelectorAll('[data-quota-tab]').forEach(other=>{
+              const active = other === btn;
+              other.classList.toggle('active', active);
+              other.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            quotaPanelsContainer.querySelectorAll('.quota-tab-pane').forEach(panel=>{
+              panel.classList.toggle('active', panel.getAttribute('data-quota-panel') === target);
+            });
+          });
+        });
+      }
+
       function resetDeclaration(box, checkbox, hint){
         if(!box || !checkbox) return;
         checkbox.checked = false;
@@ -1159,6 +1285,7 @@
         `;
 
         $('#reviewBlock').innerHTML = reviewSections.map(renderSection).join('\n');
+        updateQuotaForms();
       }
 
       // ========= Submit state =========
@@ -1210,7 +1337,7 @@
 
       const stepPanels = Array.from(document.querySelectorAll('.step-panel'));
       const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
-      const tabButtons = Array.from(document.querySelectorAll('.form-tab-link'));
+      const tabButtons = Array.from(document.querySelectorAll('.form-tab-link[data-tab-target]'));
       const progressBar = $('#wizardProgressBar');
       let currentStepIndex = 0;
 
@@ -1701,36 +1828,6 @@
       document.getElementById('doc_residencia')?.addEventListener('change', ()=> uploadSingleDocument('doc_residencia','status_doc_res', RESIDENCIA_ENDPOINT,'doc_residencia', populateResidenciaFields));
       document.getElementById('doc_escolaridade')?.addEventListener('change', ()=> uploadSingleDocument('doc_escolaridade','status_doc_escolaridade', ESCOLARIDADE_ENDPOINT,'doc_escolaridade', populateEscolaridadeFields));
 
-      // ========= Draft (localStorage) =========
-      const DRAFT_KEY='hvr_inscricao_draft_v1';
-      const watchedSelectors = [
-        '#nome','#nasc','#nacionalidade','#naturalidade_cidade','#naturalidade_uf',
-        '#rg_numero','#rg_orgao','#rg_uf','#rg_data','#cpf','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf',
-        '#nivel','#ies','#curso','#ano_conclusao','#genero','#raca','#cotasPNP','#is_pcd','#tipo_pcd','#necessidade',
-        '#vinculo_publico','#qual_vinculo','#pis_pasep','#experiencia_tempo','#titulo','#zona','#secao'
-      ];
-      function saveDraft(){
-        const data={};
-        for(const sel of watchedSelectors){ const el=$(sel); if(!el) continue; data[sel]=el.value; }
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-      }
-      function loadDraft(){
-        try{
-          const data=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');
-          Object.entries(data).forEach(([sel,val])=>{
-            const el=$(sel);
-            if(el && typeof val==='string'){
-              el.value=val;
-              el.dispatchEvent(new Event('input',{bubbles:true}));
-            }
-          });
-        }catch(e){}
-      }
-      $('#quickSave').addEventListener('click', ()=>{
-        saveDraft();
-        const btn=$('#quickSave'); const old=btn.textContent; btn.textContent='Rascunho salvo'; setTimeout(()=>btn.textContent=old,1500);
-      });
-
       // ========= Build FormData & Enviar =========
       function appendIfFile(fd, id, key){
         const input=document.getElementById(id);
@@ -1837,7 +1934,6 @@
         });
       }
       function init(){
-        loadDraft();
         toggleVinculoDetails();
         togglePcdDetails();
         toggleGeneroDependents();
