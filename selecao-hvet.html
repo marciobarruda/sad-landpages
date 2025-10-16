@@ -327,11 +327,11 @@
                 <input type="text" id="cpf" class="form-control" inputmode="numeric" maxlength="11" value="{{ String(($json.cpf ?? $json.preferred_username ?? '')).replace(/\D+/g, '').slice(0,11) }}" required>
                 <div class="help tiny" id="cpfHelp"></div>
               </div>
-              <div class="col-md-7">
+              <div class="col-md-6">
                 <label class="form-label required" for="nome">Nome completo</label>
                 <input type="text" id="nome" class="form-control" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" required>
               </div>
-              <div class="col-md-2">
+              <div class="col-md-3">
                 <label class="form-label required" for="nasc">Data de nascimento</label>
                 <input type="date" id="nasc" class="form-control" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" required>
               </div>
@@ -1349,8 +1349,14 @@
         return matched;
       }
       function applyPrefillFromContext(){
-        const data = PREFILL && typeof PREFILL === 'object' ? PREFILL : null;
+        const source = Array.isArray(PREFILL) ? PREFILL[0] : PREFILL;
+        const data = source && typeof source === 'object' ? source : null;
         if(!data) return;
+        const readonlyTargets = new Set([
+          '#cpf','#nome','#nome_social','#nasc','#nacionalidade','#naturalidade_cidade',
+          '#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis'
+        ]);
+        const assignedSelectors = new Set();
         const assignValue = (selector, rawValue, transform) => {
           if(rawValue === undefined || rawValue === null) return;
           const el = $(selector);
@@ -1360,7 +1366,9 @@
           const str = String(value);
           if(!str.trim()) return;
           el.value = str;
+          assignedSelectors.add(selector);
           ['input','change'].forEach(evt => el.dispatchEvent(new Event(evt,{bubbles:true})));
+          return true;
         };
         assignValue('#cpf', data.cpf ?? data.preferred_username, value => onlyDigits(value).slice(0,11));
         assignValue('#nome', data.name ?? data.given_name ?? data.family_name, value => String(value).trim());
@@ -1449,6 +1457,17 @@
             ['input','change'].forEach(evt => el.dispatchEvent(new Event(evt,{bubbles:true})));
           }
         });
+        assignedSelectors.forEach(selector => {
+          if(!readonlyTargets.has(selector)) return;
+          const field = $(selector);
+          if(!field) return;
+          field.readOnly = true;
+          field.setAttribute('readonly','readonly');
+        });
+        const cepDigits = onlyDigits($('#cep')?.value || '');
+        if(!($('#uf')?.value || '').trim() && cepDigits.length === 8){
+          autofillAddressByCep();
+        }
       }
 
       function buildQuotaData(){
