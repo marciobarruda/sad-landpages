@@ -38,6 +38,9 @@
       .form-control[readonly]{ background:#f8f9fa; }
       .review-table td{ vertical-align: top; }
       .review-placeholder{ color:#adb5bd; font-weight:600; letter-spacing:.04em; }
+      .confirm-header{ gap:1rem; }
+      .confirm-code{ font-size:1.75rem; font-weight:800; color:var(--brand); text-align:right; }
+      .confirm-summary section:last-child{ margin-bottom:0; }
       .frame-card{
         max-width: 1020px;
         background:#ffffff;
@@ -371,21 +374,17 @@
             <div class="row g-3 mt-0 align-items-end">
               <div class="col-md-4 col-lg-3">
                 <label class="form-label required" for="sexo">Sexo</label>
-                <select id="sexo" class="form-select" data-prefill="{{ $json.sexo ?? $json.sex ?? $json.genero ?? $json.gender ?? '' }}" required>
+                <select id="sexo" class="form-select" value="{{ String($json.sexo ?? $json.sex ?? $json.genero ?? $json.gender ?? '').trim() }}" data-prefill="{{ $json.sexo ?? $json.sex ?? $json.genero ?? $json.gender ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Feminino</option>
                   <option>Masculino</option>
-                  <option>Intersexo</option>
                   <option>Prefiro não informar</option>
                 </select>
               </div>
               <div class="col-md-4 col-lg-3">
                 <label class="form-label required" for="genero">Gênero</label>
-                <select id="genero" class="form-select" data-prefill="{{ $json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '' }}" required>
+                <select id="genero" class="form-select" value="{{ String($json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '').trim() }}" data-prefill="{{ $json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '' }}" required>
                   <option value="">Selecione...</option>
-                  <option>Feminino</option>
-                  <option>Masculino</option>
-                  <option>Intersexo</option>
                   <option>Mulher cisgênero</option>
                   <option>Mulher trans</option>
                   <option>Homem cisgênero</option>
@@ -1004,7 +1003,7 @@
 
     <script>
       // ========= Config =========
-      const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/inscricao-hvr";
+      const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/instanciar-se-hospvet";
       const DOC_ID_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/doc-id";
       const QUITACAO_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/quitacao-eleitoral";
       const RESIDENCIA_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-residencia";
@@ -1414,11 +1413,20 @@
         assignValue('#pcd_cid', data.pcd_cid, value => String(value).trim().toUpperCase());
         assignValue('#necessidade', data.necessidade ?? data.specialNeedDescription, value => String(value).trim());
         assignValue('#tipo_pcd', data.tipo_pcd, value => String(value).trim());
-        if(setSelectValue('#sexo', data.sexo ?? data.sex ?? data.genero ?? data.gender)){
+        const sexoRaw = data.sexo ?? data.sex ?? data.genero ?? data.gender;
+        if(setSelectValue('#sexo', sexoRaw)){
           assignedSelectors.add('#sexo');
         }
-        if(setSelectValue('#genero', data.genero ?? data.genero_identidade ?? data.genderIdentity ?? data.gender ?? data.sexo)){
+        const generoRaw = data.genero ?? data.genero_identidade ?? data.genderIdentity ?? data.gender ?? data.sexo;
+        if(setSelectValue('#genero', generoRaw)){
           assignedSelectors.add('#genero');
+        }else if(generoRaw){
+          const generoNorm = normalizeMatch(generoRaw);
+          if(generoNorm === 'MASCULINO' && setSelectValue('#genero','Homem cisgênero')){
+            assignedSelectors.add('#genero');
+          }else if(generoNorm === 'FEMININO' && setSelectValue('#genero','Mulher cisgênero')){
+            assignedSelectors.add('#genero');
+          }
         }
         if($('#genero')?.value === 'Outro'){
           assignValue('#genero_outro', data.genero_outro ?? data.generoOutro, value => String(value).trim());
@@ -1863,6 +1871,7 @@
       }
       function refreshSubmitState(){
         const btn=$('#btnSubmitAll');
+        if(!btn) return;
         const allDeclarationsOk = declarationConfigs.every(cfg => cfg.checkbox.checked);
         const allOk = baseFieldsOk() && docsRequiredOk() && allDeclarationsOk;
         btn.disabled = !allOk;
@@ -2519,110 +2528,136 @@
       document.getElementById('doc_residencia')?.addEventListener('change', ()=> uploadSingleDocument('doc_residencia','status_doc_res', RESIDENCIA_ENDPOINT,'doc_residencia', populateResidenciaFields));
       document.getElementById('doc_escolaridade')?.addEventListener('change', ()=> uploadSingleDocument('doc_escolaridade','status_doc_escolaridade', ESCOLARIDADE_ENDPOINT,'doc_escolaridade', populateEscolaridadeFields));
 
-      // ========= Build FormData & Enviar =========
-      function appendIfFile(fd, id, key){
-        const input=document.getElementById(id);
-        if(!input) return;
-        const files=Array.from(input.files||[]);
-        files.forEach((f,idx)=> fd.append(key || id + (files.length>1?`[${idx}]`:''), f, f.name));
-      }
-      function buildFormData(){
-        const fd=new FormData();
-        // pessoais
-        fd.append('nome',$('#nome').value.trim());
-        fd.append('nome_social',$('#nome_social').value.trim());
-        fd.append('data_nascimento',$('#nasc').value);
+      // ========= Build payload & Enviar =========
+      function buildPayload(){
         const sexoSelect = $('#sexo').value;
         const generoSelect = $('#genero').value;
         const generoOutro = $('#genero_outro').value.trim();
-        fd.append('sexo', sexoSelect);
-        fd.append('genero',generoSelect);
-        fd.append('genero_outro', generoSelect === 'Outro' ? generoOutro : '');
-        fd.append('estado_civil',$('#estado_civil').value);
-        fd.append('nome_mae',$('#mae').value.trim());
-        fd.append('nome_pai',$('#pai').value.trim());
-        fd.append('nacionalidade',$('#nacionalidade').value.trim());
-        fd.append('naturalidade_cidade',$('#naturalidade_cidade').value.trim());
-        fd.append('naturalidade_uf',$('#naturalidade_uf').value.trim().toUpperCase());
-        fd.append('rg_numero',$('#rg_numero').value.trim());
-        fd.append('rg_orgao',$('#rg_orgao').value.trim().toUpperCase());
-        fd.append('rg_uf',$('#rg_uf').value.trim().toUpperCase());
-        fd.append('rg_data',$('#rg_data').value);
-        fd.append('cpf', onlyDigits($('#cpf').value));
-        fd.append('nis',$('#nis').value.trim());
-        fd.append('email',$('#email').value.trim().toLowerCase());
-        fd.append('telefone1',onlyDigits($('#tel1').value));
-        fd.append('telefone2',onlyDigits($('#tel2').value));
-        // endereço
-        fd.append('cep',onlyDigits($('#cep').value));
-        fd.append('logradouro',$('#logradouro').value.trim());
-        fd.append('numero',$('#numero').value.trim());
-        fd.append('complemento',$('#complemento').value.trim());
-        fd.append('bairro',$('#bairro').value.trim());
-        fd.append('cidade',$('#cidade').value.trim());
-        fd.append('uf',$('#uf').value.trim().toUpperCase());
-        fd.append('alistamento_numero',$('#alistamento_numero').value.trim());
-        fd.append('alistamento_orgao',$('#alistamento_orgao').value.trim().toUpperCase());
-        fd.append('alistamento_data',$('#alistamento_data').value);
-        // formação
-        fd.append('nivel_minimo',$('#nivel').value);
-        fd.append('ies',$('#ies').value.trim());
-        fd.append('curso',$('#curso').value.trim());
-        fd.append('ano_conclusao',$('#ano_conclusao').value.trim());
-        // raça/gênero
-        fd.append('raca',$('#raca').value);
-        fd.append('concorrer_ppni',$('#cotasPPNI').value);
-        // pcd
-        fd.append('is_pcd',$('#is_pcd').value);
-        fd.append('tipo_pcd',$('#tipo_pcd').value.trim());
-        fd.append('pcd_cid',$('#pcd_cid').value.trim());
-        fd.append('condicao_especial', document.querySelector('input[name="condicao_especial"]:checked')?.value || '');
-        fd.append('necessidade',$('#necessidade').value.trim());
-        // militar/eleitoral
-        fd.append('militar', document.querySelector('input[name="militar"]:checked')?.value || '');
-        fd.append('politicos', document.querySelector('input[name="politicos"]:checked')?.value || '');
-        fd.append('titulo',onlyDigits($('#titulo').value));
-        fd.append('zona',onlyDigits($('#zona').value));
-        fd.append('secao',onlyDigits($('#secao').value));
-        // certame
-        const cargoSelect=$('#cargo');
-        const cargoValue=cargoSelect?.value || '';
-        const cargoLabel=cargoSelect && cargoSelect.selectedOptions?.length ? cargoSelect.selectedOptions[0].textContent.trim() : '';
-        fd.append('cargo', cargoValue);
-        fd.append('cargo_label', cargoLabel);
-        fd.append('especialidade',$('#especialidade').value.trim());
-        fd.append('foi_jurado',$('#foi_jurado').value);
-        fd.append('jurado_periodo',$('#jurado_periodo').value.trim());
-        // vínculos
-        fd.append('vinculo_publico',$('#vinculo_publico').value);
-        fd.append('qual_vinculo',$('#qual_vinculo').value.trim());
-        fd.append('experiencia_tempo',$('#experiencia_tempo').value.trim());
-        fd.append('termo_responsabilidade', responsibilityCheckbox && responsibilityCheckbox.checked ? 'ACEITO' : 'NAO');
-        fd.append('recurso_tipo',$('#recurso_tipo')?.value || '');
-        fd.append('recurso_texto',$('#recurso_texto')?.value.trim() || '');
-
-        // uploads
-        appendIfFile(fd,'doc_id_frente','doc_id_frente');
-        appendIfFile(fd,'doc_id_verso','doc_id_verso');
-        appendIfFile(fd,'doc_cpf','doc_cpf');
-        appendIfFile(fd,'doc_residencia','doc_residencia');
-        appendIfFile(fd,'doc_quitacao_eleitoral','doc_quitacao_eleitoral');
-        appendIfFile(fd,'doc_militar','doc_militar');
-        appendIfFile(fd,'doc_jurado','doc_jurado');
-        appendIfFile(fd,'doc_jurado_440','doc_jurado_440');
-        appendIfFile(fd,'doc_escolaridade','doc_escolaridade');
-        appendIfFile(fd,'doc_curriculo','doc_curriculo');
-        appendIfFile(fd,'het_declaracao','het_declaracao');
-        appendIfFile(fd,'het_id','het_id');
-        appendIfFile(fd,'het_frente','het_frente');
-        appendIfFile(fd,'het_perfil','het_perfil');
-        appendIfFile(fd,'het_video','het_video');
-        appendIfFile(fd,'pcd_laudo','pcd_laudo');
-        appendIfFile(fd,'pcd_declaracao','pcd_declaracao');
-        appendIfFile(fd,'pcd_exames','pcd_exames');
-        appendIfFile(fd,'recurso_anexo','recurso_anexo');
-
-        return fd;
+        const cargoSelect = $('#cargo');
+        const cargoValue = cargoSelect?.value || '';
+        const cargoLabel = cargoSelect && cargoSelect.selectedOptions?.length ? cargoSelect.selectedOptions[0].textContent.trim() : '';
+        return {
+          // pessoais
+          nome: $('#nome').value.trim(),
+          nome_social: $('#nome_social').value.trim(),
+          data_nascimento: $('#nasc').value,
+          sexo: sexoSelect,
+          genero: generoSelect,
+          genero_outro: generoSelect === 'Outro' ? generoOutro : '',
+          estado_civil: $('#estado_civil').value,
+          nome_mae: $('#mae').value.trim(),
+          nome_pai: $('#pai').value.trim(),
+          nacionalidade: $('#nacionalidade').value.trim(),
+          naturalidade_cidade: $('#naturalidade_cidade').value.trim(),
+          naturalidade_uf: $('#naturalidade_uf').value.trim().toUpperCase(),
+          rg_numero: $('#rg_numero').value.trim(),
+          rg_orgao: $('#rg_orgao').value.trim().toUpperCase(),
+          rg_uf: $('#rg_uf').value.trim().toUpperCase(),
+          rg_data: $('#rg_data').value,
+          cpf: onlyDigits($('#cpf').value),
+          nis: $('#nis').value.trim(),
+          email: $('#email').value.trim().toLowerCase(),
+          telefone1: onlyDigits($('#tel1').value),
+          telefone2: onlyDigits($('#tel2').value),
+          // endereço
+          cep: onlyDigits($('#cep').value),
+          logradouro: $('#logradouro').value.trim(),
+          numero: $('#numero').value.trim(),
+          complemento: $('#complemento').value.trim(),
+          bairro: $('#bairro').value.trim(),
+          cidade: $('#cidade').value.trim(),
+          uf: $('#uf').value.trim().toUpperCase(),
+          alistamento_numero: $('#alistamento_numero').value.trim(),
+          alistamento_orgao: $('#alistamento_orgao').value.trim().toUpperCase(),
+          alistamento_data: $('#alistamento_data').value,
+          // formação
+          nivel_minimo: $('#nivel').value,
+          ies: $('#ies').value.trim(),
+          curso: $('#curso').value.trim(),
+          ano_conclusao: $('#ano_conclusao').value.trim(),
+          // raça/gênero
+          raca: $('#raca').value,
+          concorrer_ppni: $('#cotasPPNI').value,
+          // pcd
+          is_pcd: $('#is_pcd').value,
+          tipo_pcd: $('#tipo_pcd').value.trim(),
+          pcd_cid: $('#pcd_cid').value.trim(),
+          condicao_especial: document.querySelector('input[name="condicao_especial"]:checked')?.value || '',
+          necessidade: $('#necessidade').value.trim(),
+          // militar/eleitoral
+          militar: document.querySelector('input[name="militar"]:checked')?.value || '',
+          politicos: document.querySelector('input[name="politicos"]:checked')?.value || '',
+          titulo: onlyDigits($('#titulo').value),
+          zona: onlyDigits($('#zona').value),
+          secao: onlyDigits($('#secao').value),
+          // certame
+          cargo: cargoValue,
+          cargo_label: cargoLabel,
+          especialidade: $('#especialidade').value.trim(),
+          foi_jurado: $('#foi_jurado').value,
+          jurado_periodo: $('#jurado_periodo').value.trim(),
+          // vínculos
+          vinculo_publico: $('#vinculo_publico').value,
+          qual_vinculo: $('#qual_vinculo').value.trim(),
+          experiencia_tempo: $('#experiencia_tempo').value.trim(),
+          termo_responsabilidade: responsibilityCheckbox && responsibilityCheckbox.checked ? 'ACEITO' : 'NAO',
+          recurso_tipo: $('#recurso_tipo')?.value || '',
+          recurso_texto: $('#recurso_texto')?.value.trim() || ''
+        };
+      }
+      function getFileExtension(name){
+        const match = /\.([^.]+)$/.exec(name || '');
+        return match ? match[1].toLowerCase() : '';
+      }
+      async function fileToBase64(file){
+        const buffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        const chunkSize = 0x8000;
+        let binary = '';
+        for(let i = 0; i < bytes.length; i += chunkSize){
+          const chunk = bytes.subarray(i, i + chunkSize);
+          binary += String.fromCharCode.apply(null, chunk);
+        }
+        return btoa(binary);
+      }
+      async function collectAttachments(){
+        const defs = [
+          { id:'doc_id_frente', campo:'doc_id_frente' },
+          { id:'doc_id_verso', campo:'doc_id_verso' },
+          { id:'doc_cpf', campo:'doc_cpf' },
+          { id:'doc_residencia', campo:'doc_residencia' },
+          { id:'doc_quitacao_eleitoral', campo:'doc_quitacao_eleitoral' },
+          { id:'doc_militar', campo:'doc_militar' },
+          { id:'doc_jurado', campo:'doc_jurado' },
+          { id:'doc_jurado_440', campo:'doc_jurado_440' },
+          { id:'doc_escolaridade', campo:'doc_escolaridade' },
+          { id:'doc_curriculo', campo:'doc_curriculo' },
+          { id:'het_declaracao', campo:'het_declaracao' },
+          { id:'het_id', campo:'het_id' },
+          { id:'het_frente', campo:'het_frente' },
+          { id:'het_perfil', campo:'het_perfil' },
+          { id:'het_video', campo:'het_video' },
+          { id:'pcd_laudo', campo:'pcd_laudo' },
+          { id:'pcd_declaracao', campo:'pcd_declaracao' },
+          { id:'pcd_exames', campo:'pcd_exames' },
+          { id:'recurso_anexo', campo:'recurso_anexo' }
+        ];
+        const attachments = [];
+        for(const def of defs){
+          const input = document.getElementById(def.id);
+          if(!input || !input.files) continue;
+          const files = Array.from(input.files);
+          for(const file of files){
+            const conteudo = await fileToBase64(file);
+            attachments.push({
+              campo: def.campo,
+              nome: file.name,
+              extensao: getFileExtension(file.name),
+              conteudo
+            });
+          }
+        }
+        return attachments;
       }
       async function postForm(url, formData){
         const res = await fetch(url, { method:'POST', body: formData });
@@ -2630,21 +2665,141 @@
         let data=null; try{ data=JSON.parse(text); }catch(e){}
         return { ok: res.ok, status: res.status, text, data };
       }
-      async function submitAll(){
-        if($('#btnSubmitAll').disabled) return;
+      async function postJson(url, payload){
+        const res = await fetch(url, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const text = await res.text();
+        let data=null; try{ data=JSON.parse(text); }catch(e){}
+        return { ok: res.ok, status: res.status, text, data };
+      }
+      function extractConfirmationRecords(data){
+        if(Array.isArray(data)) return data;
+        if(data && typeof data === 'object'){
+          if(Array.isArray(data.registros)) return data.registros;
+          if(Array.isArray(data.dados)) return data.dados;
+          if(data.dados && typeof data.dados === 'object') return [data.dados];
+          return [data];
+        }
+        return [];
+      }
+      function pickInscricaoValue(record){
+        if(!record || typeof record !== 'object') return '';
+        const keys = ['inscrição','inscricao','Inscrição','Inscricao','INSCRIÇÃO','INSCRICAO','numero_inscricao','numeroInscricao','inscricao_numero'];
+        for(const key of keys){
+          if(Object.prototype.hasOwnProperty.call(record, key)){
+            const value = record[key];
+            if(value !== undefined && value !== null){
+              const str = String(value).trim();
+              if(str) return str;
+            }
+          }
+        }
+        if(record && typeof record.dados === 'object' && record.dados !== null){
+          const nested = pickInscricaoValue(record.dados);
+          if(nested) return nested;
+        }
+        return '';
+      }
+      function formatConfirmationValue(value){
+        if(value === null || value === undefined) return '<span class="review-placeholder">Sem informação</span>';
+        if(typeof value === 'string'){
+          const trimmed = value.trim();
+          return trimmed ? esc(trimmed) : '<span class="review-placeholder">Sem informação</span>';
+        }
+        if(typeof value === 'number' || typeof value === 'boolean'){
+          return esc(String(value));
+        }
+        if(Array.isArray(value)){
+          if(value.length === 0) return '<span class="review-placeholder">Sem informação</span>';
+          const simple = value.every(item => ['string','number','boolean'].includes(typeof item));
+          if(simple){
+            return value.map(item => esc(String(item))).join(', ');
+          }
+        }
         try{
-          $('#finalStatus').innerHTML = '<span class="badge text-bg-secondary">Enviando...</span>';
-          const out = await postForm(FINAL_ENDPOINT, buildFormData());
+          return `<pre class="json mb-0">${esc(JSON.stringify(value, null, 2))}</pre>`;
+        }catch(e){
+          return esc(String(value));
+        }
+      }
+      function renderConfirmationSection(record, index, total){
+        if(!record || typeof record !== 'object') return '';
+        const entries = Object.entries(record);
+        if(!entries.length) return '';
+        const rows = entries.map(([key,val])=>`
+              <tr>
+                <td width="240"><strong>${esc(humanizeFlag(key))}</strong></td>
+                <td>${formatConfirmationValue(val)}</td>
+              </tr>
+            `).join('');
+        const title = total > 1 ? `Registro ${index + 1}` : 'Dados confirmados';
+        return `
+          <section class="mb-4">
+            <h3 class="h6 section-title mb-2">${esc(title)}</h3>
+            <table class="table table-sm review-table mb-0">
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+          </section>
+        `;
+      }
+      function renderConfirmation(result){
+        const app = document.getElementById('app');
+        if(!app) return;
+        const records = extractConfirmationRecords(result);
+        const firstRecord = records[0] || {};
+        const inscricaoValor = pickInscricaoValue(firstRecord) || pickInscricaoValue(result);
+        const sectionsHtml = records.map((record, index)=> renderConfirmationSection(record, index, records.length)).join('') || '<p class="text-muted">Resposta recebida.</p>';
+        app.innerHTML = `
+          <div class="confirm-header d-flex justify-content-between align-items-start mb-4">
+            <div>
+              <h2 class="h4 mb-1">Inscrição enviada</h2>
+              <p class="text-muted mb-0">Confira abaixo os dados retornados pelo sistema.</p>
+            </div>
+            ${inscricaoValor ? `<div class="confirm-code">${esc(inscricaoValor)}</div>` : ''}
+          </div>
+          <div class="confirm-summary">
+            ${sectionsHtml}
+          </div>
+        `;
+      }
+      async function submitAll(){
+        const button = $('#btnSubmitAll');
+        if(button?.disabled) return;
+        if(button) button.disabled = true;
+        const statusEl = $('#finalStatus');
+        const errorBox = $('#finalOut');
+        if(errorBox){
+          errorBox.textContent='';
+          errorBox.classList.add('d-none');
+        }
+        try{
+          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-secondary">Preparando...</span>';
+          const dados = buildPayload();
+          const anexos = await collectAttachments();
+          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-secondary">Enviando...</span>';
+          const out = await postJson(FINAL_ENDPOINT, { dados, anexos });
           if(out.ok){
-            alert('Inscrição enviada com sucesso!');
-            document.getElementById('app').innerHTML = `<div class="py-5 text-center"><h3 class="mb-3">Sua inscrição foi registrada</h3><p class="text-muted">Acompanhe as publicações oficiais do certame.</p></div>`;
+            renderConfirmation(out.data ?? {});
           }else{
-            $('#finalStatus').innerHTML = '<span class="badge text-bg-danger">Falha no envio</span>';
-            $('#finalOut').textContent = out.text || ''; $('#finalOut').classList.remove('d-none');
+            if(statusEl) statusEl.innerHTML = `<span class="badge text-bg-danger">Erro ${out.status || ''}</span>`;
+            if(errorBox){
+              errorBox.textContent = out.text || '';
+              errorBox.classList.remove('d-none');
+            }
           }
         }catch(e){
-          $('#finalStatus').innerHTML = '<span class="badge text-bg-danger">Erro de rede</span>';
-          $('#finalOut').textContent = String(e); $('#finalOut').classList.remove('d-none');
+          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-danger">Erro de rede</span>';
+          if(errorBox){
+            errorBox.textContent = String(e);
+            errorBox.classList.remove('d-none');
+          }
+        }finally{
+          refreshSubmitState();
         }
       }
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
