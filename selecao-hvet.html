@@ -215,6 +215,19 @@
       .declaration-box::-webkit-scrollbar-thumb{ background:#c7d5f8; border-radius:999px; }
       .declaration-check{ margin-top:1rem; }
       .declaration-actions .btn{ min-width:140px; }
+      .submit-wrapper{ position:relative; display:inline-block; }
+      .submit-guard{
+        position:absolute;
+        inset:0;
+        border:0;
+        background:transparent;
+        border-radius:inherit;
+        padding:0;
+        cursor:not-allowed;
+        width:100%;
+        height:100%;
+      }
+      .submit-guard:focus{ outline:none; }
       .quota-tab-pane{ display:none; }
       .quota-tab-pane.active{ display:block; animation:fadeIn .3s ease; }
       @media (max-width: 992px){
@@ -830,12 +843,12 @@
                 </div>
                 <div class="col-md-4" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
 
-                <div class="col-md-8" id="doc_jurado_wrap">
+                <div class="col-md-8 d-none" id="doc_jurado_wrap">
                   <label class="form-label" id="docJuradoLabel">Certidão de atuação na função de jurado</label>
                   <div class="dropzone"><input class="form-control" type="file" id="doc_jurado" accept=".pdf,image/*"></div>
                   <div class="help tiny">Anexe quando declarar atuação como jurado(a) conforme o edital.</div>
                 </div>
-                <div class="col-md-4" id="status_doc_jurado_wrap"><div id="status_doc_jurado" class="uploader-status ms-auto"></div></div>
+                <div class="col-md-4 d-none" id="status_doc_jurado_wrap"><div id="status_doc_jurado" class="uploader-status ms-auto"></div></div>
 
                 <div class="col-md-8 d-none" id="doc_jurado_440_wrap">
                   <label class="form-label">Certidão de atuação na função de jurado (art. 440 do CPP)</label>
@@ -864,7 +877,7 @@
 
             <hr>
 
-            <section class="mb-4">
+            <section class="mb-4 d-none field-disabled" id="hetSection">
               <h3 class="h6 section-title mb-2">2) Heteroidentificação (se PPNI)</h3>
               <div class="row g-3">
                 <div class="col-md-8">
@@ -892,13 +905,14 @@
                   <label class="form-label">Vídeo (até 20s)</label>
                   <div class="dropzone"><input class="form-control" type="file" id="het_video" accept="video/mp4,video/quicktime"></div>
                   <div class="help tiny">Diga: “declaro que sou negro, da cor preta ou parda”.</div>
+                  <div id="status_het_video" class="uploader-status mt-2"></div>
                 </div>
               </div>
             </section>
 
             <hr>
 
-            <section id="pcdDocsSection" class="mb-2 field-disabled">
+            <section id="pcdDocsSection" class="mb-2 d-none field-disabled">
               <h3 class="h6 section-title mb-2">3) Avaliação biopsicossocial (PCD)</h3>
               <div class="row g-3">
                 <div class="col-md-8">
@@ -943,10 +957,10 @@
                 <p>Declaro, sob as penas da Lei, que os dados informados neste formulário são verdadeiros e que conheço e aceito todas as regras pertinentes ao concurso consignadas no Edital n° xx/2025 de Abertura de Inscrições.</p>
               </div>
               <div class="form-check declaration-check">
-                <input class="form-check-input" type="checkbox" id="termoResponsabilidade" disabled>
+                <input class="form-check-input" type="checkbox" id="termoResponsabilidade">
                 <label class="form-check-label" for="termoResponsabilidade">Li e estou de acordo com a declaração de responsabilidade.</label>
               </div>
-              <div class="form-text tiny mt-2" id="responsibilityHint">Role o texto até o final para habilitar o aceite.</div>
+              <div class="form-text tiny mt-2" id="responsibilityHint">Marque o checkbox para confirmar.</div>
             </div>
 
             <div class="d-flex flex-wrap gap-2 declaration-actions mb-3">
@@ -954,8 +968,11 @@
               <button type="button" class="btn btn-outline-danger" id="declineAllDeclarations">Não aceitar</button>
             </div>
 
-            <div class="d-flex gap-2">
-              <button type="button" class="btn btn-secondary" id="btnSubmitAll" disabled>Enviar dados</button>
+            <div class="d-flex gap-2 align-items-start">
+              <div class="submit-wrapper">
+                <button type="button" class="btn btn-secondary" id="btnSubmitAll" disabled>Enviar dados</button>
+                <button type="button" class="submit-guard d-none" id="btnSubmitGuard" aria-hidden="true" tabindex="-1"></button>
+              </div>
               <div id="finalStatus" class="ms-2"></div>
             </div>
             <pre class="json mt-3 d-none" id="finalOut"></pre>
@@ -1362,7 +1379,7 @@
         const data = source && typeof source === 'object' ? source : null;
         if(!data) return;
         const readonlyTargets = new Set([
-          '#cpf','#nome','#nome_social','#nasc','#sexo','#nacionalidade','#naturalidade_cidade',
+          '#cpf','#nome','#nasc','#sexo','#nacionalidade','#naturalidade_cidade',
           '#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis'
         ]);
         const assignedSelectors = new Set();
@@ -1598,9 +1615,9 @@
       function resetDeclaration(box, checkbox, hint){
         if(!box || !checkbox) return;
         checkbox.checked = false;
-        checkbox.disabled = true;
+        checkbox.disabled = false;
         if(hint){
-          hint.textContent = 'Role o texto até o final para habilitar o aceite.';
+          hint.textContent = 'Marque o checkbox para confirmar.';
         }
         requestAnimationFrame(()=>{ box.scrollTop = 0; });
         refreshSubmitState();
@@ -1858,7 +1875,7 @@
         if($('#cotasPPNI').value==='Sim'){
           const declaracao = checkFiles($('#het_declaracao'), {required:true});
           if(!declaracao.ok) return false;
-          const hv = checkFiles($('#het_video'), {video:true});
+          const hv = checkFiles($('#het_video'), {video:true, required:true});
           const hf = checkFiles($('#het_frente'), {});
           if(!hv.ok || !hf.ok) return false;
         }
@@ -1869,14 +1886,22 @@
         }
         return true;
       }
+      function isSubmitReady(){
+        const allDeclarationsOk = declarationConfigs.every(cfg => cfg.checkbox.checked);
+        return baseFieldsOk() && docsRequiredOk() && allDeclarationsOk;
+      }
       function refreshSubmitState(){
         const btn=$('#btnSubmitAll');
         if(!btn) return;
-        const allDeclarationsOk = declarationConfigs.every(cfg => cfg.checkbox.checked);
-        const allOk = baseFieldsOk() && docsRequiredOk() && allDeclarationsOk;
-        btn.disabled = !allOk;
-        btn.classList.toggle('btn-success', allOk);
-        btn.classList.toggle('btn-secondary', !allOk);
+        const ready = isSubmitReady();
+        btn.disabled = !ready;
+        btn.classList.toggle('btn-success', ready);
+        btn.classList.toggle('btn-secondary', !ready);
+        const guard = $('#btnSubmitGuard');
+        if(guard){
+          guard.classList.toggle('d-none', ready);
+          guard.setAttribute('aria-hidden', ready ? 'true' : 'false');
+        }
       }
 
       const stepPanels = Array.from(document.querySelectorAll('.step-panel'));
@@ -1918,6 +1943,116 @@
             window.scrollTo({ top: Math.max(0, frame.offsetTop - 24), behavior:'smooth' });
           }
         }
+      }
+
+      function focusElementAndStep(el){
+        if(!el) return;
+        const panel = el.closest('.step-panel');
+        if(panel){
+          const idx = stepPanels.indexOf(panel);
+          if(idx !== -1){
+            goToStep(idx);
+          }
+        }
+        requestAnimationFrame(()=>{
+          if(typeof el.focus === 'function'){
+            try{ el.focus({ preventScroll:true }); }
+            catch{ el.focus(); }
+          }
+        });
+      }
+
+      function focusFirstInvalid(){
+        const ensureField = (selector, validator) => {
+          const field = document.querySelector(selector);
+          if(!field || field.disabled) return true;
+          const ok = validator ? validator(field) : !!String(field.value || '').trim();
+          if(ok) return true;
+          focusElementAndStep(field);
+          return false;
+        };
+        const ensureRadio = (name) => {
+          const radios = Array.from(document.querySelectorAll(`input[name="${name}"]`));
+          if(!radios.length) return true;
+          if(radios.some(r => r.checked)) return true;
+          focusElementAndStep(radios[0]);
+          return false;
+        };
+        const ensureFile = (selector, opts) => {
+          const input = document.querySelector(selector);
+          if(!input || input.disabled) return true;
+          const res = checkFiles(input, opts);
+          if(res.ok) return true;
+          focusElementAndStep(input);
+          return false;
+        };
+        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
+        for(const id of baseIds){
+          if(!ensureField(`#${id}`)) return false;
+        }
+        if(!ensureField('#email', el => { const v = String(el.value||'').trim(); return v && isValidEmail(v); })) return false;
+        if(!ensureField('#tel1', el => { const v = String(el.value||'').trim(); return v && isValidPhone(v); })) return false;
+        const tel2 = document.getElementById('tel2');
+        if(tel2 && tel2.value && !isValidPhone(tel2.value)){
+          focusElementAndStep(tel2);
+          return false;
+        }
+        if(!ensureField('#nasc', el => { const v = el.value; return v && isAdult(v); })) return false;
+        if(document.getElementById('genero')?.value === 'Outro'){
+          if(!ensureField('#genero_outro')) return false;
+        }
+        if(!ensureRadio('jurado_funcao')) return false;
+        if(document.getElementById('foi_jurado')?.value === 'SIM'){
+          if(!ensureField('#jurado_periodo')) return false;
+        }
+        if(!ensureRadio('vinculo_publico_opcao')) return false;
+        if(document.getElementById('vinculo_publico')?.value === 'Sim'){
+          if(!ensureField('#qual_vinculo')) return false;
+          if(!ensureField('#experiencia_tempo')) return false;
+        }
+        if(!ensureRadio('condicao_especial')) return false;
+        const condicaoEspecial = document.querySelector('input[name="condicao_especial"]:checked');
+        if(isGeneroMasculino()){
+          if(!ensureRadio('militar')) return false;
+          if(!ensureField('#alistamento_numero')) return false;
+          if(!ensureField('#alistamento_orgao')) return false;
+          if(!ensureField('#alistamento_data')) return false;
+        }
+        const isPcd = document.getElementById('is_pcd')?.value === 'Sim';
+        if(isPcd){
+          if(!ensureField('#tipo_pcd')) return false;
+          if(!ensureField('#necessidade')) return false;
+        }else if(condicaoEspecial?.value === 'Sim'){
+          if(!ensureField('#necessidade')) return false;
+        }
+        if(!ensureField('#cpf', el => isValidCPF(el.value))) return false;
+        if(document.getElementById('foi_jurado')?.value === 'SIM'){
+          if(!ensureFile('#doc_jurado',{required:true})) return false;
+        }
+        if(!ensureFile('#doc_id_frente',{required:true})) return false;
+        if(!ensureFile('#doc_id_verso',{required:true})) return false;
+        if(!ensureFile('#doc_cpf',{required:true})) return false;
+        if(!ensureFile('#doc_residencia',{required:true})) return false;
+        if(!ensureFile('#doc_quitacao_eleitoral',{required:true})) return false;
+        if(isGeneroMasculino()){
+          if(!ensureFile('#doc_militar',{required:true})) return false;
+        }
+        if(!ensureFile('#doc_escolaridade',{required:true})) return false;
+        if(document.getElementById('cotasPPNI')?.value === 'Sim'){
+          if(!ensureFile('#het_declaracao',{required:true})) return false;
+          if(!ensureFile('#het_video',{video:true, required:true})) return false;
+        }
+        if(isPcd){
+          if(!ensureFile('#pcd_laudo',{required:true})) return false;
+          if(!ensureFile('#pcd_declaracao',{required:true})) return false;
+        }
+        for(const cfg of declarationConfigs){
+          if(!cfg.checkbox.checked){
+            focusElementAndStep(cfg.checkbox);
+            return false;
+          }
+        }
+        return true;
       }
 
       function handleStepNav(event){
@@ -2149,8 +2284,14 @@
         const juradoWrap=$('#doc_jurado_wrap');
         const juradoStatusWrap=$('#status_doc_jurado_wrap');
         const juradoLabel=$('#docJuradoLabel');
-        if(juradoWrap){ juradoWrap.classList.toggle('field-disabled', !show); }
-        if(juradoStatusWrap){ juradoStatusWrap.classList.toggle('field-disabled', !show); }
+        if(juradoWrap){
+          juradoWrap.classList.toggle('field-disabled', !show);
+          juradoWrap.classList.toggle('d-none', !show);
+        }
+        if(juradoStatusWrap){
+          juradoStatusWrap.classList.toggle('field-disabled', !show);
+          juradoStatusWrap.classList.toggle('d-none', !show);
+        }
         if(juradoLabel){ juradoLabel.classList.toggle('required', show); }
         if(juradoInput){
           juradoInput.required = show;
@@ -2206,6 +2347,7 @@
         wrap?.classList.toggle('d-none', !isSim);
         if(docs){
           docs.classList.toggle('field-disabled', !isSim);
+          docs.classList.toggle('d-none', !isSim);
         }
         const tipoField=$('#tipo_pcd');
         if(tipoField){
@@ -2254,6 +2396,57 @@
         refreshSubmitState();
       }
       $('#is_pcd')?.addEventListener('change', togglePcdDetails);
+
+      function toggleHeteroDocs(){
+        const isPPNI = $('#cotasPPNI')?.value === 'Sim';
+        const section = $('#hetSection');
+        if(section){
+          section.classList.toggle('d-none', !isPPNI);
+          section.classList.toggle('field-disabled', !isPPNI);
+        }
+        const configs = [
+          { id:'het_declaracao', required:isPPNI },
+          { id:'het_id', required:false },
+          { id:'het_frente', required:false },
+          { id:'het_perfil', required:false },
+          { id:'het_video', required:isPPNI }
+        ];
+        configs.forEach(({id, required})=>{
+          const input = document.getElementById(id);
+          if(!input) return;
+          input.required = required;
+          input.disabled = !isPPNI;
+          if(!isPPNI){
+            input.value='';
+          }
+        });
+        if(!isPPNI){
+          ['status_het_declaracao','status_het_id'].forEach(resetUploaderStatus);
+          const videoStatus = document.getElementById('status_het_video');
+          if(videoStatus){
+            videoStatus.textContent='';
+            videoStatus.className='uploader-status mt-2';
+          }
+        }else{
+          const decl = $('#het_declaracao');
+          const declStatus = $('#status_het_declaracao');
+          if(decl && declStatus && decl.files.length){
+            const res = checkFiles(decl,{required:true});
+            if(res.ok) ok(declStatus,res.msg); else bad(declStatus,res.msg);
+          }
+          const video = $('#het_video');
+          const videoStatus = document.getElementById('status_het_video');
+          if(videoStatus){
+            videoStatus.className='uploader-status mt-2';
+          }
+          if(video && videoStatus && video.files.length){
+            const res = checkFiles(video,{video:true, required:true});
+            if(res.ok) ok(videoStatus,res.msg); else bad(videoStatus,res.msg);
+          }
+        }
+        refreshSubmitState();
+      }
+      $('#cotasPPNI')?.addEventListener('change', ()=>{ toggleHeteroDocs(); updateReview(); refreshSubmitState(); });
 
       document.querySelectorAll('input[name="jurado_funcao"]').forEach(radio=>{
         radio.addEventListener('change', ()=>{
@@ -2331,8 +2524,7 @@
       bindChecker('doc_curriculo','status_doc_curriculo',{});
       bindChecker('het_declaracao','status_het_declaracao',()=>({required: $('#cotasPPNI')?.value === 'Sim'}));
       bindChecker('het_id','status_het_id',{});
-      const hetVideo=$('#het_video'); const statusHetVideo=document.createElement('div'); hetVideo?.parentElement?.appendChild(statusHetVideo);
-      hetVideo?.addEventListener('change', ()=>{ const res=checkFiles(hetVideo,{video:true}); if(res.ok) ok(statusHetVideo,res.msg); else bad(statusHetVideo,res.msg); refreshSubmitState(); });
+      bindChecker('het_video','status_het_video',()=>({video:true, required: $('#cotasPPNI')?.value === 'Sim'}));
       bindChecker('pcd_laudo','status_pcd_laudo',()=>({required: $('#is_pcd')?.value === 'Sim'}));
       bindChecker('pcd_declaracao','status_pcd_declaracao',()=>({required: $('#is_pcd')?.value === 'Sim'}));
       bindChecker('pcd_exames','status_pcd_exames',{});
@@ -2769,8 +2961,17 @@
       }
       async function submitAll(){
         const button = $('#btnSubmitAll');
-        if(button?.disabled) return;
+        if(!isSubmitReady()){
+          focusFirstInvalid();
+          refreshSubmitState();
+          return;
+        }
         if(button) button.disabled = true;
+        const guardEl = document.getElementById('btnSubmitGuard');
+        if(guardEl){
+          guardEl.classList.add('d-none');
+          guardEl.setAttribute('aria-hidden','true');
+        }
         const statusEl = $('#finalStatus');
         const errorBox = $('#finalOut');
         if(errorBox){
@@ -2803,6 +3004,8 @@
         }
       }
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
+      const submitGuard = document.getElementById('btnSubmitGuard');
+      submitGuard?.addEventListener('click', e=>{ e.preventDefault(); focusFirstInvalid(); });
 
       // ========= Init =========
       function attachWatchers(){
@@ -2818,6 +3021,7 @@
         applyPrefillFromContext();
         toggleVinculoDetails();
         togglePcdDetails();
+        toggleHeteroDocs();
         toggleGeneroDependents();
         toggleGeneroOutro();
         toggleJuradoDetails();
