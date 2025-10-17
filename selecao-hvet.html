@@ -507,7 +507,8 @@
         return true;
       }
       function applyUppercase(el){
-        if(!el) return;
+        if(!el || el.dataset.keepcase === 'true') return;
+        if(el.type === 'email') return;
         const raw = el.value;
         if(!raw || raw.includes('{{')) return;
         const upper = raw.toUpperCase();
@@ -521,7 +522,16 @@
         }
       }
       function enforceUppercaseTextInputs(){
-        document.querySelectorAll('input[type="text"], textarea').forEach(el=>{
+        const selector = 'input[type="text"]:not([data-keepcase])';
+        document.querySelectorAll(selector).forEach(el=>{
+          el.classList.add('text-uppercase');
+          applyUppercase(el);
+          if(el.dataset.uppercaseBound === 'true') return;
+          el.addEventListener('input', ()=>applyUppercase(el));
+          el.dataset.uppercaseBound = 'true';
+        });
+        document.querySelectorAll('textarea:not([data-keepcase])').forEach(el=>{
+          el.classList.add('text-uppercase');
           applyUppercase(el);
           if(el.dataset.uppercaseBound === 'true') return;
           el.addEventListener('input', ()=>applyUppercase(el));
