@@ -506,43 +506,6 @@
         rest=(soma*10)%11; if(rest===10||rest===11) rest=0; if(rest!==parseInt(cpf.substring(10,11))) return false;
         return true;
       }
-      function applyUppercase(el){
-        if(!el || el.dataset.keepcase === 'true') return;
-        if(el.type === 'email') return;
-        const raw = el.value;
-        if(!raw || raw.includes('{{')) return;
-        const upper = raw.toUpperCase();
-        if(raw !== upper){
-          const start = el.selectionStart;
-          const end = el.selectionEnd;
-          el.value = upper;
-          if(typeof start === 'number' && typeof end === 'number'){
-            el.setSelectionRange(start, end);
-          }
-        }
-      }
-      function enforceUppercaseTextInputs(){
-        const selector = 'input[type="text"]:not([data-keepcase])';
-        document.querySelectorAll(selector).forEach(el=>{
-          el.classList.add('text-uppercase');
-          applyUppercase(el);
-          if(el.dataset.uppercaseBound === 'true') return;
-          el.addEventListener('input', ()=>applyUppercase(el));
-          el.dataset.uppercaseBound = 'true';
-        });
-        document.querySelectorAll('textarea:not([data-keepcase])').forEach(el=>{
-          el.classList.add('text-uppercase');
-          applyUppercase(el);
-          if(el.dataset.uppercaseBound === 'true') return;
-          el.addEventListener('input', ()=>applyUppercase(el));
-          el.dataset.uppercaseBound = 'true';
-        });
-      }
-      function disableAutocomplete(){
-        document.querySelectorAll('input, textarea, select').forEach(el=>{
-          el.setAttribute('autocomplete','off');
-        });
-      }
       function checkFiles(input, {video=false, required=false, minFiles=1}){
         const files = Array.from(input.files||[]);
         if(required && files.length < minFiles){ return {ok:false, msg:`Selecione pelo menos ${minFiles} arquivo(s).`}; }
@@ -610,7 +573,6 @@
 
       // ========= Review =========
       function updateReview(){
-        enforceUppercaseTextInputs();
         const nome=esc($('#nome').value), email=esc(($('#email').value||'').toLowerCase());
         const cpf=fmtCPF($('#cpf').value);
         const tel = esc(`(${onlyDigits($('#tel1_ddd').value)}) ${onlyDigits($('#tel1_num').value)}`);
@@ -663,7 +625,7 @@
         const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1_ddd','tel1_num','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','raca','cotasPNP','is_pcd','vinculo_publico'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isValidCPF($('#cpf').value)) return false;
-        if(!isValidEmail($('#email').value.trim())) return false;
+        if(!isValidEmail($('#email').value)) return false;
         return true;
       }
       function docsRequiredOk(){
@@ -876,6 +838,26 @@
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
 
       // ========= Init =========
+      function enforceUppercaseTextInputs(){
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        textInputs.forEach(input => {
+          if(input.type !== 'text') return;
+          if(input.id === 'email') return;
+          input.classList.add('text-uppercase');
+          const apply = () => {
+            const { selectionStart, selectionEnd, value } = input;
+            const upper = value.toUpperCase();
+            if(value !== upper){
+              input.value = upper;
+              if(document.activeElement === input && selectionStart != null && selectionEnd != null){
+                input.setSelectionRange(selectionStart, selectionEnd);
+              }
+            }
+          };
+          apply();
+          input.addEventListener('input', apply);
+        });
+      }
       function attachWatchers(){
         const events=['input','change','blur'];
         document.querySelectorAll('input,select,textarea').forEach(el=>{
@@ -883,7 +865,6 @@
         });
       }
       function init(){
-        disableAutocomplete();
         loadDraft();
         enforceUppercaseTextInputs();
         attachWatchers();
