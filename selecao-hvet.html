@@ -370,6 +370,16 @@
             </div>
             <div class="row g-3 mt-0 align-items-end">
               <div class="col-md-4 col-lg-3">
+                <label class="form-label required" for="sexo">Sexo</label>
+                <select id="sexo" class="form-select" data-prefill="{{ $json.sexo ?? $json.sex ?? $json.genero ?? $json.gender ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option>Feminino</option>
+                  <option>Masculino</option>
+                  <option>Intersexo</option>
+                  <option>Prefiro não informar</option>
+                </select>
+              </div>
+              <div class="col-md-4 col-lg-3">
                 <label class="form-label required" for="genero">Gênero</label>
                 <select id="genero" class="form-select" data-prefill="{{ $json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '' }}" required>
                   <option value="">Selecione...</option>
@@ -1174,12 +1184,15 @@
         return age >= 18;
       };
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
+      const getSexoSelection = () => String($('#sexo')?.value || '').trim();
       const getGeneroSelection = () => String($('#genero')?.value || '').trim();
       const isGeneroMasculino = () => {
         const generoSelected = getGeneroSelection();
         const generoNormalized = normalizeMatch(generoSelected);
         if(generoNormalized === 'HOMEMCISGENERO') return true;
         if(generoNormalized === 'MASCULINO') return true;
+        const sexoNormalized = normalizeMatch(getSexoSelection());
+        if(sexoNormalized === 'MASCULINO') return true;
         if(generoNormalized){
           return false;
         }
@@ -1313,9 +1326,9 @@
       };
       function setSelectValue(selector, value){
         const el = $(selector);
-        if(!el) return;
+        if(!el) return false;
         const normalizedTarget = normalizeMatch(value);
-        if(!normalizedTarget) return;
+        if(!normalizedTarget) return false;
         const options = Array.from(el.options || []);
         const match = options.find(option => {
           const optionNorm = normalizeMatch(option.value || option.textContent || '');
@@ -1324,7 +1337,9 @@
         if(match){
           el.value = match.value;
           ['input','change'].forEach(evt => el.dispatchEvent(new Event(evt,{bubbles:true})));
+          return true;
         }
+        return false;
       }
       function setRadioValue(name, value){
         const normalizedTarget = normalizeMatch(value);
@@ -1348,7 +1363,7 @@
         const data = source && typeof source === 'object' ? source : null;
         if(!data) return;
         const readonlyTargets = new Set([
-          '#cpf','#nome','#nome_social','#nasc','#nacionalidade','#naturalidade_cidade',
+          '#cpf','#nome','#nome_social','#nasc','#sexo','#nacionalidade','#naturalidade_cidade',
           '#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis'
         ]);
         const assignedSelectors = new Set();
@@ -1399,7 +1414,12 @@
         assignValue('#pcd_cid', data.pcd_cid, value => String(value).trim().toUpperCase());
         assignValue('#necessidade', data.necessidade ?? data.specialNeedDescription, value => String(value).trim());
         assignValue('#tipo_pcd', data.tipo_pcd, value => String(value).trim());
-        setSelectValue('#genero', data.genero ?? data.genero_identidade ?? data.genderIdentity ?? data.gender ?? data.sexo);
+        if(setSelectValue('#sexo', data.sexo ?? data.sex ?? data.genero ?? data.gender)){
+          assignedSelectors.add('#sexo');
+        }
+        if(setSelectValue('#genero', data.genero ?? data.genero_identidade ?? data.genderIdentity ?? data.gender ?? data.sexo)){
+          assignedSelectors.add('#genero');
+        }
         if($('#genero')?.value === 'Outro'){
           assignValue('#genero_outro', data.genero_outro ?? data.generoOutro, value => String(value).trim());
         }
@@ -1445,7 +1465,7 @@
           if(normalized === 'SIM') setRadioValue('condicao_especial','Sim');
           else if(normalized === 'NAO') setRadioValue('condicao_especial','Não');
         }
-        const selectorsToTrigger = ['#cpf','#nome','#nome_social','#nasc','#genero','#nacionalidade','#naturalidade_cidade','#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis','#mae','#pai','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf','#ies','#curso','#ano_conclusao','#especialidade','#jurado_periodo','#qual_vinculo','#experiencia_tempo','#tipo_pcd','#pcd_cid','#necessidade'];
+        const selectorsToTrigger = ['#cpf','#nome','#nome_social','#nasc','#sexo','#genero','#nacionalidade','#naturalidade_cidade','#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis','#mae','#pai','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf','#ies','#curso','#ano_conclusao','#especialidade','#jurado_periodo','#qual_vinculo','#experiencia_tempo','#tipo_pcd','#pcd_cid','#necessidade'];
         selectorsToTrigger.forEach(selector => {
           const el = $(selector);
           if(el && el.value){
@@ -1628,6 +1648,7 @@
         const telPrincipal = fmtPhone($('#tel1').value);
         const telAdicional = fmtPhone($('#tel2').value);
         const nasc = fmtDateBr($('#nasc').value);
+        const sexo=$('#sexo').value;
         const genero=getGeneroValue();
         const estadoCivil=$('#estado_civil').value;
         const nacionalidade = $('#nacionalidade').value;
@@ -1690,6 +1711,7 @@
             {label:'Nome completo', value: present(nome)},
             {label:'Nome social', value: present(nomeSocial)},
             {label:'Data de nascimento', value: present(nasc)},
+            {label:'Sexo', value: present(sexo)},
             {label:'Gênero', value: present(genero)},
             {label:'Estado civil', value: present(estadoCivil)},
             {label:'Nacionalidade', value: present(nacionalidade)},
@@ -1776,7 +1798,7 @@
 
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
@@ -2076,7 +2098,7 @@
         });
         refreshSubmitState();
       }
-      $('#genero')?.addEventListener('change', toggleGeneroDependents);
+      $('#sexo')?.addEventListener('change', ()=>{ toggleGeneroDependents(); updateReview(); refreshSubmitState(); });
 
       function toggleGeneroOutro(){
         const generoSelect = $('#genero');
@@ -2510,8 +2532,10 @@
         fd.append('nome',$('#nome').value.trim());
         fd.append('nome_social',$('#nome_social').value.trim());
         fd.append('data_nascimento',$('#nasc').value);
+        const sexoSelect = $('#sexo').value;
         const generoSelect = $('#genero').value;
         const generoOutro = $('#genero_outro').value.trim();
+        fd.append('sexo', sexoSelect);
         fd.append('genero',generoSelect);
         fd.append('genero_outro', generoSelect === 'Outro' ? generoOutro : '');
         fd.append('estado_civil',$('#estado_civil').value);
