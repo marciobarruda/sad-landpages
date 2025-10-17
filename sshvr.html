@@ -1031,6 +1031,25 @@
       const VID_MAX_MB = 30;
       const PREFILL = {{ $json ? JSON.stringify($json) : '{}' }};
 
+      document.addEventListener('DOMContentLoaded', () => {
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        textInputs.forEach(input => {
+          const enforceUppercase = () => {
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const upper = input.value.toUpperCase();
+            if(upper !== input.value){
+              input.value = upper;
+              if(start != null && end != null){
+                input.setSelectionRange(start, end);
+              }
+            }
+          };
+          enforceUppercase();
+          input.addEventListener('input', enforceUppercase);
+        });
+      });
+
       const recursoWrapper = document.getElementById('recursoWrapper');
       const recursoState = { enabled:false, start:null, end:null };
       const parseResourceDate = (value) => {
