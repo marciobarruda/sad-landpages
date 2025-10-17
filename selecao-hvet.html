@@ -329,11 +329,11 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label required" for="nome">Nome completo</label>
-                <input type="text" id="nome" class="form-control" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" required>
+                <input type="text" id="nome" class="form-control" value="{{ String($json.nome ?? $json.name ?? '').trim() || String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="nasc">Data de nascimento</label>
-                <input type="date" id="nasc" class="form-control" value="{{ ($json.dob||'').split('/').reverse().join('-') }}" required>
+                <input type="date" id="nasc" class="form-control" value="{{ (($json.nasc ?? $json.dob) || '').split('/').reverse().join('-') }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -370,19 +370,12 @@
             </div>
             <div class="row g-3 mt-0 align-items-end">
               <div class="col-md-4 col-lg-3">
-                <label class="form-label required" for="sexo">Sexo</label>
-                <select id="sexo" class="form-select" data-prefill="{{ $json.gender ?? $json.sexo ?? '' }}" required>
+                <label class="form-label required" for="genero">Gênero</label>
+                <select id="genero" class="form-select" data-prefill="{{ $json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '' }}" required>
                   <option value="">Selecione...</option>
                   <option>Feminino</option>
                   <option>Masculino</option>
                   <option>Intersexo</option>
-                  <option>Prefiro não informar</option>
-                </select>
-              </div>
-              <div class="col-md-4 col-lg-3">
-                <label class="form-label" for="genero_identidade">Gênero</label>
-                <select id="genero_identidade" class="form-select" data-prefill="{{ $json.genero_identidade ?? $json.genderIdentity ?? '' }}">
-                  <option value="">Selecione...</option>
                   <option>Mulher cisgênero</option>
                   <option>Mulher trans</option>
                   <option>Homem cisgênero</option>
@@ -427,7 +420,7 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label" for="nome_social">Nome social</label>
-                <input type="text" id="nome_social" class="form-control" value="{{ String($json.socialName ?? '').trim().toUpperCase() }}">
+                <input type="text" id="nome_social" class="form-control" value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}">
               </div>
             </div>
           </div>
@@ -504,7 +497,7 @@
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="tel1">Telefone 1</label>
-                <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}" required>
+                <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone1 ?? $json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}" required>
                 <div class="help tiny" id="tel1Help"></div>
               </div>
               <div class="col-md-3">
@@ -533,13 +526,13 @@
               </div>
               <div class="col-md-3">
                 <label class="form-label required" for="numero">Número</label>
-                <input type="text" id="numero" class="form-control" value="{{ String($json.addressNumber ?? '').trim().toUpperCase() }}" required>
+                <input type="text" id="numero" class="form-control" value="{{ String($json.numero ?? $json.addressNumber ?? '').trim().toUpperCase() }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4">
                 <label class="form-label" for="complemento">Complemento</label>
-                <input type="text" id="complemento" class="form-control" value="{{ String($json.addressComplement ?? '').trim().toUpperCase() }}">
+                <input type="text" id="complemento" class="form-control" value="{{ String($json.complemento ?? $json.addressComplement ?? '').trim().toUpperCase() }}">
               </div>
               <div class="col-md-4">
                 <label class="form-label required" for="bairro">Bairro</label>
@@ -547,7 +540,7 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label required" for="cidade">Cidade</label>
-                <input type="text" id="cidade" class="form-control" value="{{ String($json.locality ?? $json.city ?? '').trim().toUpperCase() }}" required>
+                <input type="text" id="cidade" class="form-control" value="{{ String($json.cidade ?? $json.locality ?? $json.city ?? '').trim().toUpperCase() }}" required>
               </div>
             </div>
             <div class="row g-3 mt-0">
@@ -824,7 +817,7 @@
                 <div class="col-md-8" id="docMilitarWrap">
                   <label class="form-label" id="docMilitarLabel">Quitação do serviço militar</label>
                   <div class="dropzone"><input class="form-control" type="file" id="doc_militar" accept=".pdf,image/*"></div>
-                  <div class="help tiny">Obrigatório para candidatos do sexo masculino. Exemplos: CAM, CDI, CI ou CRM.</div>
+                  <div class="help tiny">Obrigatório para candidatos do gênero masculino. Exemplos: CAM, CDI, CI ou CRM.</div>
                 </div>
                 <div class="col-md-4" id="status_doc_militar_wrap"><div id="status_doc_militar" class="uploader-status ms-auto"></div></div>
 
@@ -1181,19 +1174,21 @@
         return age >= 18;
       };
       const joinParts = (parts, sep=' / ') => parts.map(part => String(part||'').trim()).filter(Boolean).join(sep);
-      const isSexoMasculino = () => {
-        const sexo = String($('#sexo')?.value || '').trim().toUpperCase();
-        const generoRaw = String($('#genero_identidade')?.value || '').trim();
-        const generoNormalized = generoRaw
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .toUpperCase();
-        if(generoNormalized === 'HOMEM CISGENERO') return true;
-        if(generoNormalized) return false;
-        return sexo === 'MASCULINO';
+      const getGeneroSelection = () => String($('#genero')?.value || '').trim();
+      const isGeneroMasculino = () => {
+        const generoSelected = getGeneroSelection();
+        const generoNormalized = normalizeMatch(generoSelected);
+        if(generoNormalized === 'HOMEMCISGENERO') return true;
+        if(generoNormalized === 'MASCULINO') return true;
+        if(generoNormalized){
+          return false;
+        }
+        const outroValor = String($('#genero_outro')?.value || '').trim();
+        const outroNormalized = normalizeMatch(outroValor);
+        return outroNormalized === 'HOMEMCISGENERO' || outroNormalized === 'MASCULINO';
       };
-      const getGeneroIdentidadeValue = () => {
-        const selected = String($('#genero_identidade')?.value || '').trim();
+      const getGeneroValue = () => {
+        const selected = getGeneroSelection();
         if(selected === 'Outro'){
           return String($('#genero_outro')?.value || '').trim();
         }
@@ -1371,9 +1366,9 @@
           return true;
         };
         assignValue('#cpf', data.cpf ?? data.preferred_username, value => onlyDigits(value).slice(0,11));
-        assignValue('#nome', data.name ?? data.given_name ?? data.family_name, value => String(value).trim());
-        assignValue('#nome_social', data.socialName, value => String(value).trim().toUpperCase());
-        assignValue('#nasc', data.dob ?? data.data_nascimento, parseToIsoDate);
+        assignValue('#nome', data.nome ?? data.name ?? data.given_name ?? data.family_name, value => String(value).trim());
+        assignValue('#nome_social', data.nome_social ?? data.socialName, value => String(value).trim().toUpperCase());
+        assignValue('#nasc', data.nasc ?? data.dob ?? data.data_nascimento, parseToIsoDate);
         assignValue('#nacionalidade', data.nacionalidade ?? data.nationality, value => String(value).trim().toUpperCase());
         assignValue('#naturalidade_cidade', data.naturalidade ?? data.naturalidade_cidade, value => String(value).trim().toUpperCase());
         assignValue('#naturalidade_uf', data.uf_naturalidade ?? data.naturalidade_uf, value => String(value).trim().toUpperCase());
@@ -1385,14 +1380,14 @@
         assignValue('#mae', data.mae ?? data.motherName, value => String(value).trim().toUpperCase());
         assignValue('#pai', data.pai ?? data.fatherName, value => String(value).trim().toUpperCase());
         assignValue('#email', data.email, value => String(value).trim().toLowerCase());
-        assignValue('#tel1', data.telefone ?? data.phone, fmtPhone);
+        assignValue('#tel1', data.telefone1 ?? data.telefone ?? data.phone, fmtPhone);
         assignValue('#tel2', data.telefone2 ?? data.phone2, fmtPhone);
         assignValue('#cep', data.postal_code ?? data.cep, value => onlyDigits(value).slice(0,8));
         assignValue('#logradouro', data.addressStreet ?? data.logradouro, value => String(value).trim().toUpperCase());
-        assignValue('#numero', data.addressNumber, value => String(value).trim().toUpperCase());
+        assignValue('#numero', data.numero ?? data.addressNumber, value => String(value).trim().toUpperCase());
         assignValue('#complemento', data.addressComplement ?? data.complemento, value => String(value).trim().toUpperCase());
         assignValue('#bairro', data.neighborhood ?? data.bairro, value => String(value).trim().toUpperCase());
-        assignValue('#cidade', data.locality ?? data.city, value => String(value).trim().toUpperCase());
+        assignValue('#cidade', data.cidade ?? data.locality ?? data.city, value => String(value).trim().toUpperCase());
         assignValue('#uf', data.state ?? data.addressState ?? data.uf, value => String(value).trim().toUpperCase());
         assignValue('#ies', data.instituicao ?? data.ies, value => String(value).trim().toUpperCase());
         assignValue('#curso', data.curso, value => String(value).trim().toUpperCase());
@@ -1403,9 +1398,9 @@
         assignValue('#experiencia_tempo', data.experiencia_tempo, value => String(value).trim());
         assignValue('#pcd_cid', data.pcd_cid, value => String(value).trim().toUpperCase());
         assignValue('#necessidade', data.necessidade ?? data.specialNeedDescription, value => String(value).trim());
-        setSelectValue('#sexo', data.gender ?? data.sexo);
-        setSelectValue('#genero_identidade', data.genero_identidade ?? data.genderIdentity);
-        if($('#genero_identidade')?.value === 'Outro'){
+        assignValue('#tipo_pcd', data.tipo_pcd, value => String(value).trim());
+        setSelectValue('#genero', data.genero ?? data.genero_identidade ?? data.genderIdentity ?? data.gender ?? data.sexo);
+        if($('#genero')?.value === 'Outro'){
           assignValue('#genero_outro', data.genero_outro ?? data.generoOutro, value => String(value).trim());
         }
         setSelectValue('#estado_civil', data.estado_civil ?? data.maritalStatus);
@@ -1424,7 +1419,7 @@
           });
         });
         if(disabilityLabels.length){
-          assignValue('#tipo_pcd', disabilityLabels.join(', '));
+          applyIfEmpty('#tipo_pcd', disabilityLabels.join(', '));
         }
         const withDisability = data.is_pcd ?? data.withDisability;
         let pcdChoice = '';
@@ -1450,7 +1445,7 @@
           if(normalized === 'SIM') setRadioValue('condicao_especial','Sim');
           else if(normalized === 'NAO') setRadioValue('condicao_especial','Não');
         }
-        const selectorsToTrigger = ['#cpf','#nome','#nome_social','#nasc','#nacionalidade','#naturalidade_cidade','#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis','#mae','#pai','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf','#ies','#curso','#ano_conclusao','#especialidade','#jurado_periodo','#qual_vinculo','#experiencia_tempo','#tipo_pcd','#pcd_cid','#necessidade'];
+        const selectorsToTrigger = ['#cpf','#nome','#nome_social','#nasc','#genero','#nacionalidade','#naturalidade_cidade','#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis','#mae','#pai','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf','#ies','#curso','#ano_conclusao','#especialidade','#jurado_periodo','#qual_vinculo','#experiencia_tempo','#tipo_pcd','#pcd_cid','#necessidade'];
         selectorsToTrigger.forEach(selector => {
           const el = $(selector);
           if(el && el.value){
@@ -1477,9 +1472,7 @@
         const nacionalidade = $('#nacionalidade')?.value || '';
         const naturalidadeCidade = $('#naturalidade_cidade')?.value || '';
         const naturalidadeUf = $('#naturalidade_uf')?.value || '';
-        const sexo = $('#sexo')?.value || '';
-        const generoIdentidade = getGeneroIdentidadeValue();
-        const genero = generoIdentidade || sexo;
+        const genero = getGeneroValue();
         const raca = $('#raca')?.value || '';
         const concorrerPPNI = ($('#cotasPPNI')?.value || '').trim() === 'Sim';
         const isPCD = ($('#is_pcd')?.value || '').trim() === 'Sim';
@@ -1635,8 +1628,7 @@
         const telPrincipal = fmtPhone($('#tel1').value);
         const telAdicional = fmtPhone($('#tel2').value);
         const nasc = fmtDateBr($('#nasc').value);
-        const sexo=$('#sexo').value;
-        const generoIdentidade=getGeneroIdentidadeValue();
+        const genero=getGeneroValue();
         const estadoCivil=$('#estado_civil').value;
         const nacionalidade = $('#nacionalidade').value;
         const naturalidade = joinParts([
@@ -1698,8 +1690,7 @@
             {label:'Nome completo', value: present(nome)},
             {label:'Nome social', value: present(nomeSocial)},
             {label:'Data de nascimento', value: present(nasc)},
-            {label:'Sexo', value: present(sexo)},
-            {label:'Identidade de gênero', value: present(generoIdentidade)},
+            {label:'Gênero', value: present(genero)},
             {label:'Estado civil', value: present(estadoCivil)},
             {label:'Nacionalidade', value: present(nacionalidade)},
             {label:'Naturalidade', value: present(naturalidade)},
@@ -1785,7 +1776,7 @@
 
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
@@ -1793,7 +1784,7 @@
         if(!isValidPhone($('#tel1').value)) return false;
         const tel2Val = $('#tel2')?.value || '';
         if(tel2Val && !isValidPhone(tel2Val)) return false;
-        if((document.getElementById('genero_identidade')?.value || '') === 'Outro'){
+        if((document.getElementById('genero')?.value || '') === 'Outro'){
           if(!String(document.getElementById('genero_outro')?.value || '').trim()) return false;
         }
         if(!$('#foi_jurado').value.trim()) return false;
@@ -1804,7 +1795,7 @@
           if(!String($('#qual_vinculo').value||'').trim()) return false;
           if(!String($('#experiencia_tempo').value||'').trim()) return false;
         }
-        if(isSexoMasculino()){
+        if(isGeneroMasculino()){
           const militar = document.querySelector('input[name="militar"]:checked');
           if(!militar) return false;
           if(!String($('#alistamento_numero').value||'').trim()) return false;
@@ -1821,7 +1812,7 @@
       function docsRequiredOk(){
         const req = ['doc_id_frente','doc_id_verso','doc_cpf','doc_residencia','doc_quitacao_eleitoral','doc_escolaridade'];
         for(const id of req){ const el=document.getElementById(id); const ok=checkFiles(el,{required:true}).ok; if(!ok) return false; }
-        if(isSexoMasculino()){
+        if(isGeneroMasculino()){
           const militarOk = checkFiles(document.getElementById('doc_militar'), {required:true}).ok;
           if(!militarOk) return false;
         }
@@ -2018,7 +2009,7 @@
         const input = $('#doc_militar');
         const status = document.getElementById('status_doc_militar');
         if(!input || !status) return;
-        if(!isSexoMasculino()){
+        if(!isGeneroMasculino()){
           resetUploaderStatus('status_doc_militar');
           return;
         }
@@ -2026,8 +2017,8 @@
         if(res.ok) ok(status, res.msg); else bad(status, res.msg);
       }
 
-      function toggleSexoDependents(){
-        const isMasc = isSexoMasculino();
+      function toggleGeneroDependents(){
+        const isMasc = isGeneroMasculino();
         document.querySelectorAll('input[name="militar"]').forEach(radio=>{
           radio.required = isMasc;
           radio.disabled = !isMasc;
@@ -2085,10 +2076,10 @@
         });
         refreshSubmitState();
       }
-      $('#sexo')?.addEventListener('change', toggleSexoDependents);
+      $('#genero')?.addEventListener('change', toggleGeneroDependents);
 
       function toggleGeneroOutro(){
-        const generoSelect = $('#genero_identidade');
+        const generoSelect = $('#genero');
         const outroCol = $('#generoOutroCol');
         const outroInput = $('#genero_outro');
         const isOutro = (generoSelect?.value || '') === 'Outro';
@@ -2102,9 +2093,9 @@
         updateReview();
         refreshSubmitState();
       }
-      $('#genero_identidade')?.addEventListener('change', ()=>{
+      $('#genero')?.addEventListener('change', ()=>{
         toggleGeneroOutro();
-        toggleSexoDependents();
+        toggleGeneroDependents();
       });
       $('#genero_outro')?.addEventListener('input', ()=>{ updateReview(); refreshSubmitState(); });
 
@@ -2302,7 +2293,7 @@
       bindChecker('doc_cpf','status_doc_cpf',{required:true});
       bindChecker('doc_residencia','status_doc_res',{required:true});
       bindChecker('doc_quitacao_eleitoral','status_doc_eleitoral',{required:true});
-      bindChecker('doc_militar','status_doc_militar',()=>({required: isSexoMasculino()}));
+      bindChecker('doc_militar','status_doc_militar',()=>({required: isGeneroMasculino()}));
       bindChecker('doc_jurado','status_doc_jurado',()=>({required: $('#foi_jurado')?.value === 'SIM'}));
       bindChecker('doc_jurado_440','status_doc_jurado_440',{});
       bindChecker('doc_escolaridade','status_doc_escolaridade',{required:true});
@@ -2519,10 +2510,9 @@
         fd.append('nome',$('#nome').value.trim());
         fd.append('nome_social',$('#nome_social').value.trim());
         fd.append('data_nascimento',$('#nasc').value);
-        const generoSelect = $('#genero_identidade').value;
+        const generoSelect = $('#genero').value;
         const generoOutro = $('#genero_outro').value.trim();
-        fd.append('sexo',$('#sexo').value);
-        fd.append('genero_identidade',generoSelect);
+        fd.append('genero',generoSelect);
         fd.append('genero_outro', generoSelect === 'Outro' ? generoOutro : '');
         fd.append('estado_civil',$('#estado_civil').value);
         fd.append('nome_mae',$('#mae').value.trim());
@@ -2649,7 +2639,7 @@
         applyPrefillFromContext();
         toggleVinculoDetails();
         togglePcdDetails();
-        toggleSexoDependents();
+        toggleGeneroDependents();
         toggleGeneroOutro();
         toggleJuradoDetails();
         updateNecessidadeRequirement();
