@@ -1029,7 +1029,23 @@
       const DOC_MAX_MB = 2;
       const VID_OK_EXT = ['mp4','mov'];
       const VID_MAX_MB = 30;
-      const PREFILL = {{ $json ? JSON.stringify($json) : '{}' }};
+      const PREFILL_RAW = "{{ $json ? JSON.stringify($json) : '{}' }}";
+      let PREFILL = {};
+      try{
+        PREFILL = JSON.parse(PREFILL_RAW);
+      }catch(firstParseError){
+        try{
+          const sanitized = String(PREFILL_RAW || '')
+            .replace(/&quot;/g, '"')
+            .replace(/&#34;/g, '"');
+          PREFILL = JSON.parse(sanitized);
+        }catch(secondParseError){
+          PREFILL = {};
+        }
+      }
+      if(!Array.isArray(PREFILL) && (typeof PREFILL !== 'object' || PREFILL === null)){
+        PREFILL = {};
+      }
 
       const recursoWrapper = document.getElementById('recursoWrapper');
       const recursoState = { enabled:false, start:null, end:null };
@@ -1070,6 +1086,23 @@
       const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/,'$1.$2.$3-$4') : (d||''); };
       const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\\d{5})(\\d{3})/,'$1-$2') : (d||''); };
       const toMB = bytes => Math.round((bytes/1024/1024)*100)/100;
+
+      function disableAutocomplete(){
+        document.querySelectorAll('input,select,textarea').forEach(el=>{
+          el.setAttribute('autocomplete','off');
+        });
+      }
+      function isTemplatePlaceholder(value){
+        if(typeof value !== 'string') return false;
+        return value.includes('{{') && value.includes('}}');
+      }
+      function clearPlaceholderValues(){
+        document.querySelectorAll('input,textarea,select').forEach(el=>{
+          if(isTemplatePlaceholder(el.value)){
+            el.value = '';
+          }
+        });
+      }
 
       // ========= Validators =========
       function isValidEmail(v){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(String(v||'').trim()); }
@@ -2153,6 +2186,40 @@
         });
         el.addEventListener('blur', e=>{ e.target.value = (e.target.value||'').toUpperCase(); });
       }
+      function shouldUppercaseElement(el){
+        if(!el) return false;
+        const tag = (el.tagName || '').toLowerCase();
+        if(tag === 'textarea') return el.dataset.allowcase !== 'any';
+        if(tag !== 'input') return false;
+        const type = (el.getAttribute('type') || 'text').toLowerCase();
+        const skip = ['email','date','datetime-local','time','month','number','password','file','checkbox','radio','hidden','range','color'];
+        if(skip.includes(type)) return false;
+        if(el.dataset.allowcase === 'any') return false;
+        return true;
+      }
+      function enforceUppercaseTextualInputs(){
+        const updateValue = (el) => {
+          if(!el) return;
+          const upper = (el.value || '').toUpperCase();
+          if(el.value === upper) return;
+          const active = document.activeElement === el;
+          const start = active ? el.selectionStart : null;
+          const end = active ? el.selectionEnd : null;
+          el.value = upper;
+          if(active && start !== null && end !== null){
+            try{ el.setSelectionRange(start, end); }
+            catch(error){ /* ignore */ }
+          }
+        };
+        const attach = (el) => {
+          if(!shouldUppercaseElement(el)) return;
+          ['input','change','blur'].forEach(evt => {
+            el.addEventListener(evt, ()=>updateValue(el));
+          });
+          updateValue(el);
+        };
+        document.querySelectorAll('input,textarea').forEach(attach);
+      }
       bindNumeric('#cpf',11);
       bindNumeric('#rg_numero',14);
       bindNumeric('#cep',8);
@@ -3015,10 +3082,13 @@
         });
       }
       function init(){
+        disableAutocomplete();
+        clearPlaceholderValues();
         bindWizard();
         declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
         attachWatchers();
         applyPrefillFromContext();
+        enforceUppercaseTextualInputs();
         toggleVinculoDetails();
         togglePcdDetails();
         toggleHeteroDocs();
