@@ -267,16 +267,21 @@
         color:#172a63;
       }
       .inscricao-banner-subtitle{ font-size:.95rem; color:#516098; }
-      .inscricao-banner-code{
+      .inscricao-banner-meta{
         display:flex;
         flex-direction:column;
         align-items:flex-end;
+        gap:.45rem;
+      }
+      .inscricao-banner-code{
+        display:flex;
+        align-items:center;
         justify-content:center;
         border:1px solid #c5d4fb;
         border-radius:999px;
         padding:.65rem 1.75rem;
         min-width:210px;
-        text-align:right;
+        text-align:center;
         background:rgba(255,255,255,.85);
         box-shadow:0 10px 26px rgba(13,110,253,.12);
       }
@@ -287,7 +292,7 @@
         text-transform:uppercase;
         color:#6a77b4;
         font-weight:600;
-        margin-bottom:.25rem;
+        text-align:right;
       }
       .inscricao-banner-value{
         display:block;
@@ -304,7 +309,9 @@
         body{ overflow-x:hidden; }
         .frame-card{ margin:-60px auto -60px; padding:1.25rem; }
         .inscricao-banner{ flex-direction:column; align-items:flex-start; padding:1.1rem 1.25rem; gap:1rem; }
-        .inscricao-banner-code{ align-self:stretch; text-align:left; min-width:auto; border-radius:1.1rem; }
+        .inscricao-banner-meta{ align-items:flex-start; width:100%; }
+        .inscricao-banner-code{ align-self:stretch; text-align:center; min-width:auto; border-radius:1.1rem; }
+        .inscricao-banner-label{ text-align:left; }
         .wizard-shell{ padding:1.25rem 1.1rem; }
         .wizard-heading::before{ width:24px; }
         .wizard-steps{
@@ -350,9 +357,11 @@
           <p class="inscricao-banner-title mb-1">Seleção Simplificada — Hospital Veterinário do Recife</p>
           <p class="inscricao-banner-subtitle mb-0 text-muted subtle">Inscrição on-line</p>
         </div>
-        <div class="inscricao-banner-code" aria-label="Número da inscrição">
-          <span class="inscricao-banner-label">Nº inscrição</span>
-          <span class="inscricao-banner-value" id="inscricaoBannerValue">—</span>
+        <div class="inscricao-banner-meta">
+          <span class="inscricao-banner-label" id="inscricaoBannerLabel">Nº inscrição</span>
+          <div class="inscricao-banner-code" aria-labelledby="inscricaoBannerLabel">
+            <span class="inscricao-banner-value" id="inscricaoBannerValue">—</span>
+          </div>
         </div>
       </div>
       <div id="app">
