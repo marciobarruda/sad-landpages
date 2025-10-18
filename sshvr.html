@@ -38,11 +38,17 @@
       .form-control[readonly]{ background:#f8f9fa; }
       .review-table td{ vertical-align: top; }
       .review-placeholder{ color:#adb5bd; font-weight:600; letter-spacing:.04em; }
-      .confirm-header{ gap:1rem; }
-      .confirm-code{ font-size:1.75rem; font-weight:800; color:var(--brand); text-align:right; }
+      .confirm-header{ gap:1rem; position:relative; padding-right:1rem; }
+      .confirm-header.has-code{ padding-right:220px; }
+      .confirm-code{ position:absolute; top:1rem; right:1rem; text-align:right; color:#0d6efd; font-weight:700; font-size:1.75rem; }
       .confirm-code .confirm-code-label{ font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#6c757d; display:block; margin-bottom:.25rem; }
-      .confirm-code .confirm-code-value{ display:block; }
+      .confirm-code .confirm-code-value{ display:block; color:#0d6efd; font-weight:700; font-size:1.75rem; }
       .confirm-summary section:last-child{ margin-bottom:0; }
+      @media (max-width: 768px){
+        .confirm-header{ padding-right:0; }
+        .confirm-header.has-code{ padding-right:0; }
+        .confirm-code{ position:static; margin-top:.75rem; text-align:left; }
+      }
       .frame-card{
         max-width: 1020px;
         background:#ffffff;
@@ -264,8 +270,8 @@
         .wizard-step{ min-width:150px; }
         .wizard-step .wizard-index{ width:34px; height:34px; }
         .wizard-step .wizard-label{ font-size:.88rem; }
-      .form-tab-pane{ display:none; }
-      .form-tab-pane.active{ display:block; }
+        .form-tab-pane{ display:none; }
+        .form-tab-pane.active{ display:block; }
         .wizard-step::before,
         .wizard-step::after{ top:17px; }
       }
@@ -276,12 +282,13 @@
     <div class="pattern-strip pattern-top"></div>
 
     <main class="container my-4 frame-card" id="app">
-      <div class="text-center mb-4">
-        <h1 class="h4 mb-1">Seleção Simplificada — Hospital Veterinário do Recife</h1>
-        <p class="text-muted subtle">Inscrição on-line</p>
-      </div>
+      <form id="formHospVet" autocomplete="off" novalidate>
+        <div class="text-center mb-4">
+          <h1 class="h4 mb-1">Seleção Simplificada — Hospital Veterinário do Recife</h1>
+          <p class="text-muted subtle">Inscrição on-line</p>
+        </div>
 
-      <div class="wizard-shell">
+        <div class="wizard-shell">
         <h2 class="h6 text-uppercase text-muted wizard-heading mb-3">Etapas da inscrição</h2>
         <p class="tiny text-muted mb-3">Acompanhe o avanço das etapas e navegue rapidamente pelo formulário.</p>
         <ol class="wizard-steps" role="tablist">
@@ -319,7 +326,7 @@
         </div>
       </div>
 
-      <div class="tab-shell">
+        <div class="tab-shell">
         <div class="form-tabs" role="tablist">
           <button type="button" class="form-tab-link active" data-tab-target="0" role="tab" aria-selected="true">Identificação</button>
           <button type="button" class="form-tab-link" data-tab-target="1" role="tab" aria-selected="false">Contato &amp; Endereço</button>
@@ -1023,6 +1030,7 @@
       </div>
 
       <div class="text-center text-muted tiny mb-5">Pré-validações locais. A conferência oficial seguirá o Edital do certame.</div>
+      </form>
     </main>
 
     <div class="pattern-strip pattern-bottom"></div>
@@ -1120,6 +1128,9 @@
       const $ = (sel) => document.querySelector(sel);
       const onlyDigits = (s) => (s||'').replace(/\\D+/g, '');
       const esc = s => { const d=document.createElement('div'); d.innerText=s??''; return d.innerHTML||''; };
+      function escapeHtml(value){
+        return esc(value ?? '');
+      }
       const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/,'$1.$2.$3-$4') : (d||''); };
       const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\\d{5})(\\d{3})/,'$1-$2') : (d||''); };
       const toMB = bytes => Math.round((bytes/1024/1024)*100)/100;
@@ -3002,16 +3013,21 @@
             <span class="confirm-code-value">${esc(inscricaoValor)}</span>
           </div>
         ` : '';
+        const headerClass = inscricaoValor ? 'card-header confirm-header has-code' : 'card-header confirm-header';
         app.innerHTML = `
-          <div class="confirm-header d-flex justify-content-between align-items-start mb-4">
-            <div>
-              <h2 class="h4 mb-1">Inscrição enviada</h2>
-              <p class="text-muted mb-0">Confira abaixo os dados retornados pelo sistema.</p>
+          <div class="card card-form">
+            <div class="${headerClass}">
+              <div>
+                <h2 class="h4 mb-1">Inscrição enviada</h2>
+                <p class="text-muted mb-0">Confira abaixo os dados retornados pelo sistema.</p>
+              </div>
+              ${codeMarkup}
             </div>
-            ${codeMarkup}
-          </div>
-          <div class="confirm-summary">
-            ${sectionsHtml}
+            <div class="card-body">
+              <div class="confirm-summary">
+                ${sectionsHtml}
+              </div>
+            </div>
           </div>
         `;
       }
@@ -3031,18 +3047,21 @@
           button.disabled = false;
         }
       }
-      function showFinalMessage(message, variant = 'info'){
+      function showError(message){
         const statusEl = document.getElementById('finalStatus');
         if(!statusEl) return;
         statusEl.innerHTML = '';
         if(!message) return;
         const alert = document.createElement('div');
-        alert.className = `alert alert-${variant} mb-0 small`;
+        alert.className = 'alert alert-danger mb-0 small';
         alert.setAttribute('role','alert');
-        alert.textContent = message;
+        alert.innerHTML = escapeHtml(message);
         statusEl.appendChild(alert);
       }
-      async function submitAll(){
+      async function submitAll(event){
+        if(event && typeof event.preventDefault === 'function'){
+          event.preventDefault();
+        }
         if(!isSubmitReady()){
           const message = focusFirstInvalid();
           if(message){
@@ -3057,47 +3076,65 @@
           guardEl.classList.add('d-none');
           guardEl.setAttribute('aria-hidden','true');
         }
-        showFinalMessage('');
-        const formRoot = document.getElementById('app');
-        let payload;
+        showError('');
         try{
-          payload = await buildPayload(formRoot);
-        }catch(error){
-          showFinalMessage('Erro ao preparar os dados para envio. Tente novamente.', 'danger');
-          setSubmitButtonLoading(false);
-          refreshSubmitState();
-          return;
-        }
-        try{
-          const response = await fetch(FINAL_ENDPOINT, {
-            method:'POST',
-            headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify(payload)
-          });
-          if(!response.ok){
-            const errorText = (await response.text()).trim();
-            const fallback = (response.statusText || '').trim();
-            const message = errorText || fallback || 'Resposta inválida.';
-            showFinalMessage(`Erro no envio: ${message}`, 'danger');
+          const formEl = document.getElementById('formHospVet');
+          if(!formEl){
+            showError('Formulário não encontrado.');
             return;
           }
-          let data = {};
+          let formData;
           try{
-            data = await response.json();
-          }catch(e){
-            data = {};
+            formData = new FormData(formEl);
+          }catch(error){
+            showError('Erro ao preparar os dados para envio. Tente novamente.');
+            return;
           }
-          showFinalMessage('');
-          setSubmitButtonLoading(false);
-          renderConfirmacao(data);
-        }catch(error){
-          showFinalMessage('Erro de rede ao enviar. Tente novamente.', 'danger');
+          formData.delete('email_confirm');
+          if(responsibilityCheckbox){
+            const fieldName = responsibilityCheckbox.name || 'termoResponsabilidade';
+            formData.set(fieldName, responsibilityCheckbox.checked ? 'ACEITO' : 'NAO');
+          }
+          const cargoSelect = document.getElementById('cargo');
+          if(cargoSelect){
+            const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
+            if(cargoLabel){
+              formData.set('cargo_label', cargoLabel);
+            }else{
+              formData.delete('cargo_label');
+            }
+          }
+          try{
+            const response = await fetch(FINAL_ENDPOINT, {
+              method:'POST',
+              body: formData
+            });
+            if(!response.ok){
+              const errorText = (await response.text()).trim();
+              const fallback = (response.statusText || '').trim();
+              const message = errorText || fallback || 'Resposta inválida.';
+              showError(`Erro no envio: ${message}`);
+              return;
+            }
+            let data = {};
+            try{
+              data = await response.json();
+            }catch(e){
+              data = {};
+            }
+            showError('');
+            renderConfirmacao(data);
+          }catch(error){
+            showError('Erro de rede ao enviar. Tente novamente.');
+          }
         }finally{
           setSubmitButtonLoading(false);
           refreshSubmitState();
         }
       }
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
+      const formElement = document.getElementById('formHospVet');
+      formElement?.addEventListener('submit', submitAll);
       const submitGuard = document.getElementById('btnSubmitGuard');
       submitGuard?.addEventListener('click', e=>{
         e.preventDefault();
