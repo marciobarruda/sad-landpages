@@ -838,6 +838,26 @@
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
 
       // ========= Init =========
+      function enforceUppercaseTextInputs(){
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        textInputs.forEach(input => {
+          if(input.type !== 'text') return;
+          if(input.id === 'email') return;
+          input.classList.add('text-uppercase');
+          const apply = () => {
+            const { selectionStart, selectionEnd, value } = input;
+            const upper = value.toUpperCase();
+            if(value !== upper){
+              input.value = upper;
+              if(document.activeElement === input && selectionStart != null && selectionEnd != null){
+                input.setSelectionRange(selectionStart, selectionEnd);
+              }
+            }
+          };
+          apply();
+          input.addEventListener('input', apply);
+        });
+      }
       function attachWatchers(){
         const events=['input','change','blur'];
         document.querySelectorAll('input,select,textarea').forEach(el=>{
@@ -846,6 +866,7 @@
       }
       function init(){
         loadDraft();
+        enforceUppercaseTextInputs();
         attachWatchers();
         updateReview();
         refreshSubmitState();
