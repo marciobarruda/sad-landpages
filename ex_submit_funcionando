@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zona Azul do Idoso — Pré-validação</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      :root{
+        --brand:#0d6efd; --brand-dark:#0b5ed7; --bg:#f9fbff; --text:#0b2447; --muted:#6c757d;
+        --stage-w:1379px;
+        --pattern-w:1366px;
+      }
+      body{
+        background:
+          radial-gradient(1200px 600px at -10% -10%, #f0f8ff 0%, #ffffff 60%),
+          radial-gradient(800px 500px at 110% 0%, #f3f7ff 0%, #ffffff 60%),
+          linear-gradient(180deg,#ffffff 0%, #f9fbff 100%);
+        min-height:100vh;
+      }
+      .stage{ width:var(--stage-w); margin:0 auto; position:relative; left:-6px; }
+      header.hero{ width:var(--stage-w); height:240px; background:url('https://statics.recife.pe.gov.br/images/dynamics/zonaazul/banner.jpeg') center/cover no-repeat; }
+      .pattern-strip{ width:var(--pattern-w); margin:0 auto; position:relative; left:-6px; background:url('https://statics.recife.pe.gov.br/images/dynamics/zonaazul/background.jpeg') repeat center/900px auto; }
+      .pattern-top{ height:135px; opacity:.4; }
+      .pattern-bottom{ height:135px; opacity:.4; }
+      .card-form{ border:0; border-radius:1rem; box-shadow:0 12px 34px rgba(13,110,253,.12), 0 6px 16px rgba(13,110,253,.08); overflow:hidden; }
+      .card-form .card-header{ background:linear-gradient(180deg,#ffffff 0%, #f6f9ff 100%); border-bottom:1px solid #eef3ff; }
+      .required::after{ content:" *"; color:#dc3545; font-weight:600; }
+      .help{ font-size:.9rem; color:#6c757d; }
+      .section-title{ font-weight:700; letter-spacing:.2px; color:#0b2447; }
+      .dropzone{ border:2px dashed #cfe2ff; border-radius:.75rem; padding:1rem; background:#f8fbff; }
+      .form-control:focus,.form-select:focus{ box-shadow:0 0 0 .25rem rgba(13,110,253,.15); border-color:var(--brand); }
+      pre.json{ background:#0b1020; color:#e6edf3; border-radius:.75rem; padding:1rem; max-height:40vh; overflow:auto; }
+      .badge-soft{ background:#e7f1ff; color:#0b2447; border:1px solid #cfe2ff; }
+      .form-control[readonly]{ background:#f8f9fa; }
+      .review-table td{ vertical-align: top; }
+      .frame-card{
+        max-width: 920px;
+        background:#ffffff;
+        border-radius:1rem;
+        box-shadow:0 18px 40px rgba(13,110,253,.12), 0 8px 22px rgba(13,110,253,.08);
+        padding:2rem;
+        position:relative; z-index:2;
+        margin:-90px auto -90px !important;
+      }
+      @media (max-width: 992px){
+        :root{ --stage-w:100vw; --pattern-w:100vw; }
+        .stage, .pattern-strip{ left:0; }
+        header.hero{ background-position:center; background-size:cover; }
+        body{ overflow-x:hidden; }
+        .frame-card{ margin:-60px auto -60px; padding:1.25rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero stage"></header>
+    <div class="pattern-strip pattern-top"></div>
+
+    <main class="container my-4 frame-card" id="app">
+      <h2 class="h4 text-center mb-4">Solicitar créditos Zona Azul - Idoso</h2>
+
+      <div class="card card-form mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Dados do Requerente</h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label required" for="cpf">CPF</label>
+              <input type="text" inputmode="numeric" pattern="\d{11}" maxlength="14" class="form-control" id="cpf" value="{{ $json.preferred_username }}" placeholder="Somente números" readonly required>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label required" for="nome">Nome completo</label>
+              <input type="text" class="form-control" id="nome" value="{{ String($json.name ?? '').trim() || String($json.socialName ?? '').trim().toUpperCase() }}" readonly required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label required" for="nascimento">Data de nascimento</label>
+              <input type="date" class="form-control" id="nascimento" value="{{ $json.dob.split('/').reverse().join('-') }}" readonly required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-form mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="h5 mb-0">Endereço</h2>
+          <span class="badge badge-soft">ViaCEP automático</span>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label required" for="cep">CEP</label>
+              <input type="text" class="form-control" id="cep" placeholder="00000-000" value="{{ $json.postal_code }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label required" for="logradouro">Logradouro</label>
+              <input type="text" class="form-control" id="logradouro" value="{{ $json.addressStreet }}" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label required" for="numero">Número</label>
+              <input type="text" class="form-control" id="numero" value="{{ $json.addressNumber }}" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="complemento">Complemento</label>
+              <input type="text" class="form-control" id="complemento" value="{{ $json.addressComplement }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required" for="bairro">Bairro</label>
+              <input type="text" class="form-control" id="bairro" value="{{ $json.neighborhood }}" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label required" for="cidade">Cidade</label>
+              <input type="text" class="form-control" id="cidade" value="{{ $json.locality }}" required>
+            </div>
+            <div class="col-md-1">
+              <label class="form-label required" for="uf">UF</label>
+              <input type="text" class="form-control" id="uf" maxlength="2" value="PE" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required" for="email">E-mail</label>
+              <input type="text" class="form-control" id="email" value="{{ $json.email }}" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required" for="whatsapp">WhatsApp</label>
+              <input type="text" class="form-control" id="whatsapp" inputmode="numeric" pattern="[0-9]{10,11}" placeholder="DDD + número (apenas dígitos)" value="{{ $json.telefone }}" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-form mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Envio de documentos para validação</h2>
+        </div>
+        <div class="card-body">
+          <section class="mb-4">
+            <h3 class="h6 section-title mb-2">Documento oficial com foto</h3>
+            <div class="row g-3 align-items-center">
+              <div class="col-md-8">
+                <div class="dropzone">
+                  <input class="form-control" type="file" id="fileDocumento" accept="image/*,application/pdf" **capture="environment"**>
+                </div>
+                <div class="help mt-2" id="helpDocumento">Anexe o seu <strong>documento oficial com foto</strong>.</div>
+              </div>
+              <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
+                <button type="button" class="btn btn-outline-secondary" id="btnClearDocumento">Limpar</button>
+                <div id="statusDocumento" class="ms-auto"></div>
+              </div>
+            </div>
+            <pre class="json mt-3 d-none" id="respDocumento"></pre>
+          </section>
+
+          <hr>
+
+          <section class="mb-4">
+            <h3 class="h6 section-title mb-2">CRLV do veículo</h3>
+            <div class="row g-3 align-items-center">
+              <div class="col-md-8">
+                <div class="dropzone">
+                  <input class="form-control" type="file" id="fileCRLV" accept="image/*,application/pdf" disabled title="Disponível após validar o documento" **capture="environment"**>
+                </div>
+                <div class="help mt-2" id="helpCRLV">Anexe o <strong>CRLV</strong> de seu veículo.</div>
+              </div>
+              <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
+                <button type="button" class="btn btn-outline-secondary" id="btnClearCRLV">Limpar</button>
+                <div id="statusCRLV" class="ms-auto"></div>
+              </div>
+            </div>
+            <pre class="json mt-3 d-none" id="respCRLV"></pre>
+          </section>
+
+          <div id="crlvVehicleCard" class="card card-form mt-3 d-none">
+            <div class="card-header">
+              <h3 class="h6 mb-0">Dados do veículo (CRLV)</h3>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label">Tipo</label>
+                  <input type="text" class="form-control" id="crlv_tipo_documento" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Exercício</label>
+                  <input type="text" class="form-control" id="crlv_exercicio" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">RENAVAM</label>
+                  <input type="text" class="form-control" id="crlv_renavam" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Placa</label>
+                  <input type="text" class="form-control" id="crlv_placa" readonly>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Proprietário</label>
+                  <input type="text" class="form-control" id="crlv_proprietario" readonly>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">CPF</label>
+                  <input type="text" class="form-control" id="crlv_cpf_cnpj" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Categoria</label>
+                  <input type="text" class="form-control" id="crlv_categoria" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Comb.</label>
+                  <input type="text" class="form-control" id="crlv_combustivel" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Marca/Modelo</label>
+                  <input type="text" class="form-control" id="crlv_marca_modelo" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Ano Fab.</label>
+                  <input type="text" class="form-control" id="crlv_ano_fabricacao" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Ano Mod.</label>
+                  <input type="text" class="form-control" id="crlv_ano_modelo" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Cor</label>
+                  <input type="text" class="form-control" id="crlv_cor" readonly>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Município/UF</label>
+                  <input type="text" class="form-control" id="crlv_municipio_uf" readonly>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Licenciamento</label>
+                  <input type="text" class="form-control" id="crlv_data_licenciamento" readonly>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Observações</label>
+                  <textarea class="form-control" id="crlv_observacoes" rows="2" readonly></textarea>
+                </div>
+              </div>
+
+              <!-- Contrato Social (CNPJ) -->
+              <div id="cnpjContratoCard" class="card card-form mt-3 d-none">
+                <div class="card-header">
+                  <h3 class="h6 mb-0">Documento da empresa proprietária (CNPJ)</h3>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3 align-items-center">
+                    <div class="col-md-8">
+                      <div class="dropzone">
+                        <input class="form-control" type="file" id="fileContratoSocial" accept="application/pdf,image/*" title="Anexe o contrato social constando o nome do requerente">
+                      </div>
+                      <div class="help mt-2" id="helpContratoSocial">Anexe o <strong>Contrato Social</strong> da empresa proprietária constando o nome do requerente.</div>
+                    </div>
+                    <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
+                      <button type="button" class="btn btn-outline-secondary" id="btnClearContratoSocial">Limpar</button>
+                      <div id="statusContratoSocial" class="ms-auto"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Fim Contrato Social -->
+
+            </div>
+          </div>
+
+          <hr>
+
+          <section class="mb-2">
+            <h3 class="h6 section-title mb-2">Comprovante de residência</h3>
+            <div class="row g-3 align-items-center">
+              <div class="col-md-8">
+                <div class="dropzone">
+                  <input class="form-control" type="file" id="fileComprovante" accept="image/*,application/pdf" disabled title="Disponível após validar o documento e o CRLV" **capture="environment"**>
+                </div>
+                <div class="help mt-2" id="helpComp">Anexe o <strong>comprovante de residência</strong>.</div>
+              </div>
+              <div class="col-md-4 d-flex gap-2 align-items-center my-auto">
+                <button type="button" class="btn btn-outline-secondary" id="btnClearComp">Limpar</button>
+                <div id="statusComp" class="ms-auto"></div>
+              </div>
+            </div>
+            <pre class="json mt-3 d-none" id="respComp"></pre>
+          </section>
+
+          <!-- Parentesco -->
+          <div id="kinshipCard" class="card card-form mt-3 d-none">
+            <div class="card-header">
+              <h3 class="h6 mb-0">Validação por parentesco</h3>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label required" for="kinshipSelect">Grau de parentesco</label>
+                  <select id="kinshipSelect" class="form-select">
+                    <option value="" selected>Selecione...</option>
+                    <option value="CÔNJUGE">Cônjuge</option>
+                    <option value="FILHO(A)">Filho(a)</option>
+                    <option value="NETO(A)">Neto(a)</option>
+                    <option value="SOBRINHO(A)">Sobrinho(a)</option>
+                    <option value="IRMÃO(Ã)">Irmão(ã)</option>
+                    <option value="GENRO/NORA">Genro/Nora</option>
+                    <option value="PAI/MÃE">Pai/Mãe</option>
+                    <option value="ENTEADO(A)">Enteado(a)</option>
+                    <option value="TUTOR/CURADOR">Tutor/Curador</option>
+                    <option value="OUTRO">Outro</option>
+                  </select>
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label required" for="kinshipJust">Justificativa</label>
+                  <textarea id="kinshipJust" class="form-control" rows="3" placeholder="Explique por que o comprovante não está no nome do requerente."></textarea>
+                </div>
+              </div>
+              <div class="help mt-2" id="kinshipHelp">Informe o vínculo e descreva a situação para concluir a validação.</div>
+            </div>
+          </div>
+          <!-- Fim Parentesco -->
+
+        </div>
+      </div>
+
+      <div class="card card-form mb-5">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Revisão e envio</h2>
+        </div>
+        <div class="card-body">
+          <div id="reviewBlock" class="mb-3"></div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary" id="btnSubmitAll" disabled>Enviar dados</button>
+            <div id="finalStatus" class="ms-2"></div>
+          </div>
+          <pre class="json mt-3 d-none" id="finalOut"></pre>
+        </div>
+      </div>
+
+      <div class="text-center text-muted mb-5">⚠️ Este formulário realiza apenas pré-validações. O deferimento do benefício segue regras oficiais da Prefeitura da Cidade do Recife.</div>
+    </main>
+
+    <div class="pattern-strip pattern-bottom"></div>
+
+    <script>
+      const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/dados-conecta";
+
+      // Utils -------------------------------------------------------------
+      const $ = (sel) => document.querySelector(sel);
+      const show = (el) => el.classList.remove('d-none');
+      const hide = (el) => el.classList.add('d-none');
+      const onlyDigits = (s) => (s||'').replace(/\D+/g, '');
+      const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4') : (d||'—'); };
+      const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\d{5})(\d{3})/,'$1-$2') : (d||'—'); };
+      const esc = s => { const d=document.createElement('div'); d.innerText=s??''; return d.innerHTML||'—'; };
+      const normalize = (s) => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      const isPositiveValidation = (txt) => { const n=normalize(txt); return n && !n.includes('nao'); };
+      const yyyyMmDd = (date = new Date()) => date.toISOString().slice(0,10); // YYYY-MM-DD
+
+      // Estado ------------------------------------------------------------
+      let docOk=false, docReturn=null, docTried=false;
+      let crlvOk=false, crlvJson=null, crlvValidacao="", crlvTried=false;
+      let compOk=false, compReturn=null, compTried=false;
+
+      // Parentesco/justificativa
+      let kinshipMode = false;
+
+      // CNPJ / Contrato Social
+      let cnpjRequired = false;
+      let companyDocOk = false;
+
+      // Locks --------------------------------------------------------------
+      function refreshLocks(){
+        const crlvInput = $('#fileCRLV');
+        const compInput = $('#fileComprovante');
+
+        crlvInput.disabled = crlvOk ? true : !docOk;
+        compInput.disabled = compOk ? true : !(docOk && crlvOk && (!cnpjRequired || companyDocOk));
+
+        crlvInput.title = crlvInput.disabled
+          ? (crlvOk ? 'CRLV já validado' : 'Disponível após validar o documento')
+          : '';
+
+        compInput.title = compInput.disabled
+          ? (compOk ? 'Comprovante já validado'
+                    : (!docOk ? 'Disponível após validar o documento'
+                              : (!crlvOk ? 'Disponível após validar o CRLV'
+                                         : (cnpjRequired && !companyDocOk ? 'Disponível após anexar o Contrato Social' : ''))))
+          : '';
+      }
+
+      // Botão Enviar -------------------------------------------------------
+      function refreshSubmitState(){
+        const allOk = docOk && crlvOk && (!cnpjRequired || companyDocOk) && compOk;
+        const btn = $('#btnSubmitAll');
+        btn.disabled = !allOk;
+        btn.classList.toggle('btn-success', allOk);
+        btn.classList.toggle('btn-secondary', !allOk);
+      }
+
+      // Regras -------------------------------------------------------------
+      function isValidCPF(cpf){
+        cpf = onlyDigits(cpf);
+        if(!cpf || cpf.length !== 11) return false;
+        if(/^([0-9])\1+$/.test(cpf)) return false;
+        let soma=0, rest;
+        for(let i=1;i<=9;i++) soma += parseInt(cpf.substring(i-1,i))*(11-i);
+        rest=(soma*10)%11; if(rest===10||rest===11) rest=0; if(rest!==parseInt(cpf.substring(9,10))) return false;
+        soma=0; for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
+        rest=(soma*10)%11; if(rest===10||rest===11) rest=0; if(rest!==parseInt(cpf.substring(10,11))) return false;
+        return true;
+      }
+      function requireBaseFields(){
+        const cpf=$('#cpf').value.trim(), nome=$('#nome').value.trim(), nasc=$('#nascimento').value;
+        if(!isValidCPF(cpf)){ alert('CPF inválido.'); return false; }
+        if(!nome){ alert('Informe o nome completo.'); return false; }
+        if(!nasc){ alert('Informe a data de nascimento.'); return false; }
+        return true;
+      }
+      function buildBaseFormData(){
+        const fd=new FormData();
+        fd.append('cpf', onlyDigits($('#cpf').value));
+        fd.append('nome', $('#nome').value.trim());
+        fd.append('data_nascimento', $('#nascimento').value);
+        fd.append('cep', onlyDigits($('#cep').value));
+        fd.append('logradouro', $('#logradouro').value.trim());
+        fd.append('numero', $('#numero').value.trim());
+        fd.append('complemento', $('#complemento').value.trim());
+        fd.append('bairro', $('#bairro').value.trim());
+        fd.append('cidade', $('#cidade').value.trim());
+        fd.append('uf', $('#uf').value.trim().toUpperCase());
+        fd.append('email', $('#email').value.trim().toLowerCase());
+        fd.append('whatsapp', $('#whatsapp').value.trim());
+        return fd;
+      }
+      async function postForm(url, formData){
+        const res = await fetch(url, { method:'POST', body: formData });
+        const text = await res.text();
+        let data=null; try{ data=JSON.parse(text); }catch(e){}
+        return { ok: res.ok, status: res.status, text, data };
+      }
+
+      // Status com spinner -------------------------------------------------
+      function setStatus(el, type, msg, spinning = false){
+        const spinner = spinning
+          ? `<span class="spinner-border spinner-border-sm align-middle ms-2" role="status" aria-hidden="true"></span><span class="visually-hidden">Carregando...</span>`
+          : '';
+        el.innerHTML = `<span class="badge text-bg-${type} d-inline-flex align-items-center">${esc(msg)}${spinner}</span>`;
+      }
+
+      function splitJsonAndTail(text){
+        const start=text.indexOf('{'), end=text.lastIndexOf('}');
+        if(start!==-1 && end!==-1 && end>start){
+          const jsonStr=text.slice(start,end+1);
+          try{ const data=JSON.parse(jsonStr); const tail=text.slice(end+1).trim(); return { data, tail }; }catch(e){}
+        }
+        return { data:null, tail:(text||'').trim() };
+      }
+
+      // Heurísticas --------------------------------------------------------
+      function hasDivergenciaTitular(msg){
+        const n = normalize(msg||'');
+        return n.includes('diverg') && (n.includes('titular') || n.includes('propriet') || n.includes('nome'));
+      }
+      function hasCNPJHint(msg){
+        const n = normalize(msg||'');
+        return n.includes('cnpj');
+      }
+
+      // Parentesco ---------------------------------------------------------
+      function showKinshipCard(reasonText){
+        kinshipMode = true;
+        show($('#kinshipCard'));
+        $('#kinshipSelect').setAttribute('required','required');
+        $('#kinshipJust').setAttribute('required','required');
+        if(reasonText) $('#kinshipHelp').textContent = reasonText + ' — é necessária a validação por parentesco.';
+      }
+      function hideKinshipCard(){
+        kinshipMode = false;
+        hide($('#kinshipCard'));
+        $('#kinshipSelect').removeAttribute('required');
+        $('#kinshipJust').removeAttribute('required');
+        $('#kinshipSelect').value = '';
+        $('#kinshipJust').value = '';
+        $('#kinshipHelp').textContent = 'Informe o vínculo e descreva a situação para concluir a validação.';
+      }
+      function tryFinalizeKinshipValidation(){
+        if(!kinshipMode) return;
+        const grau = ($('#kinshipSelect').value||'').trim();
+        aconst = 0; // no-op
+        const just = ($('#kinshipJust').value||'').trim();
+        if(grau && just.length >= 8){
+          compOk = true;
+          $('#fileComprovante').disabled = true;
+          setStatus($('#statusComp'), 'success', 'Validação concluída');
+          $('#helpComp').textContent = 'Comprovante aceito mediante declaração de parentesco e justificativa.';
+          compReturn = { parentesco: grau, justificativa: just, via: 'validacao_parentesco' };
+          refreshLocks();
+          refreshSubmitState();
+          updateReview();
+        }
+      }
+      ['change','input'].forEach(evt=>{
+        $('#kinshipSelect').addEventListener(evt, tryFinalizeKinshipValidation);
+        $('#kinshipJust').addEventListener(evt, tryFinalizeKinshipValidation);
+      });
+
+      // Contrato Social (CNPJ) --------------------------------------------
+      function showCNPJCard(){
+        cnpjRequired = true;
+        companyDocOk = false;
+        show($('#cnpjContratoCard'));
+        $('#fileContratoSocial').setAttribute('required','required');
+        refreshLocks();
+        refreshSubmitState();
+      }
+      function hideCNPJCard(){
+        cnpjRequired = false;
+        companyDocOk = false;
+        hide($('#cnpjContratoCard'));
+        $('#fileContratoSocial').removeAttribute('required');
+        $('#fileContratoSocial').disabled = false;
+        $('#fileContratoSocial').value = '';
+        $('#statusContratoSocial').innerHTML = '';
+        $('#helpContratoSocial').textContent = 'Anexe o Contrato Social da empresa proprietária constando o nome do requerente.';
+        refreshLocks();
+        refreshSubmitState();
+      }
+      function tryValidateContratoSocial(){
+        if(!cnpjRequired) return;
+        const file = $('#fileContratoSocial').files[0];
+        if(file){
+          companyDocOk = true;
+          $('#fileContratoSocial').disabled = true;
+          setStatus($('#statusContratoSocial'), 'success', 'Contrato Social anexado');
+          $('#helpContratoSocial').textContent = 'Documento anexado e aceito para comprovação de vínculo com a empresa proprietária.';
+          refreshLocks();
+          refreshSubmitState();
+        }else{
+          companyDocOk = false;
+          $('#statusContratoSocial').innerHTML = '';
+          refreshLocks();
+          refreshSubmitState();
+        }
+      }
+      $('#fileContratoSocial').addEventListener('change', tryValidateContratoSocial);
+      $('#btnClearContratoSocial').addEventListener('click', ()=>{
+        if($('#fileContratoSocial').disabled){ $('#fileContratoSocial').disabled = false; }
+        $('#fileContratoSocial').value = '';
+        companyDocOk = false;
+        $('#statusContratoSocial').innerHTML = '';
+        $('#helpContratoSocial').textContent = 'Anexe o Contrato Social da empresa proprietária constando o nome do requerente.';
+        refreshLocks();
+        refreshSubmitState();
+      });
+
+      // ViaCEP -------------------------------------------------------------
+      $('#cep').addEventListener('blur', async () => {
+        const cep=onlyDigits($('#cep').value);
+        if(cep.length!==8) return;
+        try{
+          const res=await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+          const data=await res.json();
+          if(data && !data.erro){
+            $('#logradouro').value=data.logradouro||'';
+            $('#bairro').value=data.bairro||'';
+            $('#cidade').value=data.localidade||'';
+            $('#uf').value=(data.uf||'').toUpperCase();
+            updateReview();
+          }
+        }catch(e){}
+      });
+
+      // Documento ----------------------------------------------------------
+      async function sendDocumento(){
+        if(!requireBaseFields()) return;
+        const fileDocumento=$('#fileDocumento').files[0];
+        docTried = true;
+        if(!fileDocumento){ alert('Selecione o arquivo do documento.'); console.warn('Documento: nenhum arquivo selecionado'); return; }
+
+        const fd=buildBaseFormData();
+        fd.append('cnh', fileDocumento, fileDocumento.name);
+
+        setStatus($('#statusDocumento'),'secondary','Validando documento...', true);
+        const out=await postForm('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/validar-cnh', fd);
+
+        let data = out.data, tail='';
+        if(out.text){
+          const split = splitJsonAndTail(out.text);
+          if(split.data) data = split.data;
+          tail = split.tail;
+        }
+        const validacaoStr = (data && typeof data.validacao === 'string') ? data.validacao : '';
+        const helpMsg = validacaoStr || tail || (out.text || '');
+
+        $('#helpDocumento').textContent = helpMsg;
+
+        const positive = out.ok && !!helpMsg && isPositiveValidation(helpMsg);
+
+        docOk = !!positive;
+        docReturn = data || out.text;
+
+        if(positive){
+          $('#fileDocumento').disabled = true;
+        }
+
+        $('#respDocumento').textContent = (out.data ? JSON.stringify(out.data,null,2) : out.text);
+        setStatus($('#statusDocumento'), docOk ? 'success' : 'danger', docOk ? 'Validação concluída' : 'Falha');
+
+        refreshLocks();
+        updateReview();
+      }
+
+      // CRLV ---------------------------------------------------------------
+      function fillCRLV(d){
+        const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v??''; };
+        set('crlv_tipo_documento', d.tipo_documento);
+        set('crlv_exercicio', d.exercicio);
+        set('crlv_renavam', d.renavam);
+        set('crlv_placa', d.placa);
+        set('crlv_proprietario', d.proprietario);
+        set('crlv_cpf_cnpj', d.cpf_cnpj);
+        set('crlv_categoria', d.categoria);
+        set('crlv_combustivel', d.combustivel);
+        set('crlv_marca_modelo', d.marca_modelo);
+        set('crlv_ano_fabricacao', d.ano_fabricacao);
+        set('crlv_ano_modelo', d.ano_modelo);
+        set('crlv_cor', d.cor);
+        set('crlv_municipio_uf', d.municipio_uf);
+        set('crlv_data_licenciamento', d.data_licenciamento);
+        set('crlv_observacoes', d.observacoes);
+      }
+      function clearCRLVFields(){
+        document.querySelectorAll('#crlvVehicleCard input, #crlvVehicleCard textarea').forEach(el=>el.value='');
+        hide($('#crlvVehicleCard'));
+        hideCNPJCard();
+      }
+      async function sendCRLV(){
+        if(!requireBaseFields()) return;
+        const fileCRLV=$('#fileCRLV').files[0];
+        crlvTried = true;
+        if(!fileCRLV){ alert('Selecione o arquivo do CRLV.'); console.warn('CRLV: nenhum arquivo selecionado'); return; }
+        const fd=buildBaseFormData();
+        fd.append('crlv', fileCRLV, fileCRLV.name);
+        fd.append('data_atual', yyyyMmDd()); // YYYY-MM-DD
+
+        setStatus($('#statusCRLV'),'secondary','Validando CRLV...', true);
+        const out=await postForm('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/validar-crlv', fd);
+
+        let data = out.data, tail='';
+        if(out.text){
+          const split=splitJsonAndTail(out.text);
+          if(split.data) data=split.data;
+          tail=split.tail;
+        }
+        const validacaoStr = (data && typeof data.validacao === 'string') ? data.validacao : '';
+        $('#helpCRLV').textContent = validacaoStr || tail || '';
+
+        const tipoOk = data && String(data.tipo_documento||'').toUpperCase()==='CRLV';
+        const positive = out.ok && tipoOk && !!validacaoStr && isPositiveValidation(validacaoStr);
+
+        if(positive){
+          fillCRLV(data); show($('#crlvVehicleCard'));
+          $('#fileCRLV').disabled = true;
+
+          if(hasCNPJHint(validacaoStr || tail || '')){
+            showCNPJCard();
+          }else{
+            hideCNPJCard();
+          }
+        }else{
+          clearCRLVFields();
+        }
+        crlvOk = !!positive;
+        crlvJson = data || null;
+        crlvValidacao = validacaoStr || '';
+
+        $('#respCRLV').textContent=(out.data? JSON.stringify(out.data,null,2) : out.text);
+        setStatus($('#statusCRLV'), crlvOk ? 'success' : 'danger', crlvOk ? 'Validação concluída' : 'Falha');
+        refreshLocks();
+        updateReview();
+      }
+
+      // Comprovante --------------------------------------------------------
+      async function sendComp(){
+        if(!requireBaseFields()) return;
+        const fileDocumento=$('#fileDocumento').files[0];
+        const fileComp=$('#fileComprovante').files[0];
+        compTried = true;
+        if(!fileDocumento){ alert('É necessário anexar o documento primeiro.'); console.warn('Comp: documento não anexado'); return; }
+        if(!fileComp){ alert('Selecione o comprovante de residência.'); console.warn('Comp: nenhum arquivo selecionado'); return; }
+        const fd=buildBaseFormData();
+        fd.append('cnh', fileDocumento, fileDocumento.name);
+        fd.append('comprovante_residencia', fileComp, fileComp.name);
+
+        setStatus($('#statusComp'),'secondary','Validando comprovante...', true);
+        const out=await postForm('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/validar-endereco', fd);
+
+        let data=out.data, tail='';
+        if(out.text){
+          const split=splitJsonAndTail(out.text);
+          if(split.data) data=split.data;
+          tail=split.tail;
+        }
+        const validacaoStr = (data && typeof data.validacao === 'string') ? data.validacao : '';
+        $('#helpComp').textContent = validacaoStr || tail || '';
+
+        const positive = out.ok && !!validacaoStr && isPositiveValidation(validacaoStr);
+        const divergence = hasDivergenciaTitular(validacaoStr || tail || '');
+
+        if(positive){
+          compOk = true;
+          compReturn = data || out.text;
+          $('#fileComprovante').disabled = true;
+          hideKinshipCard();
+          setStatus($('#statusComp'), 'success', 'Validação concluída');
+        }else if(divergence){
+          compOk = false;
+          compReturn = data || out.text;
+          showKinshipCard(validacaoStr || 'Divergência no titular do comprovante');
+          setStatus($('#statusComp'), 'warning', 'Aguardando justificativa', true);
+        }else{
+          compOk = false;
+          compReturn = data || out.text;
+          hideKinshipCard();
+          setStatus($('#statusComp'), 'danger', 'Falha');
+        }
+
+        $('#respComp').textContent=(out.data? JSON.stringify(out.data,null,2) : out.text);
+        refreshLocks();
+        refreshSubmitState();
+        updateReview();
+      }
+
+      // Limpar helps ao clicar no input file -------------------------------
+      function clearHelpText(inputEl, helpEl) {
+        inputEl.addEventListener('click', () => { helpEl.textContent = ''; });
+      }
+      clearHelpText($('#fileDocumento'), $('#helpDocumento'));
+      clearHelpText($('#fileCRLV'), $('#helpCRLV'));
+      clearHelpText($('#fileComprovante'), $('#helpComp'));
+
+      // Auto-check ao anexar arquivos -------------------------------------
+      $('#fileDocumento').addEventListener('change', ()=>{ if($('#fileDocumento').files.length) sendDocumento(); });
+      $('#fileCRLV').addEventListener('change', ()=>{ if($('#fileCRLV').files.length) sendCRLV(); });
+      $('#fileComprovante').addEventListener('change', ()=>{ if($('#fileComprovante').files.length) sendComp(); });
+
+      // Espelho (revisão) --------------------------------------------------
+      function updateReview(){
+        const cpf=fmtCPF($('#cpf').value),
+              nome=esc($('#nome').value),
+              nasc=esc((($('#nascimento').value)||'').split('-').reverse().join('/'));
+        const cep=fmtCEP($('#cep').value), logr=esc($('#logradouro').value), num=esc($('#numero').value),
+              comp=esc($('#complemento').value), bairro=esc($('#bairro').value),
+              cidade=esc($('#cidade').value), uf=esc($('#uf').value.toUpperCase()),
+              email=esc($('#email').value.toLowerCase()), whatsapp=esc($('#whatsapp').value);
+        const chip = (label, ok, tried) => {
+          const cls = ok ? 'text-bg-success' : (tried ? 'text-bg-danger' : 'text-bg-warning');
+          const txt = ok ? 'Validado' : (tried ? 'Falha' : 'Pendente');
+          return `<span class="badge rounded-pill ${cls}">${label}: ${txt}</span>`;
+        };
+        const topBadges = `
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            ${chip('Documento com foto', docOk, docTried)}
+            ${chip('CRLV', crlvOk && (!cnpjRequired || companyDocOk), crlvTried)}
+            ${chip('Comprovante de residência', compOk, compTried)}
+          </div>`;
+
+        let crlvBlock='';
+        if(crlvOk && crlvJson){
+          const d=crlvJson, cell=v=>esc(v||'—');
+          crlvBlock = `
+            <h6 class="mt-3">Veículo (CRLV)</h6>
+            <table class="table table-sm review-table">
+              <tbody>
+                <tr><td><strong>Tipo</strong></td><td>${cell(d.tipo_documento)}</td></tr>
+                <tr><td><strong>Exercício</strong></td><td>${cell(d.exercicio)}</td></tr>
+                <tr><td><strong>RENAVAM</strong></td><td>${cell(d.renavam)}</td></tr>
+                <tr><td><strong>Placa</strong></td><td>${cell(d.placa)}</td></tr>
+                <tr><td><strong>Proprietário</strong></td><td>${cell(d.proprietario)}</td></tr>
+                <tr><td><strong>CPF/CNPJ</strong></td><td>${cell(d.cpf_cnpj)}</td></tr>
+                <tr><td><strong>Categoria</strong></td><td>${cell(d.categoria)}</td></tr>
+                <tr><td><strong>Marca/Modelo</strong></td><td>${cell(d.marca_modelo)}</td></tr>
+                <tr><td><strong>Ano Fab./Mod.</strong></td><td>${cell(d.ano_fabricacao)} / ${cell(d.ano_modelo)}</td></tr>
+                <tr><td><strong>Combustível</strong></td><td>${cell(d.combustivel)}</td></tr>
+                <tr><td><strong>Cor</strong></td><td>${cell(d.cor)}</td></tr>
+                <tr><td><strong>Município/UF</strong></td><td>${cell(d.municipio_uf)}</td></tr>
+                <tr><td><strong>Licenciamento</strong></td><td>${cell(d.data_licenciamento)}</td></tr>
+                <tr><td><strong>Observações</strong></td><td>${cell(d.observacoes)}</td></tr>
+              </tbody>
+            </table>
+            ${cnpjRequired ? `
+              <div class="alert alert-info py-2">Veículo vinculado a CNPJ: é obrigatório anexar o <strong>Contrato Social</strong>.</div>
+            ` : '' }
+          `;
+        }
+
+        $('#reviewBlock').innerHTML = `
+          ${topBadges}
+          <h6>Dados do Requerente</h6>
+          <table class="table table-sm review-table">
+            <tbody>
+              <tr><td width="200"><strong>CPF</strong></td><td>${cpf}</td></tr>
+              <tr><td><strong>Nome</strong></td><td>${nome}</td></tr>
+              <tr><td><strong>Nascimento</strong></td><td>${nasc}</td></tr>
+            </tbody>
+          </table>
+
+          <h6>Endereço</h6>
+          <table class="table table-sm review-table">
+            <tbody>
+              <tr><td width="200"><strong>CEP</strong></td><td>${cep}</td></tr>
+              <tr><td><strong>Logradouro</strong></td><td>${logr}</td></tr>
+              <tr><td><strong>Número</strong></td><td>${num}</td></tr>
+              <tr><td><strong>Complemento</strong></td><td>${comp}</td></tr>
+              <tr><td><strong>Bairro</strong></td><td>${bairro}</td></tr>
+              <tr><td><strong>Cidade/UF</strong></td><td>${cidade} / ${uf}</td></tr>
+              <tr><td><strong>Email</strong></td><td>${email}</td></tr>
+              <tr><td><strong>WhatsApp</strong></td><td>${whatsapp}</td></tr>
+            </tbody>
+          </table>
+
+          ${crlvBlock}
+        `;
+
+        refreshLocks();
+        refreshSubmitState();
+      }
+
+      // Botões limpar ------------------------------------------------------
+      $('#btnClearDocumento').addEventListener('click', ()=>{
+        $('#fileDocumento').disabled=false; $('#fileDocumento').value='';
+        $('#respDocumento').textContent=''; $('#statusDocumento').innerHTML='';
+        $('#helpDocumento').innerHTML='Anexe o seu <strong>documento oficial com foto</strong>.';
+        docOk=false; docReturn=null; docTried=false; crlvTried=false; compTried=false;
+
+        $('#fileCRLV').value=''; $('#statusCRLV').innerHTML=''; $('#respCRLV').textContent=''; $('#helpCRLV').innerHTML='Anexe o <strong>CRLV</strong> de seu veículo.';
+        clearCRLVFields(); crlvOk=false; crlvJson=null; crlvValidacao=''; crlvTried=false; compTried=false;
+
+        $('#fileComprovante').value=''; $('#statusComp').innerHTML=''; $('#respComp').textContent=''; $('#helpComp').innerHTML='Anexe o <strong>comprovante de residência</strong>.';
+        compOk=false; compReturn=null; compTried=false;
+        hideKinshipCard();
+        hideCNPJCard();
+
+        updateReview();
+      });
+      $('#btnClearCRLV').addEventListener('click', ()=>{
+        $('#fileCRLV').disabled=!docOk; $('#fileCRLV').value='';
+        $('#respCRLV').textContent=''; $('#statusCRLV').innerHTML='';
+        $('#helpCRLV').innerHTML='Anexe o <strong>CRLV</strong> de seu veículo.';
+        clearCRLVFields(); crlvOk=false; crlvJson=null; crlvValidacao='';
+        $('#fileComprovante').disabled=true;
+        hideCNPJCard();
+        updateReview();
+      });
+      $('#btnClearComp').addEventListener('click', ()=>{
+        $('#fileComprovante').disabled=!(docOk && crlvOk && (!cnpjRequired || companyDocOk)); $('#fileComprovante').value='';
+        $('#respComp').textContent=''; $('#statusComp').innerHTML='';
+        $('#helpComp').innerHTML='Anexe o <strong>comprovante de residência</strong>.';
+        compOk=false; compReturn=null;
+        hideKinshipCard();
+        updateReview();
+      });
+
+      // Envio único --------------------------------------------------------
+      async function submitAll(){
+        if(!requireBaseFields()) return;
+
+        const pendentes = [];
+        if(!docOk) pendentes.push('Documento');
+        if(!crlvOk) pendentes.push('CRLV');
+        if(cnpjRequired && !companyDocOk) pendentes.push('Contrato Social');
+        if(!compOk) pendentes.push('Comprovante de residência');
+        if(pendentes.length){
+          setStatus($('#finalStatus'), 'warning', 'Há itens pendentes: ' + pendentes.join(', ') + '. Conclua as validações.', true);
+          return;
+        }
+
+        try{
+          setStatus($('#finalStatus'),'secondary','Enviando...', true);
+
+          const fd = buildBaseFormData();
+          const docFile = $('#fileDocumento').files[0];
+          const crlvFile = $('#fileCRLV').files[0];
+          const compFile = $('#fileComprovante').files[0];
+          const contratoFile = $('#fileContratoSocial')?.files?.[0];
+
+          if(docFile) fd.append('cnh', docFile, docFile.name);
+          if(crlvFile) fd.append('crlv', crlvFile, crlvFile.name);
+          if(compFile) fd.append('comprovante_residencia', compFile, compFile.name);
+          if(cnpjRequired && contratoFile) fd.append('contrato_social', contratoFile, contratoFile.name);
+
+          if(kinshipMode || (compReturn && compReturn.via === 'validacao_parentesco')){
+            fd.append('parentesco', ($('#kinshipSelect').value||'').trim());
+            fd.append('justificativa_parentesco', ($('#kinshipJust').value||'').trim());
+          }
+
+          if(crlvJson) fd.append('crlv_json', JSON.stringify(crlvJson));
+          fd.append('crlv_validacao', crlvValidacao || '');
+          fd.append('data_envio', yyyyMmDd());
+
+          const res = await fetch(FINAL_ENDPOINT, { method: 'POST', body: fd });
+          const text = await res.text();
+
+          if(res.ok){
+            alert('Dados enviados com sucesso!');
+            const app = document.getElementById('app');
+            app.innerHTML = `
+              <div class="py-5 text-center">
+                <h3 class="mb-3">Seu pedido encontra-se em análise</h3>
+                <p class="text-muted">Você receberá atualizações pelos canais informados.</p>
+              </div>`;
+          }else{
+            setStatus($('#finalStatus'), 'danger', 'Falha no envio');
+            $('#finalOut').textContent = text; show($('#finalOut'));
+          }
+        }catch(e){
+          setStatus($('#finalStatus'),'danger','Erro de rede');
+          $('#finalOut').textContent = String(e); show($('#finalOut'));
+        }
+      }
+      $('#btnSubmitAll').addEventListener('click', submitAll);
+
+      // Inputs básicos + review -------------------------------------------
+      $('#cpf').addEventListener('input', e=>{ e.target.value=onlyDigits(e.target.value).slice(0,11); updateReview(); });
+      $('#cep').addEventListener('input', e=>{ e.target.value=onlyDigits(e.target.value).slice(0,8); updateReview(); });
+      ['#nome','#nascimento','#logradouro','#numero','#complemento','#bairro','#cidade','#uf', '#email', '#whatsapp']
+        .forEach(sel=>$(sel).addEventListener('input', updateReview));
+
+      function selfTests(){
+        try{
+          console.assert(isPositiveValidation('Não foi possível validar o documento') === false, '"não" não deve validar');
+          console.assert(isPositiveValidation('Validado com sucesso') === true, 'positivo deve validar');
+        }catch(e){ console.warn('Self-tests: ', e); }
+      }
+
+      refreshLocks();
+      updateReview();
+      selfTests();
+    </script>
+  </body>
+</html>
