@@ -238,12 +238,60 @@
       .submit-guard:focus{ outline:none; }
       .quota-tab-pane{ display:none; }
       .quota-tab-pane.active{ display:block; animation:fadeIn .3s ease; }
+      .inscricao-banner{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:1.5rem;
+        border:2px solid #0b2447;
+        border-radius:1.25rem;
+        padding:1.25rem 1.5rem;
+        margin-bottom:2.25rem;
+        background:#ffffff;
+        box-shadow:0 14px 32px rgba(13,110,253,.08);
+      }
+      .inscricao-banner-copy{ flex:1; }
+      .inscricao-banner-title{
+        font-weight:700;
+        letter-spacing:.1em;
+        text-transform:uppercase;
+        color:#0b2447;
+      }
+      .inscricao-banner-subtitle{ font-size:.95rem; }
+      .inscricao-banner-code{
+        border:2px solid #0b2447;
+        border-radius:1rem;
+        padding:.75rem 1.5rem;
+        min-width:200px;
+        text-align:right;
+        background:#f8fbff;
+        box-shadow:0 12px 24px rgba(13,110,253,.12);
+      }
+      .inscricao-banner-label{
+        display:block;
+        font-size:.75rem;
+        letter-spacing:.12em;
+        text-transform:uppercase;
+        color:#6c757d;
+        font-weight:600;
+        margin-bottom:.25rem;
+      }
+      .inscricao-banner-value{
+        display:block;
+        font-weight:700;
+        font-size:1.9rem;
+        color:var(--brand);
+        line-height:1;
+      }
+      .inscricao-banner.inscricao-banner-empty .inscricao-banner-value{ color:#adb5bd; }
       @media (max-width: 992px){
         :root{ --stage-w:100vw; --pattern-w:100vw; }
         .stage, .pattern-strip{ left:0; }
         header.hero{ background-position:center; background-size:cover; }
         body{ overflow-x:hidden; }
         .frame-card{ margin:-60px auto -60px; padding:1.25rem; }
+        .inscricao-banner{ flex-direction:column; align-items:flex-start; padding:1rem 1.1rem; gap:1rem; }
+        .inscricao-banner-code{ align-self:stretch; text-align:left; min-width:auto; }
         .wizard-shell{ padding:1.25rem 1.1rem; }
         .wizard-heading::before{ width:24px; }
         .wizard-steps{
@@ -274,6 +322,8 @@
         .form-tab-pane.active{ display:block; }
         .wizard-step::before,
         .wizard-step::after{ top:17px; }
+        .inscricao-banner-code{ padding:.65rem 1rem; }
+        .inscricao-banner-value{ font-size:1.6rem; }
       }
     </style>
   </head>
@@ -281,12 +331,19 @@
     <header class="hero stage"></header>
     <div class="pattern-strip pattern-top"></div>
 
-    <main class="container my-4 frame-card" id="app">
-      <form id="formHospVet" autocomplete="off" novalidate>
-        <div class="text-center mb-4">
-          <h1 class="h4 mb-1">Seleção Simplificada — Hospital Veterinário do Recife</h1>
-          <p class="text-muted subtle">Inscrição on-line</p>
+    <main class="container my-4 frame-card">
+      <div class="inscricao-banner inscricao-banner-empty" id="inscricaoBanner" aria-live="polite">
+        <div class="inscricao-banner-copy">
+          <p class="inscricao-banner-title mb-1">Seleção Simplificada — Hospital Veterinário do Recife</p>
+          <p class="inscricao-banner-subtitle mb-0 text-muted subtle">Inscrição on-line</p>
         </div>
+        <div class="inscricao-banner-code" aria-label="Número da inscrição">
+          <span class="inscricao-banner-label">Nº inscrição</span>
+          <span class="inscricao-banner-value" id="inscricaoBannerValue">—</span>
+        </div>
+      </div>
+      <div id="app">
+        <form id="formHospVet" autocomplete="off" novalidate>
 
         <div class="wizard-shell">
         <h2 class="h6 text-uppercase text-muted wizard-heading mb-3">Etapas da inscrição</h2>
@@ -1029,8 +1086,9 @@
         </div>
       </div>
 
-      <div class="text-center text-muted tiny mb-5">Pré-validações locais. A conferência oficial seguirá o Edital do certame.</div>
-      </form>
+        <div class="text-center text-muted tiny mb-5">Pré-validações locais. A conferência oficial seguirá o Edital do certame.</div>
+        </form>
+      </div>
     </main>
 
     <div class="pattern-strip pattern-bottom"></div>
@@ -1130,6 +1188,19 @@
       const esc = s => { const d=document.createElement('div'); d.innerText=s??''; return d.innerHTML||''; };
       function escapeHtml(value){
         return esc(value ?? '');
+      }
+      function updateInscricaoBanner(value){
+        const banner = document.getElementById('inscricaoBanner');
+        const badgeValue = document.getElementById('inscricaoBannerValue');
+        if(!banner || !badgeValue) return;
+        const text = typeof value === 'string' ? value.trim() : String(value ?? '').trim();
+        if(text){
+          badgeValue.textContent = text;
+          banner.classList.remove('inscricao-banner-empty');
+        }else{
+          badgeValue.textContent = '—';
+          banner.classList.add('inscricao-banner-empty');
+        }
       }
       const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/,'$1.$2.$3-$4') : (d||''); };
       const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\\d{5})(\\d{3})/,'$1-$2') : (d||''); };
@@ -1560,6 +1631,7 @@
         const source = Array.isArray(PREFILL) ? PREFILL[0] : PREFILL;
         const data = source && typeof source === 'object' ? source : null;
         if(!data) return;
+        updateInscricaoBanner(pickInscricaoValue(data));
         const readonlyTargets = new Set([
           '#cpf','#nome','#nasc','#sexo','#nacionalidade','#naturalidade_cidade',
           '#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis'
@@ -2984,6 +3056,9 @@
         const records = extractConfirmationRecords(result);
         const baseRecord = (records[0] && typeof records[0] === 'object') ? records[0] : (result && typeof result === 'object' ? result : {});
         const inscricaoValor = pickInscricaoValue(baseRecord) || pickInscricaoValue(result);
+        if(inscricaoValor){
+          updateInscricaoBanner(inscricaoValor);
+        }
         const sectionsHtml = (records.length ? records : [baseRecord]).map((record, index, arr)=>{
           if(!record || typeof record !== 'object') return '';
           const entries = Object.entries(record).filter(([key])=> !INSCRICAO_KEYS.includes(key) && key !== 'anexos');
