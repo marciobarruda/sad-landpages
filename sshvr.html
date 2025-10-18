@@ -2988,6 +2988,7 @@
         controls.forEach(control => {
           const name = (control.name || '').trim();
           if(!name || control.disabled) return;
+          if(name === 'email_confirm') return;
           if(control.type === 'file') return;
           if(control.type === 'radio'){
             if(radioGroups.has(name)) return;
@@ -3180,42 +3181,29 @@
             showError('Formulário não encontrado.');
             return;
           }
-          let formData;
+          let payload;
           try{
-            formData = new FormData(formEl);
+            payload = await buildPayload(formEl);
           }catch(error){
             showError('Erro ao preparar os dados para envio. Tente novamente.');
             return;
           }
-          const fileInputs = formEl.querySelectorAll('input[type="file"]');
-          fileInputs.forEach(input => {
-            const fieldName = input.name;
-            if(!fieldName) return;
-            formData.delete(fieldName);
-          });
-          Array.from(formData.entries()).forEach(([key, value]) => {
-            if(typeof value === 'string' && value.trim() === ''){
-              formData.delete(key);
-            }
-          });
-          formData.delete('email_confirm');
-          if(responsibilityCheckbox){
-            const fieldName = responsibilityCheckbox.name || 'termoResponsabilidade';
-            formData.set(fieldName, responsibilityCheckbox.checked ? 'ACEITO' : 'NAO');
-          }
-          const cargoSelect = document.getElementById('cargo');
-          if(cargoSelect){
-            const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
-            if(cargoLabel){
-              formData.set('cargo_label', cargoLabel);
-            }else{
-              formData.delete('cargo_label');
+          if(payload && payload.dados){
+            const cargoSelect = document.getElementById('cargo');
+            if(cargoSelect){
+              const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
+              if(cargoLabel){
+                payload.dados.cargo_label = cargoLabel;
+              }
             }
           }
           try{
             const response = await fetch(FINAL_ENDPOINT, {
               method:'POST',
-              body: formData
+              headers:{
+                'Content-Type':'application/json'
+              },
+              body: JSON.stringify(payload)
             });
             if(!response.ok){
               const errorText = (await response.text()).trim();
@@ -3224,14 +3212,25 @@
               showError(`Erro no envio: ${message}`);
               return;
             }
-            let data = {};
+            let data = null;
             try{
               data = await response.json();
             }catch(e){
-              data = {};
+              data = null;
             }
             showError('');
-            renderConfirmacao(data);
+            if(data){
+              const records = extractConfirmationRecords(data);
+              const baseRecord = (records[0] && typeof records[0] === 'object') ? records[0] : (data && typeof data === 'object' ? data : {});
+              const inscricaoValor = pickInscricaoValue(baseRecord) || pickInscricaoValue(data);
+              if(inscricaoValor){
+                updateInscricaoBanner(inscricaoValor);
+              }
+            }
+            const statusEl = document.getElementById('finalStatus');
+            if(statusEl){
+              statusEl.innerHTML = '<div class="alert alert-success mb-0 small" role="status">Dados enviados com sucesso.</div>';
+            }
           }catch(error){
             showError('Erro de rede ao enviar. Tente novamente.');
           }
