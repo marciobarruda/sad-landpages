@@ -40,6 +40,8 @@
       .review-placeholder{ color:#adb5bd; font-weight:600; letter-spacing:.04em; }
       .confirm-header{ gap:1rem; }
       .confirm-code{ font-size:1.75rem; font-weight:800; color:var(--brand); text-align:right; }
+      .confirm-code .confirm-code-label{ font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#6c757d; display:block; margin-bottom:.25rem; }
+      .confirm-code .confirm-code-value{ display:block; }
       .confirm-summary section:last-child{ margin-bottom:0; }
       .frame-card{
         max-width: 1020px;
@@ -514,12 +516,12 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="email">E-mail</label>
-                <input type="text" id="email" class="form-control" inputmode="email" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
+                <input type="text" id="email" class="form-control" inputmode="email" data-keep-case value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
                 <div class="help tiny" id="emailHelp"></div>
               </div>
               <div class="col-md-6">
                 <label class="form-label required" for="email_confirm">Confirme o e-mail</label>
-                <input type="text" id="email_confirm" class="form-control" inputmode="email" required>
+                <input type="text" id="email_confirm" class="form-control" inputmode="email" data-keep-case required>
                 <div class="help tiny" id="emailConfirmHelp"></div>
               </div>
             </div>
@@ -1064,7 +1066,7 @@
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-        const textInputs = document.querySelectorAll('input[type="text"]');
+        const textInputs = document.querySelectorAll('input[type="text"]:not([data-keep-case])');
         textInputs.forEach(input => {
           const enforceUppercase = () => {
             const start = input.selectionStart;
@@ -1187,10 +1189,92 @@
       }
 
       function disableAutocomplete(){
-        document.querySelectorAll('form').forEach(form => form.setAttribute('autocomplete','off'));
-        document.querySelectorAll('input, select, textarea').forEach(field => {
-          field.setAttribute('autocomplete','off');
+        document.querySelectorAll('form').forEach(form => {
+          form.setAttribute('autocomplete','off');
+          form.setAttribute('data-form-type','other');
         });
+        document.querySelectorAll('input, select, textarea').forEach(field => {
+          const tag = field.tagName.toLowerCase();
+          const type = String(field.getAttribute('type') || '').toLowerCase();
+          const sensitiveTypes = ['text','email','tel','number','search','password'];
+          if(tag === 'textarea' || (tag === 'input' && sensitiveTypes.includes(type))){
+            field.setAttribute('autocomplete','new-password');
+            field.autocomplete = 'new-password';
+          }else{
+            field.setAttribute('autocomplete','off');
+          }
+          field.setAttribute('autocorrect','off');
+          field.setAttribute('autocapitalize','off');
+          field.setAttribute('spellcheck','false');
+          field.setAttribute('aria-autocomplete','none');
+          field.setAttribute('data-lpignore','true');
+          field.setAttribute('data-form-type','other');
+        });
+      }
+
+      function normalizeFieldValue(field, transformer){
+        if(!field) return;
+        const current = field.value ?? '';
+        const next = transformer ? transformer(current) : current;
+        if(next === current) return;
+        let start = null;
+        let end = null;
+        try{
+          start = field.selectionStart;
+          end = field.selectionEnd;
+        }catch(e){ start = end = null; }
+        field.value = next;
+        if(typeof start === 'number' && typeof end === 'number'){
+          try{ field.setSelectionRange(start, end); }catch(e){}
+        }
+        field.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+
+      function applyAutofillNormalization(){
+        const digitConfigs = [
+          { selector:'#cpf', max:11 },
+          { selector:'#rg_numero', max:14 },
+          { selector:'#nis', max:11 },
+          { selector:'#tel1', normalize: fmtPhone },
+          { selector:'#tel2', normalize: fmtPhone },
+          { selector:'#cep', max:8 },
+          { selector:'#ano_conclusao', max:4 },
+          { selector:'#alistamento_numero', max:20 },
+          { selector:'#titulo', max:12 },
+          { selector:'#zona', max:4 },
+          { selector:'#secao', max:4 }
+        ];
+        digitConfigs.forEach(({selector, max, normalize}) => {
+          const field = $(selector);
+          if(!field) return;
+          if(typeof normalize === 'function'){
+            normalizeFieldValue(field, normalize);
+          }else if(typeof max === 'number'){
+            normalizeFieldValue(field, value => onlyDigits(value).slice(0, max));
+          }
+        });
+        document.querySelectorAll('input[type="text"]:not([data-keep-case])').forEach(field => {
+          normalizeFieldValue(field, value => String(value || '').toUpperCase());
+        });
+        updateEmailFeedback({ skipReview: true });
+        refreshSubmitState();
+        updateReview();
+      }
+
+      function scheduleAutofillNormalization(){
+        const queue = [0, 120, 480, 1200];
+        queue.forEach(delay => {
+          setTimeout(()=>{ applyAutofillNormalization(); }, delay);
+        });
+        window.addEventListener('pageshow', () => {
+          setTimeout(()=>{ applyAutofillNormalization(); }, 120);
+        });
+        document.addEventListener('focusin', () => {
+          requestAnimationFrame(()=>{ applyAutofillNormalization(); });
+        });
+        document.addEventListener('change', () => {
+          requestAnimationFrame(()=>{ applyAutofillNormalization(); });
+        }, true);
       }
 
       // ========= Validators =========
@@ -1253,8 +1337,18 @@
         return '';
       };
       const fmtPhone = (value) => {
-        const digits = onlyDigits(value).slice(0,11);
-        return digits;
+        let digits = onlyDigits(value);
+        if(!digits) return '';
+        if(digits.length > 11){
+          digits = digits.slice(-11);
+        }
+        if((digits.length === 10 || digits.length === 11) && digits.startsWith('0')){
+          const trimmed = digits.slice(1);
+          if(trimmed.length >= 10){
+            digits = trimmed;
+          }
+        }
+        return digits.slice(0,11);
       };
       const isValidPhone = (value) => {
         const digits = onlyDigits(value);
@@ -2297,7 +2391,7 @@
         if(!input) return;
         const help = helpId ? $(helpId) : null;
         const apply = (value)=>{
-          const digits = onlyDigits(value).slice(0,11);
+          const digits = fmtPhone(value);
           input.value = digits;
           const hasDigits = digits.length > 0;
           const valid = hasDigits ? isValidPhone(digits) : !required;
@@ -2872,6 +2966,8 @@
       async function postJson(url, payload){
         const res = await fetch(url, {
           method:'POST',
+          mode:'cors',
+          credentials:'omit',
           headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify(payload)
         });
@@ -2958,13 +3054,19 @@
         const firstRecord = records[0] || {};
         const inscricaoValor = pickInscricaoValue(firstRecord) || pickInscricaoValue(result);
         const sectionsHtml = records.map((record, index)=> renderConfirmationSection(record, index, records.length)).join('') || '<p class="text-muted">Resposta recebida.</p>';
+        const codeMarkup = inscricaoValor ? [
+          '<div class="confirm-code">',
+          '<span class="confirm-code-label">Inscrição</span>',
+          `<span class="confirm-code-value">${esc(inscricaoValor)}</span>`,
+          '</div>'
+        ].join('') : '';
         app.innerHTML = `
           <div class="confirm-header d-flex justify-content-between align-items-start mb-4">
             <div>
               <h2 class="h4 mb-1">Inscrição enviada</h2>
               <p class="text-muted mb-0">Confira abaixo os dados retornados pelo sistema.</p>
             </div>
-            ${inscricaoValor ? `<div class="confirm-code">${esc(inscricaoValor)}</div>` : ''}
+            ${codeMarkup}
           </div>
           <div class="confirm-summary">
             ${sectionsHtml}
@@ -3037,6 +3139,7 @@
       }
       function init(){
         disableAutocomplete();
+        scheduleAutofillNormalization();
         bindWizard();
         declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
         attachWatchers();
