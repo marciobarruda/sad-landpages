@@ -2958,8 +2958,9 @@
         const inputs = Array.from(scope.querySelectorAll('input[type="file"]'));
         const anexos = [];
         for(const input of inputs){
+          if(!input || input.disabled) continue;
           const campo = (input.name || '').trim();
-          if(!campo || !input.files) continue;
+          if(!campo || !input.files || input.files.length === 0) continue;
           const files = Array.from(input.files);
           for(const file of files){
             const conteudo = await readFileAsBase64(file);
@@ -3014,13 +3015,26 @@
       }
       async function buildPayload(formEl){
         const scope = formEl || document;
-        const dados = collectDados(scope);
+        const dadosRaw = collectDados(scope);
+        const dados = {};
+        Object.keys(dadosRaw).forEach(key => {
+          const value = dadosRaw[key];
+          if(value === '' || value === null || value === undefined) return;
+          dados[key] = value;
+        });
         const cargoSelect = document.getElementById('cargo');
         if(cargoSelect){
           const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
-          dados.cargo_label = cargoLabel;
+          if(cargoLabel){
+            dados.cargo_label = cargoLabel;
+          }
         }
-        return { dados };
+        const anexos = await collectAttachmentsBase64(scope);
+        const payload = { dados };
+        if(anexos.length){
+          payload.anexos = anexos;
+        }
+        return payload;
       }
       function extractConfirmationRecords(data){
         if(Array.isArray(data)) return data;
@@ -3199,9 +3213,7 @@
           try{
             const response = await fetch(FINAL_ENDPOINT, {
               method:'POST',
-              headers:{
-                'Content-Type':'application/json'
-              },
+              mode:'cors',
               body: JSON.stringify(payload)
             });
             if(!response.ok){
