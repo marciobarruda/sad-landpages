@@ -487,16 +487,16 @@
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4">
-                <label class="form-label" for="titulo">Título de Eleitor</label>
-                <input type="text" id="titulo" class="form-control" inputmode="numeric" maxlength="12">
+                <label class="form-label required" for="titulo">Título de Eleitor</label>
+                <input type="text" id="titulo" class="form-control" inputmode="numeric" maxlength="12" required>
               </div>
               <div class="col-md-4">
-                <label class="form-label" for="zona">Zona</label>
-                <input type="text" id="zona" class="form-control" inputmode="numeric" maxlength="4">
+                <label class="form-label required" for="zona">Zona</label>
+                <input type="text" id="zona" class="form-control" inputmode="numeric" maxlength="4" required>
               </div>
               <div class="col-md-4">
-                <label class="form-label" for="secao">Seção</label>
-                <input type="text" id="secao" class="form-control" inputmode="numeric" maxlength="4">
+                <label class="form-label required" for="secao">Seção</label>
+                <input type="text" id="secao" class="form-control" inputmode="numeric" maxlength="4" required>
               </div>
             </div>
           </div>
@@ -2025,7 +2025,7 @@
 
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','titulo','zona','secao','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
@@ -2215,7 +2215,7 @@
           const baseMessage = res.msg || 'Verifique os documentos anexados.';
           return label ? `${label}: ${baseMessage}` : baseMessage;
         };
-        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
+        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','titulo','zona','secao','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
         for(const id of baseIds){
           const message = ensureField(`#${id}`);
           if(message) return message;
@@ -2833,87 +2833,11 @@
       bindChecker('pcd_exames','status_pcd_exames',{});
 
       // ========= Build payload & Enviar =========
-      function buildPayload(){
-        const sexoSelect = $('#sexo').value;
-        const generoSelect = $('#genero').value;
-        const generoOutro = $('#genero_outro').value.trim();
-        const cargoSelect = $('#cargo');
-        const cargoValue = cargoSelect?.value || '';
-        const cargoLabel = cargoSelect && cargoSelect.selectedOptions?.length ? cargoSelect.selectedOptions[0].textContent.trim() : '';
-        return {
-          // pessoais
-          nome: $('#nome').value.trim(),
-          nome_social: $('#nome_social').value.trim(),
-          data_nascimento: $('#nasc').value,
-          sexo: sexoSelect,
-          genero: generoSelect,
-          genero_outro: generoSelect === 'Outro' ? generoOutro : '',
-          estado_civil: $('#estado_civil').value,
-          nome_mae: $('#mae').value.trim(),
-          nome_pai: $('#pai').value.trim(),
-          nacionalidade: $('#nacionalidade').value.trim(),
-          naturalidade_cidade: $('#naturalidade_cidade').value.trim(),
-          naturalidade_uf: $('#naturalidade_uf').value.trim().toUpperCase(),
-          rg_numero: $('#rg_numero').value.trim(),
-          rg_orgao: $('#rg_orgao').value.trim().toUpperCase(),
-          rg_uf: $('#rg_uf').value.trim().toUpperCase(),
-          rg_data: $('#rg_data').value,
-          cpf: onlyDigits($('#cpf').value),
-          nis: $('#nis').value.trim(),
-          email: $('#email').value.trim().toLowerCase(),
-          telefone1: onlyDigits($('#tel1').value),
-          telefone2: onlyDigits($('#tel2').value),
-          // endereço
-          cep: onlyDigits($('#cep').value),
-          logradouro: $('#logradouro').value.trim(),
-          numero: $('#numero').value.trim(),
-          complemento: $('#complemento').value.trim(),
-          bairro: $('#bairro').value.trim(),
-          cidade: $('#cidade').value.trim(),
-          uf: $('#uf').value.trim().toUpperCase(),
-          alistamento_numero: $('#alistamento_numero').value.trim(),
-          alistamento_orgao: $('#alistamento_orgao').value.trim().toUpperCase(),
-          alistamento_data: $('#alistamento_data').value,
-          // formação
-          nivel_minimo: $('#nivel').value,
-          ies: $('#ies').value.trim(),
-          curso: $('#curso').value.trim(),
-          ano_conclusao: $('#ano_conclusao').value.trim(),
-          // raça/gênero
-          raca: $('#raca').value,
-          concorrer_ppni: $('#cotasPPNI').value,
-          // pcd
-          is_pcd: $('#is_pcd').value,
-          tipo_pcd: $('#tipo_pcd').value.trim(),
-          pcd_cid: $('#pcd_cid').value.trim(),
-          condicao_especial: document.querySelector('input[name="condicao_especial"]:checked')?.value || '',
-          necessidade: $('#necessidade').value.trim(),
-          // militar/eleitoral
-          militar: document.querySelector('input[name="militar"]:checked')?.value || '',
-          politicos: document.querySelector('input[name="politicos"]:checked')?.value || '',
-          titulo: onlyDigits($('#titulo').value),
-          zona: onlyDigits($('#zona').value),
-          secao: onlyDigits($('#secao').value),
-          // certame
-          cargo: cargoValue,
-          cargo_label: cargoLabel,
-          especialidade: $('#especialidade').value.trim(),
-          foi_jurado: $('#foi_jurado').value,
-          jurado_periodo: $('#jurado_periodo').value.trim(),
-          // vínculos
-          vinculo_publico: $('#vinculo_publico').value,
-          qual_vinculo: $('#qual_vinculo').value.trim(),
-          experiencia_tempo: $('#experiencia_tempo').value.trim(),
-          termo_responsabilidade: responsibilityCheckbox && responsibilityCheckbox.checked ? 'ACEITO' : 'NAO',
-          recurso_tipo: $('#recurso_tipo')?.value || '',
-          recurso_texto: $('#recurso_texto')?.value.trim() || ''
-        };
-      }
       function getFileExtension(name){
-        const match = /\.([^.]+)$/.exec(name || '');
+        const match = /(\.[^.]+)$/.exec(name || '');
         return match ? match[1].toLowerCase() : '';
       }
-      async function fileToBase64(file){
+      async function readFileAsBase64(file){
         const buffer = await file.arrayBuffer();
         const bytes = new Uint8Array(buffer);
         const chunkSize = 0x8000;
@@ -2924,56 +2848,74 @@
         }
         return btoa(binary);
       }
-      async function collectAttachments(){
-        const defs = [
-          { id:'doc_id_frente', campo:'doc_id_frente' },
-          { id:'doc_id_verso', campo:'doc_id_verso' },
-          { id:'doc_cpf', campo:'doc_cpf' },
-          { id:'doc_residencia', campo:'doc_residencia' },
-          { id:'doc_quitacao_eleitoral', campo:'doc_quitacao_eleitoral' },
-          { id:'doc_militar', campo:'doc_militar' },
-          { id:'doc_jurado', campo:'doc_jurado' },
-          { id:'doc_jurado_440', campo:'doc_jurado_440' },
-          { id:'doc_escolaridade', campo:'doc_escolaridade' },
-          { id:'doc_curriculo', campo:'doc_curriculo' },
-          { id:'het_declaracao', campo:'het_declaracao' },
-          { id:'het_id', campo:'het_id' },
-          { id:'het_frente', campo:'het_frente' },
-          { id:'het_perfil', campo:'het_perfil' },
-          { id:'het_video', campo:'het_video' },
-          { id:'pcd_laudo', campo:'pcd_laudo' },
-          { id:'pcd_declaracao', campo:'pcd_declaracao' },
-          { id:'pcd_exames', campo:'pcd_exames' },
-          { id:'recurso_anexo', campo:'recurso_anexo' }
-        ];
-        const attachments = [];
-        for(const def of defs){
-          const input = document.getElementById(def.id);
-          if(!input || !input.files) continue;
+      async function collectAttachmentsBase64(formEl){
+        const scope = formEl || document;
+        const inputs = Array.from(scope.querySelectorAll('input[type="file"]'));
+        const anexos = [];
+        for(const input of inputs){
+          const campo = (input.name || '').trim();
+          if(!campo || !input.files) continue;
           const files = Array.from(input.files);
           for(const file of files){
-            const conteudo = await fileToBase64(file);
-            attachments.push({
-              campo: def.campo,
+            const conteudo = await readFileAsBase64(file);
+            anexos.push({
+              campo,
               nome: file.name,
               extensao: getFileExtension(file.name),
               conteudo
             });
           }
         }
-        return attachments;
+        return anexos;
       }
-      async function postJson(url, payload){
-        const res = await fetch(url, {
-          method:'POST',
-          mode:'cors',
-          credentials:'omit',
-          headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify(payload)
+      function getCheckedRadioValue(scope, name){
+        const root = scope || document;
+        const escaped = name.replace(/"/g, '\"');
+        const selector = `input[type="radio"][name="${escaped}"]:checked`;
+        const radio = root.querySelector(selector);
+        return radio ? radio.value : '';
+      }
+      function collectDados(formEl){
+        const scope = formEl || document;
+        const controls = Array.from(scope.querySelectorAll('input, select, textarea'));
+        const dados = {};
+        const radioGroups = new Set();
+        controls.forEach(control => {
+          const name = (control.name || '').trim();
+          if(!name || control.disabled) return;
+          if(control.type === 'file') return;
+          if(control.type === 'radio'){
+            if(radioGroups.has(name)) return;
+            radioGroups.add(name);
+            dados[name] = getCheckedRadioValue(scope, name);
+            return;
+          }
+          if(control.type === 'checkbox'){
+            if(control.id === 'termoResponsabilidade'){
+              dados[name] = control.checked ? 'ACEITO' : 'NAO';
+            }else{
+              dados[name] = control.checked ? (control.value !== 'on' ? control.value : 'on') : '';
+            }
+            return;
+          }
+          let value = control.value;
+          if(typeof value === 'string'){
+            value = value.trim();
+          }
+          dados[name] = value;
         });
-        const text = await res.text();
-        let data=null; try{ data=JSON.parse(text); }catch(e){}
-        return { ok: res.ok, status: res.status, text, data };
+        return dados;
+      }
+      async function buildPayload(formEl){
+        const scope = formEl || document;
+        const dados = collectDados(scope);
+        const cargoSelect = document.getElementById('cargo');
+        if(cargoSelect){
+          const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
+          dados.cargo_label = cargoLabel;
+        }
+        const anexos = await collectAttachmentsBase64(scope);
+        return { dados, anexos };
       }
       function extractConfirmationRecords(data){
         if(Array.isArray(data)) return data;
@@ -2985,10 +2927,10 @@
         }
         return [];
       }
+      const INSCRICAO_KEYS = ['inscrição','inscricao','Inscrição','Inscricao','INSCRIÇÃO','INSCRICAO','numero_inscricao','numeroInscricao','inscricao_numero'];
       function pickInscricaoValue(record){
         if(!record || typeof record !== 'object') return '';
-        const keys = ['inscrição','inscricao','Inscrição','Inscricao','INSCRIÇÃO','INSCRICAO','numero_inscricao','numeroInscricao','inscricao_numero'];
-        for(const key of keys){
+        for(const key of INSCRICAO_KEYS){
           if(Object.prototype.hasOwnProperty.call(record, key)){
             const value = record[key];
             if(value !== undefined && value !== null){
@@ -3025,41 +2967,41 @@
           return esc(String(value));
         }
       }
-      function renderConfirmationSection(record, index, total){
-        if(!record || typeof record !== 'object') return '';
-        const entries = Object.entries(record);
-        if(!entries.length) return '';
-        const rows = entries.map(([key,val])=>`
-              <tr>
-                <td width="240"><strong>${esc(humanizeFlag(key))}</strong></td>
-                <td>${formatConfirmationValue(val)}</td>
-              </tr>
-            `).join('');
-        const title = total > 1 ? `Registro ${index + 1}` : 'Dados confirmados';
-        return `
-          <section class="mb-4">
-            <h3 class="h6 section-title mb-2">${esc(title)}</h3>
-            <table class="table table-sm review-table mb-0">
-              <tbody>
-                ${rows}
-              </tbody>
-            </table>
-          </section>
-        `;
-      }
-      function renderConfirmation(result){
+      function renderConfirmacao(result){
         const app = document.getElementById('app');
         if(!app) return;
         const records = extractConfirmationRecords(result);
-        const firstRecord = records[0] || {};
-        const inscricaoValor = pickInscricaoValue(firstRecord) || pickInscricaoValue(result);
-        const sectionsHtml = records.map((record, index)=> renderConfirmationSection(record, index, records.length)).join('') || '<p class="text-muted">Resposta recebida.</p>';
-        const codeMarkup = inscricaoValor ? [
-          '<div class="confirm-code">',
-          '<span class="confirm-code-label">Inscrição</span>',
-          `<span class="confirm-code-value">${esc(inscricaoValor)}</span>`,
-          '</div>'
-        ].join('') : '';
+        const baseRecord = (records[0] && typeof records[0] === 'object') ? records[0] : (result && typeof result === 'object' ? result : {});
+        const inscricaoValor = pickInscricaoValue(baseRecord) || pickInscricaoValue(result);
+        const sectionsHtml = (records.length ? records : [baseRecord]).map((record, index, arr)=>{
+          if(!record || typeof record !== 'object') return '';
+          const entries = Object.entries(record).filter(([key])=> !INSCRICAO_KEYS.includes(key) && key !== 'anexos');
+          if(!entries.length) return '';
+          const rows = entries.map(([key,val])=>`
+                <tr>
+                  <td width="240"><strong>${esc(humanizeFlag(key))}</strong></td>
+                  <td>${formatConfirmationValue(val)}</td>
+                </tr>
+              `).join('');
+          const total = arr.length;
+          const title = total > 1 ? `Registro ${index + 1}` : 'Dados confirmados';
+          return `
+            <section class="mb-4">
+              <h3 class="h6 section-title mb-2">${esc(title)}</h3>
+              <table class="table table-sm review-table mb-0">
+                <tbody>
+                  ${rows}
+                </tbody>
+              </table>
+            </section>
+          `;
+        }).join('') || '<p class="text-muted">Resposta recebida.</p>';
+        const codeMarkup = inscricaoValor ? `
+          <div class="confirm-code">
+            <span class="confirm-code-label">Inscrição</span>
+            <span class="confirm-code-value">${esc(inscricaoValor)}</span>
+          </div>
+        ` : '';
         app.innerHTML = `
           <div class="confirm-header d-flex justify-content-between align-items-start mb-4">
             <div>
@@ -3073,8 +3015,34 @@
           </div>
         `;
       }
+      function setSubmitButtonLoading(isLoading){
+        const button = document.getElementById('btnSubmitAll');
+        if(!button) return;
+        if(isLoading){
+          if(!button.dataset.originalHtml){
+            button.dataset.originalHtml = button.innerHTML;
+          }
+          button.disabled = true;
+          button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando…';
+        }else{
+          if(button.dataset.originalHtml){
+            button.innerHTML = button.dataset.originalHtml;
+          }
+          button.disabled = false;
+        }
+      }
+      function showFinalMessage(message, variant = 'info'){
+        const statusEl = document.getElementById('finalStatus');
+        if(!statusEl) return;
+        statusEl.innerHTML = '';
+        if(!message) return;
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${variant} mb-0 small`;
+        alert.setAttribute('role','alert');
+        alert.textContent = message;
+        statusEl.appendChild(alert);
+      }
       async function submitAll(){
-        const button = $('#btnSubmitAll');
         if(!isSubmitReady()){
           const message = focusFirstInvalid();
           if(message){
@@ -3083,40 +3051,49 @@
           refreshSubmitState();
           return;
         }
-        if(button) button.disabled = true;
+        setSubmitButtonLoading(true);
         const guardEl = document.getElementById('btnSubmitGuard');
         if(guardEl){
           guardEl.classList.add('d-none');
           guardEl.setAttribute('aria-hidden','true');
         }
-        const statusEl = $('#finalStatus');
-        const errorBox = $('#finalOut');
-        if(errorBox){
-          errorBox.textContent='';
-          errorBox.classList.add('d-none');
+        showFinalMessage('');
+        const formRoot = document.getElementById('app');
+        let payload;
+        try{
+          payload = await buildPayload(formRoot);
+        }catch(error){
+          showFinalMessage('Erro ao preparar os dados para envio. Tente novamente.', 'danger');
+          setSubmitButtonLoading(false);
+          refreshSubmitState();
+          return;
         }
         try{
-          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-secondary">Preparando...</span>';
-          const dados = buildPayload();
-          const anexos = await collectAttachments();
-          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-secondary">Enviando...</span>';
-          const out = await postJson(FINAL_ENDPOINT, { dados, anexos });
-          if(out.ok){
-            renderConfirmation(out.data ?? {});
-          }else{
-            if(statusEl) statusEl.innerHTML = `<span class="badge text-bg-danger">Erro ${out.status || ''}</span>`;
-            if(errorBox){
-              errorBox.textContent = out.text || '';
-              errorBox.classList.remove('d-none');
-            }
+          const response = await fetch(FINAL_ENDPOINT, {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if(!response.ok){
+            const errorText = (await response.text()).trim();
+            const fallback = (response.statusText || '').trim();
+            const message = errorText || fallback || 'Resposta inválida.';
+            showFinalMessage(`Erro no envio: ${message}`, 'danger');
+            return;
           }
-        }catch(e){
-          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-danger">Erro de rede</span>';
-          if(errorBox){
-            errorBox.textContent = String(e);
-            errorBox.classList.remove('d-none');
+          let data = {};
+          try{
+            data = await response.json();
+          }catch(e){
+            data = {};
           }
+          showFinalMessage('');
+          setSubmitButtonLoading(false);
+          renderConfirmacao(data);
+        }catch(error){
+          showFinalMessage('Erro de rede ao enviar. Tente novamente.', 'danger');
         }finally{
+          setSubmitButtonLoading(false);
           refreshSubmitState();
         }
       }
@@ -3131,6 +3108,29 @@
       });
 
       // ========= Init =========
+      function ensureFieldNames(){
+        const overrides = new Map([
+          ['nasc','data_nascimento'],
+          ['mae','nome_mae'],
+          ['pai','nome_pai'],
+          ['tel1','telefone1'],
+          ['tel2','telefone2'],
+          ['nivel','nivel_minimo'],
+          ['cotasPPNI','concorrer_ppni'],
+          ['termoResponsabilidade','termo_responsabilidade']
+        ]);
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+          if(el.name) return;
+          const override = overrides.get(el.id);
+          if(override){
+            el.name = override;
+            return;
+          }
+          if(el.id){
+            el.name = el.id;
+          }
+        });
+      }
       function attachWatchers(){
         const events=['input','change','blur'];
         document.querySelectorAll('input,select,textarea').forEach(el=>{
@@ -3139,6 +3139,7 @@
       }
       function init(){
         disableAutocomplete();
+        ensureFieldNames();
         scheduleAutofillNormalization();
         bindWizard();
         declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
