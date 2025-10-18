@@ -239,47 +239,60 @@
       .quota-tab-pane{ display:none; }
       .quota-tab-pane.active{ display:block; animation:fadeIn .3s ease; }
       .inscricao-banner{
+        position:relative;
         display:flex;
         align-items:center;
         justify-content:space-between;
-        gap:1.5rem;
-        border:2px solid #0b2447;
-        border-radius:1.25rem;
-        padding:1.25rem 1.5rem;
+        gap:1.75rem;
+        border:1px solid #d8e1fb;
+        border-radius:1.5rem;
+        padding:1.35rem 1.75rem;
         margin-bottom:2.25rem;
-        background:#ffffff;
-        box-shadow:0 14px 32px rgba(13,110,253,.08);
+        background:linear-gradient(135deg,#ffffff 0%, #f2f6ff 100%);
+        box-shadow:0 18px 36px rgba(13,110,253,.08);
+      }
+      .inscricao-banner::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        border-radius:inherit;
+        pointer-events:none;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
       }
       .inscricao-banner-copy{ flex:1; }
       .inscricao-banner-title{
         font-weight:700;
         letter-spacing:.1em;
         text-transform:uppercase;
-        color:#0b2447;
+        color:#172a63;
       }
-      .inscricao-banner-subtitle{ font-size:.95rem; }
+      .inscricao-banner-subtitle{ font-size:.95rem; color:#516098; }
       .inscricao-banner-code{
-        border:2px solid #0b2447;
-        border-radius:1rem;
-        padding:.75rem 1.5rem;
-        min-width:200px;
+        display:flex;
+        flex-direction:column;
+        align-items:flex-end;
+        justify-content:center;
+        border:1px solid #c5d4fb;
+        border-radius:999px;
+        padding:.65rem 1.75rem;
+        min-width:210px;
         text-align:right;
-        background:#f8fbff;
-        box-shadow:0 12px 24px rgba(13,110,253,.12);
+        background:rgba(255,255,255,.85);
+        box-shadow:0 10px 26px rgba(13,110,253,.12);
       }
       .inscricao-banner-label{
         display:block;
         font-size:.75rem;
         letter-spacing:.12em;
         text-transform:uppercase;
-        color:#6c757d;
+        color:#6a77b4;
         font-weight:600;
         margin-bottom:.25rem;
       }
       .inscricao-banner-value{
         display:block;
         font-weight:700;
-        font-size:1.9rem;
+        font-size:1.75rem;
         color:var(--brand);
         line-height:1;
       }
@@ -290,8 +303,8 @@
         header.hero{ background-position:center; background-size:cover; }
         body{ overflow-x:hidden; }
         .frame-card{ margin:-60px auto -60px; padding:1.25rem; }
-        .inscricao-banner{ flex-direction:column; align-items:flex-start; padding:1rem 1.1rem; gap:1rem; }
-        .inscricao-banner-code{ align-self:stretch; text-align:left; min-width:auto; }
+        .inscricao-banner{ flex-direction:column; align-items:flex-start; padding:1.1rem 1.25rem; gap:1rem; }
+        .inscricao-banner-code{ align-self:stretch; text-align:left; min-width:auto; border-radius:1.1rem; }
         .wizard-shell{ padding:1.25rem 1.1rem; }
         .wizard-heading::before{ width:24px; }
         .wizard-steps{
@@ -322,8 +335,8 @@
         .form-tab-pane.active{ display:block; }
         .wizard-step::before,
         .wizard-step::after{ top:17px; }
-        .inscricao-banner-code{ padding:.65rem 1rem; }
-        .inscricao-banner-value{ font-size:1.6rem; }
+        .inscricao-banner-code{ padding:.65rem 1.15rem; }
+        .inscricao-banner-value{ font-size:1.55rem; }
       }
     </style>
   </head>
