@@ -408,11 +408,11 @@
                   <option>Prefiro não informar</option>
                 </select>
               </div>
-              <div class="col-md-4 col-lg-3">
+              <div class="col-md-4 col-lg-6">
                 <label class="form-label" for="nome_social">Nome social</label>
                 <input type="text" id="nome_social" class="form-control" value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}">
               </div>
-              <div class="col-md-4 col-lg-3 d-none" id="generoOutroCol">
+              <div class="col-12 col-lg-6 d-none" id="generoOutroCol">
                 <label class="form-label" for="genero_outro">Informe o gênero</label>
                 <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80" value="{{ String($json.genero_outro ?? '').trim() }}">
               </div>
@@ -436,11 +436,11 @@
               </div>
             </div>
             <div class="row g-3 mt-0">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label required" for="mae">Nome da mãe</label>
                 <input type="text" id="mae" class="form-control" value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}" required>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label" for="pai">Nome do pai</label>
                 <input type="text" id="pai" class="form-control" value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}">
               </div>
@@ -514,9 +514,16 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="email">E-mail</label>
-                <input type="email" id="email" class="form-control" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
+                <input type="text" id="email" class="form-control" inputmode="email" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
                 <div class="help tiny" id="emailHelp"></div>
               </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="email_confirm">Confirme o e-mail</label>
+                <input type="text" id="email_confirm" class="form-control" inputmode="email" required>
+                <div class="help tiny" id="emailConfirmHelp"></div>
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
               <div class="col-md-3">
                 <label class="form-label required" for="tel1">Telefone 1</label>
                 <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone1 ?? $json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}" required>
@@ -1114,9 +1121,79 @@
       const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/,'$1.$2.$3-$4') : (d||''); };
       const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\\d{5})(\\d{3})/,'$1-$2') : (d||''); };
       const toMB = bytes => Math.round((bytes/1024/1024)*100)/100;
+      const normalizeEmail = value => String(value || '').trim().toLowerCase();
+      function getEmailPair(){
+        return {
+          email: normalizeEmail($('#email')?.value),
+          confirm: normalizeEmail($('#email_confirm')?.value)
+        };
+      }
+      function emailsMatch(){
+        const { email, confirm } = getEmailPair();
+        if(!email || !confirm) return false;
+        return email === confirm;
+      }
+      function normalizeCepData(raw){
+        if(!raw || typeof raw !== 'object') return null;
+        if(raw.erro || raw.error) return null;
+        return {
+          logradouro: raw.logradouro ?? raw.street ?? '',
+          bairro: raw.bairro ?? raw.neighborhood ?? '',
+          cidade: raw.localidade ?? raw.city ?? '',
+          uf: raw.uf ?? raw.state ?? '',
+          complemento: raw.complemento ?? raw.complement ?? ''
+        };
+      }
+      async function fetchCepInfo(value){
+        const cep = onlyDigits(value);
+        if(cep.length !== 8) return null;
+        const urls = [
+          `https://viacep.com.br/ws/${cep}/json/`,
+          `https://brasilapi.com.br/api/cep/v2/${cep}`
+        ];
+        for(const url of urls){
+          try{
+            const res = await fetch(url);
+            if(!res.ok) continue;
+            const data = await res.json();
+            const normalized = normalizeCepData(data);
+            if(normalized) return normalized;
+          }catch(err){
+            continue;
+          }
+        }
+        return null;
+      }
+      function applyCepData(data){
+        if(!data) return;
+        const mappings = [
+          { selector:'#logradouro', value:data.logradouro },
+          { selector:'#bairro', value:data.bairro },
+          { selector:'#cidade', value:data.cidade },
+          { selector:'#uf', value:data.uf },
+          { selector:'#complemento', value:data.complemento }
+        ];
+        mappings.forEach(({selector, value})=>{
+          if(!value) return;
+          const field = $(selector);
+          if(!field) return;
+          const normalized = String(value).trim().toUpperCase();
+          if(!normalized) return;
+          if(!field.value.trim()){
+            field.value = normalized;
+          }
+          ['input','change'].forEach(evt => field.dispatchEvent(new Event(evt,{bubbles:true})));
+        });
+      }
+
+      function disableAutocomplete(){
+        document.querySelectorAll('form').forEach(form => form.setAttribute('autocomplete','off'));
+        document.querySelectorAll('input, select, textarea').forEach(field => {
+          field.setAttribute('autocomplete','off');
+        });
+      }
 
       // ========= Validators =========
-      function isValidEmail(v){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(String(v||'').trim()); }
       function isValidCPF(cpf){
         cpf = onlyDigits(cpf);
         if(!cpf || cpf.length !== 11) return false;
@@ -1817,15 +1894,51 @@
         updateQuotaForms();
       }
 
+      function updateEmailFeedback({ skipReview = false } = {}){
+        const emailField = $('#email');
+        const confirmField = $('#email_confirm');
+        const normalizeField = (field) => {
+          if(!field) return '';
+          const { selectionStart, selectionEnd } = field;
+          const normalized = normalizeEmail(field.value);
+          if(field.value !== normalized){
+            field.value = normalized;
+            if(typeof selectionStart === 'number' && typeof selectionEnd === 'number'){
+              try{ field.setSelectionRange(selectionStart, selectionEnd); }catch(e){}
+            }
+          }
+          return normalized;
+        };
+        const emailValue = normalizeField(emailField);
+        const confirmValue = normalizeField(confirmField);
+        const mismatch = emailValue && confirmValue && emailValue !== confirmValue;
+        const confirmHelp = $('#emailConfirmHelp');
+        if(confirmHelp){
+          confirmHelp.textContent = mismatch ? 'Os e-mails informados não coincidem.' : '';
+        }
+        const emailHelp = $('#emailHelp');
+        if(emailHelp){
+          emailHelp.textContent = 'O e-mail será utilizado para contato.';
+        }
+        [emailField, confirmField].forEach(field => {
+          if(field){
+            field.classList.toggle('is-invalid', mismatch);
+          }
+        });
+        if(!skipReview) updateReview();
+        refreshSubmitState();
+      }
+
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
         if(!isValidPhone($('#tel1').value)) return false;
         const tel2Val = $('#tel2')?.value || '';
         if(tel2Val && !isValidPhone(tel2Val)) return false;
+        if(!emailsMatch()) return false;
         if((document.getElementById('genero')?.value || '') === 'Outro'){
           if(!String(document.getElementById('genero_outro')?.value || '').trim()) return false;
         }
@@ -2008,16 +2121,22 @@
           const baseMessage = res.msg || 'Verifique os documentos anexados.';
           return label ? `${label}: ${baseMessage}` : baseMessage;
         };
-        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
+        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
         for(const id of baseIds){
           const message = ensureField(`#${id}`);
           if(message) return message;
         }
-        const emailMessage = ensureField('#email', el => {
-          const v = String(el.value||'').trim();
-          return v && isValidEmail(v);
-        }, () => 'Informe um e-mail válido.');
+        const emailMessage = ensureField('#email');
         if(emailMessage) return emailMessage;
+        const emailConfirmMessage = ensureField('#email_confirm');
+        if(emailConfirmMessage) return emailConfirmMessage;
+        const { email: emailValue, confirm: emailConfirmValue } = getEmailPair();
+        if(emailValue && emailConfirmValue && emailValue !== emailConfirmValue){
+          updateEmailFeedback({ skipReview: true });
+          const confirmField = $('#email_confirm');
+          focusElementAndStep(confirmField);
+          return 'Os e-mails informados não coincidem.';
+        }
         const tel1Message = ensureField('#tel1', el => {
           const v = String(el.value||'').trim();
           return v && isValidPhone(v);
@@ -2234,6 +2353,37 @@
       bindUppercase('#uf');
       bindUppercase('#alistamento_orgao');
       bindUppercase('#pcd_cid');
+
+      let lastCepLookup = '';
+      let cepLookupToken = 0;
+      async function handleCepLookup(force = false){
+        const cepInput = $('#cep');
+        if(!cepInput) return;
+        const digits = onlyDigits(cepInput.value);
+        if(digits.length !== 8){
+          if(!force){
+            lastCepLookup = '';
+          }
+          return;
+        }
+        if(!force && digits === lastCepLookup) return;
+        const token = ++cepLookupToken;
+        const data = await fetchCepInfo(digits);
+        if(token !== cepLookupToken) return;
+        lastCepLookup = digits;
+        if(data){
+          applyCepData(data);
+        }
+      }
+      const cepField = $('#cep');
+      if(cepField){
+        ['blur','change'].forEach(evt => cepField.addEventListener(evt, ()=>{ handleCepLookup(false); }));
+        cepField.addEventListener('input', ()=>{
+          if(onlyDigits(cepField.value).length === 8){
+            handleCepLookup(false);
+          }
+        });
+      }
 
       function updateDocMilitarStatus(){
         const input = $('#doc_militar');
@@ -2547,13 +2697,12 @@
         refreshSubmitState();
       });
 
-      $('#email').addEventListener('input', e=>{
-        e.target.value = (e.target.value||'').toLowerCase();
-        const v=e.target.value.trim(); const ok=isValidEmail(v);
-        e.target.setCustomValidity(v && !ok ? 'E-mail inválido' : '');
-        $('#emailHelp').textContent = v ? (ok ? '' : 'Informe um e-mail válido.') : '';
-        refreshSubmitState(); updateReview();
-      });
+      const emailInputField = $('#email');
+      emailInputField?.addEventListener('input', ()=>{ updateEmailFeedback(); });
+      emailInputField?.addEventListener('blur', ()=>{ updateEmailFeedback(); });
+      const emailConfirmField = $('#email_confirm');
+      emailConfirmField?.addEventListener('input', ()=>{ updateEmailFeedback(); });
+      emailConfirmField?.addEventListener('blur', ()=>{ updateEmailFeedback(); });
       $('#cpf').addEventListener('input', e=>{
         const ok=isValidCPF(e.target.value);
         $('#cpfHelp').textContent = ok? '' : 'CPF inválido';
@@ -2887,10 +3036,13 @@
         });
       }
       function init(){
+        disableAutocomplete();
         bindWizard();
         declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
         attachWatchers();
         applyPrefillFromContext();
+        handleCepLookup(true);
+        updateEmailFeedback({ skipReview: true });
         toggleVinculoDetails();
         togglePcdDetails();
         toggleHeteroDocs();
