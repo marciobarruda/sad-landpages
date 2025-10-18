@@ -2944,56 +2944,6 @@
         const radio = root.querySelector(selector);
         return radio ? radio.value : '';
       }
-      function collectDados(formEl){
-        const scope = formEl || document;
-        const controls = Array.from(scope.querySelectorAll('input, select, textarea'));
-        const dados = {};
-        const radioGroups = new Set();
-        controls.forEach(control => {
-          const name = (control.name || '').trim();
-          if(!name || control.disabled) return;
-          if(name === 'email_confirm') return;
-          if(control.type === 'file') return;
-          if(control.type === 'radio'){
-            if(radioGroups.has(name)) return;
-            radioGroups.add(name);
-            dados[name] = getCheckedRadioValue(scope, name);
-            return;
-          }
-          if(control.type === 'checkbox'){
-            if(control.id === 'termoResponsabilidade'){
-              dados[name] = control.checked ? 'ACEITO' : 'NAO';
-            }else{
-              dados[name] = control.checked ? (control.value !== 'on' ? control.value : 'on') : '';
-            }
-            return;
-          }
-          let value = control.value;
-          if(typeof value === 'string'){
-            value = value.trim();
-          }
-          dados[name] = value;
-        });
-        return dados;
-      }
-      async function buildPayload(formEl){
-        const scope = formEl || document;
-        const dadosRaw = collectDados(scope);
-        const dados = {};
-        Object.keys(dadosRaw).forEach(key => {
-          const value = dadosRaw[key];
-          if(value === '' || value === null || value === undefined) return;
-          dados[key] = value;
-        });
-        const cargoSelect = document.getElementById('cargo');
-        if(cargoSelect){
-          const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
-          if(cargoLabel){
-            dados.cargo_label = cargoLabel;
-          }
-        }
-        return { dados };
-      }
       const INSCRICAO_KEYS = ['inscrição','inscricao','Inscrição','Inscricao','INSCRIÇÃO','INSCRICAO','numero_inscricao','numeroInscricao','inscricao_numero'];
       function pickInscricaoValue(record){
         if(!record || typeof record !== 'object') return '';
@@ -3012,33 +2962,6 @@
         }
         return '';
       }
-      function setSubmitButtonLoading(isLoading){
-        const button = document.getElementById('btnSubmitAll');
-        if(!button) return;
-        if(isLoading){
-          if(!button.dataset.originalHtml){
-            button.dataset.originalHtml = button.innerHTML;
-          }
-          button.disabled = true;
-          button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando…';
-        }else{
-          if(button.dataset.originalHtml){
-            button.innerHTML = button.dataset.originalHtml;
-          }
-          button.disabled = false;
-        }
-      }
-      function showError(message){
-        const statusEl = document.getElementById('finalStatus');
-        if(!statusEl) return;
-        statusEl.innerHTML = '';
-        if(!message) return;
-        const alert = document.createElement('div');
-        alert.className = 'alert alert-danger mb-0 small';
-        alert.setAttribute('role','alert');
-        alert.innerHTML = escapeHtml(message);
-        statusEl.appendChild(alert);
-      }
       async function submitAll(event){
         if(event && typeof event.preventDefault === 'function'){
           event.preventDefault();
@@ -3048,39 +2971,13 @@
           if(message){
             showAlert(message);
           }
+          if(event && typeof event.stopImmediatePropagation === 'function'){
+            event.stopImmediatePropagation();
+          }
           refreshSubmitState();
           return;
         }
-        setSubmitButtonLoading(true);
-        const guardEl = document.getElementById('btnSubmitGuard');
-        if(guardEl){
-          guardEl.classList.add('d-none');
-          guardEl.setAttribute('aria-hidden','true');
-        }
-        showError('');
-        try{
-          const formEl = document.getElementById('formHospVet');
-          if(!formEl){
-            showError('Formulário não encontrado.');
-            return;
-          }
-          let payload;
-          try{
-            payload = await buildPayload(formEl);
-          }catch(error){
-            showError('Erro ao preparar os dados para envio. Tente novamente.');
-            return;
-          }
-          console.warn('[ROLLBACK] Chamada bloqueada: instanciar-se-hospvet');
-          console.info('[ROLLBACK] Dados locais preparados', payload);
-          const statusEl = document.getElementById('finalStatus');
-          if(statusEl){
-            statusEl.innerHTML = '<div class="alert alert-warning mb-0 small" role="status">Envio externo temporariamente desativado nesta versão. Seus dados não foram transmitidos.</div>';
-          }
-        }finally{
-          setSubmitButtonLoading(false);
-          refreshSubmitState();
-        }
+        refreshSubmitState();
       }
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
       const formElement = document.getElementById('formHospVet');
@@ -3146,6 +3043,233 @@
         refreshSubmitState();
       }
       init();
+    </script>
+    <script>
+      // ====== SUBMIT HOSPVET (multipart) ======
+      (() => {
+        const ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/instanciar-se-hospvet";
+        const formEl    = document.querySelector('#formHospVet');
+        const btnSend   = document.querySelector('#btnSubmitAll');
+        const btnGuard  = document.querySelector('#btnSubmitGuard');
+        const statusEl  = document.querySelector('#finalStatus');
+        const logEl     = document.querySelector('#finalOut');
+        const bannerVal = document.querySelector('#inscricaoBannerValue');
+        const appRoot   = document.querySelector('#app');
+
+        if(!formEl || !btnSend) return;
+
+        const esc = (s)=>{ const d=document.createElement('div'); d.innerText=String(s??''); return d.innerHTML; };
+
+        function addToData(store, name, value){
+          if(Object.prototype.hasOwnProperty.call(store, name)){
+            const current = store[name];
+            if(Array.isArray(current)){
+              current.push(value);
+            }else{
+              store[name] = [current, value];
+            }
+          }else{
+            store[name] = value;
+          }
+        }
+
+        function serializeFormToJSON(form){
+          const data = {};
+          const controls = form.querySelectorAll('input, select, textarea');
+          controls.forEach(el => {
+            if(!el.name || el.disabled) return;
+            if(el.name === 'email_confirm') return;
+            const type = (el.type || '').toLowerCase();
+
+            if(type === 'file') return;
+            if(type === 'checkbox'){
+              if(el.id === 'termoResponsabilidade'){
+                data[el.name] = el.checked ? 'ACEITO' : 'NAO';
+              }else{
+                const rawValue = el.value || 'on';
+                data[el.name] = el.checked ? rawValue.trim() : '';
+              }
+              return;
+            }
+            if(type === 'radio'){
+              if(!el.checked) return;
+              data[el.name] = typeof el.value === 'string' ? el.value.trim() : el.value;
+              return;
+            }
+            if(el.tagName.toLowerCase() === 'select' && el.multiple){
+              addToData(data, el.name, Array.from(el.selectedOptions).map(o => (o.value || '').trim()));
+              return;
+            }
+            const value = typeof el.value === 'string' ? el.value.trim() : '';
+            addToData(data, el.name, value);
+          });
+
+          const cargoSelect = form.querySelector('#cargo');
+          const cargoLabel = cargoSelect?.selectedOptions?.[0]?.textContent?.trim();
+          if(cargoLabel){
+            data.cargo_label = cargoLabel;
+          }
+
+          return data;
+        }
+
+        function buildMultipart(form){
+          const fd = new FormData();
+          const json = serializeFormToJSON(form);
+          fd.append('data', JSON.stringify(json));
+
+          const info = [];
+          form.querySelectorAll('input[type="file"][name]').forEach(input => {
+            const field = input.name;
+            Array.from(input.files || []).forEach(file => {
+              if(!file) return;
+              const safe = file.name || `${field}.bin`;
+              const filename = `${field}__${safe}`;
+              fd.append('anexos', file, filename);
+              info.push({ campo: field, filename });
+            });
+          });
+          fd.append('anexos_info', JSON.stringify(info));
+          return fd;
+        }
+
+        function setBusy(busy){
+          if(busy){
+            btnSend.dataset.originalHtml = btnSend.innerHTML;
+            btnSend.dataset.originalClasses = btnSend.className;
+            btnSend.setAttribute('disabled','true');
+            btnSend.classList.remove('btn-success','btn-secondary');
+            btnSend.classList.add('btn-outline-secondary');
+            btnSend.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando…';
+            if(btnGuard){
+              btnGuard.classList.remove('d-none');
+              btnGuard.setAttribute('aria-hidden','false');
+            }
+            if(statusEl){
+              statusEl.innerHTML = `<span class="badge text-bg-secondary">Enviando…</span>`;
+            }
+            if(logEl){
+              logEl.textContent = '';
+              logEl.classList.add('d-none');
+            }
+          }else{
+            btnSend.removeAttribute('disabled');
+            btnSend.classList.remove('btn-outline-secondary');
+            if(btnSend.dataset.originalClasses){
+              btnSend.className = btnSend.dataset.originalClasses;
+            }
+            if(btnSend.dataset.originalHtml){
+              btnSend.innerHTML = btnSend.dataset.originalHtml;
+            }
+            delete btnSend.dataset.originalClasses;
+            delete btnSend.dataset.originalHtml;
+            if(btnGuard){
+              btnGuard.classList.add('d-none');
+              btnGuard.setAttribute('aria-hidden','true');
+            }
+            if(typeof window.refreshSubmitState === 'function'){
+              try{ window.refreshSubmitState(); }catch(_){}
+            }
+          }
+        }
+
+        async function submitHospVet(){
+          const controller = new AbortController();
+          const kill = setTimeout(()=>controller.abort(), 30000);
+
+          setBusy(true);
+          try{
+            const fd = buildMultipart(formEl);
+            const res = await fetch(ENDPOINT, {
+              method: 'POST',
+              body: fd,
+              signal: controller.signal
+            });
+
+            const text = await res.text();
+            let payload = null;
+            try{
+              payload = JSON.parse(text);
+            }catch{
+              payload = null;
+            }
+
+            if(!res.ok){
+              if(statusEl){
+                statusEl.innerHTML = `<span class="badge text-bg-danger">Falha (${res.status})</span>`;
+              }
+              if(logEl){
+                logEl.textContent = text || `HTTP ${res.status}`;
+                logEl.classList.remove('d-none');
+              }
+              return;
+            }
+
+            if(statusEl){
+              statusEl.innerHTML = `<span class="badge text-bg-success">OK</span>`;
+            }
+
+            const protocolo = payload?.inscricao || payload?.protocolo || payload?.numero || payload?.id || '';
+            if(bannerVal){
+              bannerVal.textContent = protocolo ? String(protocolo) : (bannerVal.textContent || '—');
+            }
+
+            const enviado = (() => {
+              const raw = fd.get('data');
+              if(typeof raw === 'string'){
+                try{ return JSON.parse(raw); }catch{ return {}; }
+              }
+              return {};
+            })();
+            const anexosResumo = (() => {
+              const raw = fd.get('anexos_info');
+              if(typeof raw === 'string'){
+                try{ return JSON.parse(raw); }catch{ return []; }
+              }
+              return [];
+            })();
+            const resumoEnviado = { dados: enviado, anexos: anexosResumo };
+
+            if(appRoot){
+              const retorno = payload ? esc(JSON.stringify(payload, null, 2)) : (text ? esc(text) : '');
+              const retornoBlock = retorno ? `<h6 class="mt-3">Retorno do sistema</h6><pre class="json" style="white-space:pre-wrap">${retorno}</pre>` : '';
+              appRoot.innerHTML = `
+                <div class="py-5 text-center">
+                  <h3 class="mb-3">Inscrição enviada</h3>
+                  ${protocolo ? `<p class="mb-1"><strong>Nº inscrição:</strong> ${esc(protocolo)}</p>` : ``}
+                  <p class="text-muted mb-4">Status: ${esc(payload?.status || 'RECEBIDO')}</p>
+                  <div class="mx-auto" style="max-width:880px;text-align:left">
+                    <h6>Resumo enviado</h6>
+                    <pre class="json" style="white-space:pre-wrap">${esc(JSON.stringify(resumoEnviado, null, 2))}</pre>
+                    ${retornoBlock}
+                  </div>
+                </div>`;
+            }
+          }catch(err){
+            const aborted = err && typeof err === 'object' && err.name === 'AbortError';
+            if(statusEl){
+              statusEl.innerHTML = aborted
+                ? `<span class="badge text-bg-danger">Tempo limite excedido (30s)</span>`
+                : `<span class="badge text-bg-danger">Erro de rede/timeout</span>`;
+            }
+            if(logEl){
+              const message = aborted ? 'Tempo limite excedido após 30 segundos.' : String(err?.message || err);
+              logEl.textContent = message;
+              logEl.classList.remove('d-none');
+            }
+          }finally{
+            clearTimeout(kill);
+            setBusy(false);
+          }
+        }
+
+        btnSend.addEventListener('click', submitHospVet);
+        formEl.addEventListener('submit', ev => {
+          ev.preventDefault();
+          submitHospVet();
+        });
+        window.__submitHospVet = submitHospVet;
+      })();
     </script>
   </body>
 </html>
