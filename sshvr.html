@@ -38,9 +38,17 @@
       .form-control[readonly]{ background:#f8f9fa; }
       .review-table td{ vertical-align: top; }
       .review-placeholder{ color:#adb5bd; font-weight:600; letter-spacing:.04em; }
-      .confirm-header{ gap:1rem; }
-      .confirm-code{ font-size:1.75rem; font-weight:800; color:var(--brand); text-align:right; }
+      .confirm-header{ gap:1rem; position:relative; padding-right:1rem; }
+      .confirm-header.has-code{ padding-right:220px; }
+      .confirm-code{ position:absolute; top:1rem; right:1rem; text-align:right; color:#0d6efd; font-weight:700; font-size:1.75rem; }
+      .confirm-code .confirm-code-label{ font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#6c757d; display:block; margin-bottom:.25rem; }
+      .confirm-code .confirm-code-value{ display:block; color:#0d6efd; font-weight:700; font-size:1.75rem; }
       .confirm-summary section:last-child{ margin-bottom:0; }
+      @media (max-width: 768px){
+        .confirm-header{ padding-right:0; }
+        .confirm-header.has-code{ padding-right:0; }
+        .confirm-code{ position:static; margin-top:.75rem; text-align:left; }
+      }
       .frame-card{
         max-width: 1020px;
         background:#ffffff;
@@ -230,12 +238,80 @@
       .submit-guard:focus{ outline:none; }
       .quota-tab-pane{ display:none; }
       .quota-tab-pane.active{ display:block; animation:fadeIn .3s ease; }
+      .inscricao-banner{
+        position:relative;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:1.75rem;
+        border:1px solid #d8e1fb;
+        border-radius:1.5rem;
+        padding:1.35rem 1.75rem;
+        margin-bottom:2.25rem;
+        background:linear-gradient(135deg,#ffffff 0%, #f2f6ff 100%);
+        box-shadow:0 18px 36px rgba(13,110,253,.08);
+      }
+      .inscricao-banner::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        border-radius:inherit;
+        pointer-events:none;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+      }
+      .inscricao-banner-copy{ flex:1; }
+      .inscricao-banner-title{
+        font-weight:700;
+        letter-spacing:.1em;
+        text-transform:uppercase;
+        color:#172a63;
+      }
+      .inscricao-banner-subtitle{ font-size:.95rem; color:#516098; }
+      .inscricao-banner-meta{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:.45rem;
+      }
+      .inscricao-banner-code{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border:1px solid #c5d4fb;
+        border-radius:999px;
+        padding:.65rem 1.75rem;
+        min-width:210px;
+        text-align:center;
+        background:rgba(255,255,255,.85);
+        box-shadow:0 10px 26px rgba(13,110,253,.12);
+      }
+      .inscricao-banner-label{
+        display:block;
+        font-size:.75rem;
+        letter-spacing:.12em;
+        text-transform:uppercase;
+        color:#6a77b4;
+        font-weight:600;
+        text-align:center;
+      }
+      .inscricao-banner-value{
+        display:block;
+        font-weight:700;
+        font-size:1.75rem;
+        color:var(--brand);
+        line-height:1;
+      }
+      .inscricao-banner.inscricao-banner-empty .inscricao-banner-value{ color:#adb5bd; }
       @media (max-width: 992px){
         :root{ --stage-w:100vw; --pattern-w:100vw; }
         .stage, .pattern-strip{ left:0; }
         header.hero{ background-position:center; background-size:cover; }
         body{ overflow-x:hidden; }
         .frame-card{ margin:-60px auto -60px; padding:1.25rem; }
+        .inscricao-banner{ flex-direction:column; align-items:flex-start; padding:1.1rem 1.25rem; gap:1rem; }
+        .inscricao-banner-meta{ align-items:center; width:100%; }
+        .inscricao-banner-code{ align-self:stretch; text-align:center; min-width:auto; border-radius:1.1rem; }
+        .inscricao-banner-label{ text-align:center; }
         .wizard-shell{ padding:1.25rem 1.1rem; }
         .wizard-heading::before{ width:24px; }
         .wizard-steps{
@@ -262,10 +338,12 @@
         .wizard-step{ min-width:150px; }
         .wizard-step .wizard-index{ width:34px; height:34px; }
         .wizard-step .wizard-label{ font-size:.88rem; }
-      .form-tab-pane{ display:none; }
-      .form-tab-pane.active{ display:block; }
+        .form-tab-pane{ display:none; }
+        .form-tab-pane.active{ display:block; }
         .wizard-step::before,
         .wizard-step::after{ top:17px; }
+        .inscricao-banner-code{ padding:.65rem 1.15rem; }
+        .inscricao-banner-value{ font-size:1.55rem; }
       }
     </style>
   </head>
@@ -273,13 +351,23 @@
     <header class="hero stage"></header>
     <div class="pattern-strip pattern-top"></div>
 
-    <main class="container my-4 frame-card" id="app">
-      <div class="text-center mb-4">
-        <h1 class="h4 mb-1">Seleção Simplificada — Hospital Veterinário do Recife</h1>
-        <p class="text-muted subtle">Inscrição on-line</p>
+    <main class="container my-4 frame-card">
+      <div class="inscricao-banner inscricao-banner-empty" id="inscricaoBanner" aria-live="polite">
+        <div class="inscricao-banner-copy">
+          <p class="inscricao-banner-title mb-1">Seleção Simplificada — Hospital Veterinário do Recife</p>
+          <p class="inscricao-banner-subtitle mb-0 text-muted subtle">Inscrição on-line</p>
+        </div>
+        <div class="inscricao-banner-meta">
+          <span class="inscricao-banner-label" id="inscricaoBannerLabel">Nº inscrição</span>
+          <div class="inscricao-banner-code" aria-labelledby="inscricaoBannerLabel">
+            <span class="inscricao-banner-value" id="inscricaoBannerValue">—</span>
+          </div>
+        </div>
       </div>
+      <div id="app">
+        <form id="formHospVet" autocomplete="off" novalidate>
 
-      <div class="wizard-shell">
+        <div class="wizard-shell">
         <h2 class="h6 text-uppercase text-muted wizard-heading mb-3">Etapas da inscrição</h2>
         <p class="tiny text-muted mb-3">Acompanhe o avanço das etapas e navegue rapidamente pelo formulário.</p>
         <ol class="wizard-steps" role="tablist">
@@ -317,7 +405,7 @@
         </div>
       </div>
 
-      <div class="tab-shell">
+        <div class="tab-shell">
         <div class="form-tabs" role="tablist">
           <button type="button" class="form-tab-link active" data-tab-target="0" role="tab" aria-selected="true">Identificação</button>
           <button type="button" class="form-tab-link" data-tab-target="1" role="tab" aria-selected="false">Contato &amp; Endereço</button>
@@ -408,7 +496,11 @@
                   <option>Prefiro não informar</option>
                 </select>
               </div>
-              <div class="col-md-4 col-lg-3 d-none" id="generoOutroCol">
+              <div class="col-md-4 col-lg-6">
+                <label class="form-label" for="nome_social">Nome social</label>
+                <input type="text" id="nome_social" class="form-control" value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}">
+              </div>
+              <div class="col-12 col-lg-6 d-none" id="generoOutroCol">
                 <label class="form-label" for="genero_outro">Informe o gênero</label>
                 <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80" value="{{ String($json.genero_outro ?? '').trim() }}">
               </div>
@@ -432,17 +524,13 @@
               </div>
             </div>
             <div class="row g-3 mt-0">
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label required" for="mae">Nome da mãe</label>
                 <input type="text" id="mae" class="form-control" value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}" required>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label class="form-label" for="pai">Nome do pai</label>
                 <input type="text" id="pai" class="form-control" value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label" for="nome_social">Nome social</label>
-                <input type="text" id="nome_social" class="form-control" value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}">
               </div>
             </div>
           </div>
@@ -485,16 +573,16 @@
             </div>
             <div class="row g-3 mt-0">
               <div class="col-md-4">
-                <label class="form-label" for="titulo">Título de Eleitor</label>
-                <input type="text" id="titulo" class="form-control" inputmode="numeric" maxlength="12">
+                <label class="form-label required" for="titulo">Título de Eleitor</label>
+                <input type="text" id="titulo" class="form-control" inputmode="numeric" maxlength="12" required>
               </div>
               <div class="col-md-4">
-                <label class="form-label" for="zona">Zona</label>
-                <input type="text" id="zona" class="form-control" inputmode="numeric" maxlength="4">
+                <label class="form-label required" for="zona">Zona</label>
+                <input type="text" id="zona" class="form-control" inputmode="numeric" maxlength="4" required>
               </div>
               <div class="col-md-4">
-                <label class="form-label" for="secao">Seção</label>
-                <input type="text" id="secao" class="form-control" inputmode="numeric" maxlength="4">
+                <label class="form-label required" for="secao">Seção</label>
+                <input type="text" id="secao" class="form-control" inputmode="numeric" maxlength="4" required>
               </div>
             </div>
           </div>
@@ -514,9 +602,16 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label required" for="email">E-mail</label>
-                <input type="email" id="email" class="form-control" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
+                <input type="text" id="email" class="form-control" inputmode="email" data-keep-case value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
                 <div class="help tiny" id="emailHelp"></div>
               </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="email_confirm">Confirme o e-mail</label>
+                <input type="text" id="email_confirm" class="form-control" inputmode="email" data-keep-case required>
+                <div class="help tiny" id="emailConfirmHelp"></div>
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
               <div class="col-md-3">
                 <label class="form-label required" for="tel1">Telefone 1</label>
                 <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone1 ?? $json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}" required>
@@ -1013,23 +1108,68 @@
         </div>
       </div>
 
-      <div class="text-center text-muted tiny mb-5">Pré-validações locais. A conferência oficial seguirá o Edital do certame.</div>
+        <div class="text-center text-muted tiny mb-5">Pré-validações locais. A conferência oficial seguirá o Edital do certame.</div>
+        </form>
+      </div>
     </main>
 
     <div class="pattern-strip pattern-bottom"></div>
 
+    <div class="modal fade" id="formAlert" tabindex="-1" aria-labelledby="formAlertTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="formAlertTitle">⚠️ Alerta!</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body" id="formAlertMessage"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       // ========= Config =========
-      const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/instanciar-se-hospvet";
-      const DOC_ID_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/doc-id";
-      const QUITACAO_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/quitacao-eleitoral";
-      const RESIDENCIA_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-residencia";
-      const ESCOLARIDADE_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-escolaridade";
       const DOC_OK_EXT = ['pdf','jpg','jpeg','png'];
       const DOC_MAX_MB = 2;
       const VID_OK_EXT = ['mp4','mov'];
       const VID_MAX_MB = 30;
       const PREFILL = {{ $json ? JSON.stringify($json) : '{}' }};
+
+      function showAlert(message){
+        const modalEl = document.getElementById('formAlert');
+        if(!modalEl || typeof bootstrap === 'undefined' || !bootstrap.Modal){
+          window.alert(String(message ?? ''));
+          return;
+        }
+        const messageEl = modalEl.querySelector('#formAlertMessage');
+        if(messageEl){
+          messageEl.textContent = String(message ?? '');
+        }
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const textInputs = document.querySelectorAll('input[type="text"]:not([data-keep-case])');
+        textInputs.forEach(input => {
+          const enforceUppercase = () => {
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const upper = input.value.toUpperCase();
+            if(upper !== input.value){
+              input.value = upper;
+              if(start != null && end != null){
+                input.setSelectionRange(start, end);
+              }
+            }
+          };
+          enforceUppercase();
+          input.addEventListener('input', enforceUppercase);
+        });
+      });
 
       const recursoWrapper = document.getElementById('recursoWrapper');
       const recursoState = { enabled:false, start:null, end:null };
@@ -1067,12 +1207,180 @@
       const $ = (sel) => document.querySelector(sel);
       const onlyDigits = (s) => (s||'').replace(/\\D+/g, '');
       const esc = s => { const d=document.createElement('div'); d.innerText=s??''; return d.innerHTML||''; };
+      function escapeHtml(value){
+        return esc(value ?? '');
+      }
+      function updateInscricaoBanner(value){
+        const banner = document.getElementById('inscricaoBanner');
+        const badgeValue = document.getElementById('inscricaoBannerValue');
+        if(!banner || !badgeValue) return;
+        const text = typeof value === 'string' ? value.trim() : String(value ?? '').trim();
+        if(text){
+          badgeValue.textContent = text;
+          banner.classList.remove('inscricao-banner-empty');
+        }else{
+          badgeValue.textContent = '—';
+          banner.classList.add('inscricao-banner-empty');
+        }
+      }
       const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/,'$1.$2.$3-$4') : (d||''); };
       const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\\d{5})(\\d{3})/,'$1-$2') : (d||''); };
       const toMB = bytes => Math.round((bytes/1024/1024)*100)/100;
+      const normalizeEmail = value => String(value || '').trim().toLowerCase();
+      function getEmailPair(){
+        return {
+          email: normalizeEmail($('#email')?.value),
+          confirm: normalizeEmail($('#email_confirm')?.value)
+        };
+      }
+      function emailsMatch(){
+        const { email, confirm } = getEmailPair();
+        if(!email || !confirm) return false;
+        return email === confirm;
+      }
+      function normalizeCepData(raw){
+        if(!raw || typeof raw !== 'object') return null;
+        if(raw.erro || raw.error) return null;
+        return {
+          logradouro: raw.logradouro ?? raw.street ?? '',
+          bairro: raw.bairro ?? raw.neighborhood ?? '',
+          cidade: raw.localidade ?? raw.city ?? '',
+          uf: raw.uf ?? raw.state ?? '',
+          complemento: raw.complemento ?? raw.complement ?? ''
+        };
+      }
+      async function fetchCepInfo(value){
+        const cep = onlyDigits(value);
+        if(cep.length !== 8) return null;
+        const urls = [
+          `https://viacep.com.br/ws/${cep}/json/`,
+          `https://brasilapi.com.br/api/cep/v2/${cep}`
+        ];
+        for(const url of urls){
+          try{
+            const res = await fetch(url);
+            if(!res.ok) continue;
+            const data = await res.json();
+            const normalized = normalizeCepData(data);
+            if(normalized) return normalized;
+          }catch(err){
+            continue;
+          }
+        }
+        return null;
+      }
+      function applyCepData(data){
+        if(!data) return;
+        const mappings = [
+          { selector:'#logradouro', value:data.logradouro },
+          { selector:'#bairro', value:data.bairro },
+          { selector:'#cidade', value:data.cidade },
+          { selector:'#uf', value:data.uf },
+          { selector:'#complemento', value:data.complemento }
+        ];
+        mappings.forEach(({selector, value})=>{
+          if(!value) return;
+          const field = $(selector);
+          if(!field) return;
+          const normalized = String(value).trim().toUpperCase();
+          if(!normalized) return;
+          if(!field.value.trim()){
+            field.value = normalized;
+          }
+          ['input','change'].forEach(evt => field.dispatchEvent(new Event(evt,{bubbles:true})));
+        });
+      }
+
+      function disableAutocomplete(){
+        document.querySelectorAll('form').forEach(form => {
+          form.setAttribute('autocomplete','off');
+          form.setAttribute('data-form-type','other');
+        });
+        document.querySelectorAll('input, select, textarea').forEach(field => {
+          const tag = field.tagName.toLowerCase();
+          const type = String(field.getAttribute('type') || '').toLowerCase();
+          const sensitiveTypes = ['text','email','tel','number','search','password'];
+          if(tag === 'textarea' || (tag === 'input' && sensitiveTypes.includes(type))){
+            field.setAttribute('autocomplete','new-password');
+            field.autocomplete = 'new-password';
+          }else{
+            field.setAttribute('autocomplete','off');
+          }
+          field.setAttribute('autocorrect','off');
+          field.setAttribute('autocapitalize','off');
+          field.setAttribute('spellcheck','false');
+          field.setAttribute('aria-autocomplete','none');
+          field.setAttribute('data-lpignore','true');
+          field.setAttribute('data-form-type','other');
+        });
+      }
+
+      function normalizeFieldValue(field, transformer){
+        if(!field) return;
+        const current = field.value ?? '';
+        const next = transformer ? transformer(current) : current;
+        if(next === current) return;
+        let start = null;
+        let end = null;
+        try{
+          start = field.selectionStart;
+          end = field.selectionEnd;
+        }catch(e){ start = end = null; }
+        field.value = next;
+        if(typeof start === 'number' && typeof end === 'number'){
+          try{ field.setSelectionRange(start, end); }catch(e){}
+        }
+        field.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+
+      function applyAutofillNormalization(){
+        const digitConfigs = [
+          { selector:'#cpf', max:11 },
+          { selector:'#rg_numero', max:14 },
+          { selector:'#nis', max:11 },
+          { selector:'#tel1', normalize: fmtPhone },
+          { selector:'#tel2', normalize: fmtPhone },
+          { selector:'#cep', max:8 },
+          { selector:'#ano_conclusao', max:4 },
+          { selector:'#alistamento_numero', max:20 },
+          { selector:'#titulo', max:12 },
+          { selector:'#zona', max:4 },
+          { selector:'#secao', max:4 }
+        ];
+        digitConfigs.forEach(({selector, max, normalize}) => {
+          const field = $(selector);
+          if(!field) return;
+          if(typeof normalize === 'function'){
+            normalizeFieldValue(field, normalize);
+          }else if(typeof max === 'number'){
+            normalizeFieldValue(field, value => onlyDigits(value).slice(0, max));
+          }
+        });
+        document.querySelectorAll('input[type="text"]:not([data-keep-case])').forEach(field => {
+          normalizeFieldValue(field, value => String(value || '').toUpperCase());
+        });
+        updateEmailFeedback({ skipReview: true });
+        refreshSubmitState();
+        updateReview();
+      }
+
+      function scheduleAutofillNormalization(){
+        const queue = [0, 120, 480, 1200];
+        queue.forEach(delay => {
+          setTimeout(()=>{ applyAutofillNormalization(); }, delay);
+        });
+        window.addEventListener('pageshow', () => {
+          setTimeout(()=>{ applyAutofillNormalization(); }, 120);
+        });
+        document.addEventListener('focusin', () => {
+          requestAnimationFrame(()=>{ applyAutofillNormalization(); });
+        });
+        document.addEventListener('change', () => {
+          requestAnimationFrame(()=>{ applyAutofillNormalization(); });
+        }, true);
+      }
 
       // ========= Validators =========
-      function isValidEmail(v){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(String(v||'').trim()); }
       function isValidCPF(cpf){
         cpf = onlyDigits(cpf);
         if(!cpf || cpf.length !== 11) return false;
@@ -1106,50 +1414,6 @@
       const ok = (el,msg='Ok')=>setStatus(el,'success',msg);
       const bad = (el,msg='Inválido')=>setStatus(el,'danger',msg);
 
-      // ========= CEP (ViaCEP + BrasilAPI) =========
-      async function lookupCep(cep){
-        const normalized = onlyDigits(cep);
-        if(normalized.length !== 8) return null;
-        const providers = [
-          async () => {
-            const res = await fetch(`https://viacep.com.br/ws/${normalized}/json/`);
-            if(!res.ok) throw new Error(`ViaCEP HTTP ${res.status}`);
-            const data = await res.json();
-            if(data?.erro) return null;
-            return { logradouro:data.logradouro, bairro:data.bairro, cidade:data.localidade, uf:data.uf };
-          },
-          async () => {
-            const res = await fetch(`https://brasilapi.com.br/api/cep/v1/${normalized}`);
-            if(!res.ok) throw new Error(`BrasilAPI HTTP ${res.status}`);
-            const data = await res.json();
-            if(data?.errors || data?.error || data?.message) return null;
-            return {
-              logradouro: data.street || data.logradouro,
-              bairro: data.neighborhood || data.bairro,
-              cidade: data.city || data.localidade,
-              uf: data.state || data.uf
-            };
-          }
-        ];
-        for(const p of providers){
-          try{ const r=await p(); if(r) return r; }catch(e){ console.warn('CEP provider fail', e); }
-        }
-        return null;
-      }
-      async function autofillAddressByCep(){
-        const cep = onlyDigits($('#cep').value);
-        if(cep.length !== 8) return;
-        const data = await lookupCep(cep);
-        if(!data) return;
-        $('#logradouro').value=String(data.logradouro||'').toUpperCase();
-        $('#bairro').value=String(data.bairro||'').toUpperCase();
-        $('#cidade').value=String(data.cidade||'').toUpperCase();
-        $('#uf').value=(data.uf||'').toUpperCase();
-        updateReview();
-        updateReview();
-        refreshSubmitState();
-      }
-
       // ========= Review =========
       const reviewPlaceholder = '';
       const fmtDateBr = iso => {
@@ -1176,8 +1440,18 @@
         return '';
       };
       const fmtPhone = (value) => {
-        const digits = onlyDigits(value).slice(0,11);
-        return digits;
+        let digits = onlyDigits(value);
+        if(!digits) return '';
+        if(digits.length > 11){
+          digits = digits.slice(-11);
+        }
+        if((digits.length === 10 || digits.length === 11) && digits.startsWith('0')){
+          const trimmed = digits.slice(1);
+          if(trimmed.length >= 10){
+            digits = trimmed;
+          }
+        }
+        return digits.slice(0,11);
       };
       const isValidPhone = (value) => {
         const digits = onlyDigits(value);
@@ -1378,6 +1652,7 @@
         const source = Array.isArray(PREFILL) ? PREFILL[0] : PREFILL;
         const data = source && typeof source === 'object' ? source : null;
         if(!data) return;
+        updateInscricaoBanner(pickInscricaoValue(data));
         const readonlyTargets = new Set([
           '#cpf','#nome','#nasc','#sexo','#nacionalidade','#naturalidade_cidade',
           '#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis'
@@ -1504,10 +1779,6 @@
           field.readOnly = true;
           field.setAttribute('readonly','readonly');
         });
-        const cepDigits = onlyDigits($('#cep')?.value || '');
-        if(!($('#uf')?.value || '').trim() && cepDigits.length === 8){
-          autofillAddressByCep();
-        }
       }
 
       function buildQuotaData(){
@@ -1821,16 +2092,51 @@
         updateQuotaForms();
       }
 
+      function updateEmailFeedback({ skipReview = false } = {}){
+        const emailField = $('#email');
+        const confirmField = $('#email_confirm');
+        const normalizeField = (field) => {
+          if(!field) return '';
+          const { selectionStart, selectionEnd } = field;
+          const normalized = normalizeEmail(field.value);
+          if(field.value !== normalized){
+            field.value = normalized;
+            if(typeof selectionStart === 'number' && typeof selectionEnd === 'number'){
+              try{ field.setSelectionRange(selectionStart, selectionEnd); }catch(e){}
+            }
+          }
+          return normalized;
+        };
+        const emailValue = normalizeField(emailField);
+        const confirmValue = normalizeField(confirmField);
+        const mismatch = emailValue && confirmValue && emailValue !== confirmValue;
+        const confirmHelp = $('#emailConfirmHelp');
+        if(confirmHelp){
+          confirmHelp.textContent = mismatch ? 'Os e-mails informados não coincidem.' : '';
+        }
+        const emailHelp = $('#emailHelp');
+        if(emailHelp){
+          emailHelp.textContent = 'O e-mail será utilizado para contato.';
+        }
+        [emailField, confirmField].forEach(field => {
+          if(field){
+            field.classList.toggle('is-invalid', mismatch);
+          }
+        });
+        if(!skipReview) updateReview();
+        refreshSubmitState();
+      }
+
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','titulo','zona','secao','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
-        if(!isValidEmail($('#email').value)) return false;
         if(!isValidPhone($('#tel1').value)) return false;
         const tel2Val = $('#tel2')?.value || '';
         if(tel2Val && !isValidPhone(tel2Val)) return false;
+        if(!emailsMatch()) return false;
         if((document.getElementById('genero')?.value || '') === 'Outro'){
           if(!String(document.getElementById('genero_outro')?.value || '').trim()) return false;
         }
@@ -1963,96 +2269,171 @@
       }
 
       function focusFirstInvalid(){
-        const ensureField = (selector, validator) => {
-          const field = document.querySelector(selector);
-          if(!field || field.disabled) return true;
-          const ok = validator ? validator(field) : !!String(field.value || '').trim();
-          if(ok) return true;
-          focusElementAndStep(field);
-          return false;
+        const labelFor = (selector) => {
+          const id = selector.startsWith('#') ? selector.slice(1) : selector;
+          const label = id ? document.querySelector(`label[for="${id}"]`) : null;
+          if(label){
+            return label.textContent.replace(/\s*\*\s*$/, '').trim();
+          }
+          return '';
         };
-        const ensureRadio = (name) => {
+        const findGroupLabel = (element) => {
+          if(!element) return '';
+          const wrapper = element.closest('.col-12, .col-md-12, .col-md-9, .col-md-8, .col-md-6, .col-md-4, .col-md-3, .col-lg-6, .col-lg-12, .mb-3, fieldset');
+          const label = wrapper ? wrapper.querySelector('.form-label') : null;
+          if(label){
+            return label.textContent.replace(/\s*\*\s*$/, '').trim();
+          }
+          return '';
+        };
+        const ensureField = (selector, validator, messageBuilder) => {
+          const field = document.querySelector(selector);
+          if(!field || field.disabled) return null;
+          const ok = validator ? validator(field) : !!String(field.value || '').trim();
+          if(ok) return null;
+          focusElementAndStep(field);
+          const label = labelFor(selector);
+          if(typeof messageBuilder === 'function'){
+            return messageBuilder(label, field);
+          }
+          return label ? `Preencha o campo "${label}".` : 'Preencha todos os campos obrigatórios.';
+        };
+        const ensureRadio = (name, messageBuilder) => {
           const radios = Array.from(document.querySelectorAll(`input[name="${name}"]`));
-          if(!radios.length) return true;
-          if(radios.some(r => r.checked)) return true;
+          if(!radios.length) return null;
+          if(radios.some(r => r.checked)) return null;
           focusElementAndStep(radios[0]);
-          return false;
+          const label = findGroupLabel(radios[0]);
+          if(typeof messageBuilder === 'function'){
+            return messageBuilder(label);
+          }
+          return label ? `Selecione uma opção em "${label}".` : 'Selecione uma opção obrigatória.';
         };
         const ensureFile = (selector, opts) => {
           const input = document.querySelector(selector);
-          if(!input || input.disabled) return true;
+          if(!input || input.disabled) return null;
           const res = checkFiles(input, opts);
-          if(res.ok) return true;
+          if(res.ok) return null;
           focusElementAndStep(input);
-          return false;
+          const label = labelFor(selector);
+          const baseMessage = res.msg || 'Verifique os documentos anexados.';
+          return label ? `${label}: ${baseMessage}` : baseMessage;
         };
-        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
+        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','titulo','zona','secao','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
         for(const id of baseIds){
-          if(!ensureField(`#${id}`)) return false;
+          const message = ensureField(`#${id}`);
+          if(message) return message;
         }
-        if(!ensureField('#email', el => { const v = String(el.value||'').trim(); return v && isValidEmail(v); })) return false;
-        if(!ensureField('#tel1', el => { const v = String(el.value||'').trim(); return v && isValidPhone(v); })) return false;
+        const emailMessage = ensureField('#email');
+        if(emailMessage) return emailMessage;
+        const emailConfirmMessage = ensureField('#email_confirm');
+        if(emailConfirmMessage) return emailConfirmMessage;
+        const { email: emailValue, confirm: emailConfirmValue } = getEmailPair();
+        if(emailValue && emailConfirmValue && emailValue !== emailConfirmValue){
+          updateEmailFeedback({ skipReview: true });
+          const confirmField = $('#email_confirm');
+          focusElementAndStep(confirmField);
+          return 'Os e-mails informados não coincidem.';
+        }
+        const tel1Message = ensureField('#tel1', el => {
+          const v = String(el.value||'').trim();
+          return v && isValidPhone(v);
+        }, label => label ? `Informe um telefone válido em "${label}".` : 'Informe um telefone válido com DDD.');
+        if(tel1Message) return tel1Message;
         const tel2 = document.getElementById('tel2');
         if(tel2 && tel2.value && !isValidPhone(tel2.value)){
           focusElementAndStep(tel2);
-          return false;
+          const label = labelFor('#tel2');
+          return label ? `Informe um telefone válido em "${label}".` : 'Informe um telefone válido para contato.';
         }
-        if(!ensureField('#nasc', el => { const v = el.value; return v && isAdult(v); })) return false;
+        const nascMessage = ensureField('#nasc', el => {
+          const v = el.value;
+          return v && isAdult(v);
+        }, () => 'Informe uma data de nascimento válida (maior de 18 anos).');
+        if(nascMessage) return nascMessage;
         if(document.getElementById('genero')?.value === 'Outro'){
-          if(!ensureField('#genero_outro')) return false;
+          const generoOutroMessage = ensureField('#genero_outro');
+          if(generoOutroMessage) return generoOutroMessage;
         }
-        if(!ensureRadio('jurado_funcao')) return false;
+        const juradoMessage = ensureRadio('jurado_funcao');
+        if(juradoMessage) return juradoMessage;
         if(document.getElementById('foi_jurado')?.value === 'SIM'){
-          if(!ensureField('#jurado_periodo')) return false;
+          const periodoMessage = ensureField('#jurado_periodo');
+          if(periodoMessage) return periodoMessage;
         }
-        if(!ensureRadio('vinculo_publico_opcao')) return false;
+        const vinculoMessage = ensureRadio('vinculo_publico_opcao');
+        if(vinculoMessage) return vinculoMessage;
         if(document.getElementById('vinculo_publico')?.value === 'Sim'){
-          if(!ensureField('#qual_vinculo')) return false;
-          if(!ensureField('#experiencia_tempo')) return false;
+          const vinculoDetalhe = ensureField('#qual_vinculo');
+          if(vinculoDetalhe) return vinculoDetalhe;
+          const experienciaMessage = ensureField('#experiencia_tempo');
+          if(experienciaMessage) return experienciaMessage;
         }
-        if(!ensureRadio('condicao_especial')) return false;
+        const condicaoMessage = ensureRadio('condicao_especial');
+        if(condicaoMessage) return condicaoMessage;
         const condicaoEspecial = document.querySelector('input[name="condicao_especial"]:checked');
         if(isGeneroMasculino()){
-          if(!ensureRadio('militar')) return false;
-          if(!ensureField('#alistamento_numero')) return false;
-          if(!ensureField('#alistamento_orgao')) return false;
-          if(!ensureField('#alistamento_data')) return false;
+          const militarMessage = ensureRadio('militar');
+          if(militarMessage) return militarMessage;
+          const alistamentoNumero = ensureField('#alistamento_numero');
+          if(alistamentoNumero) return alistamentoNumero;
+          const alistamentoOrgao = ensureField('#alistamento_orgao');
+          if(alistamentoOrgao) return alistamentoOrgao;
+          const alistamentoData = ensureField('#alistamento_data');
+          if(alistamentoData) return alistamentoData;
         }
         const isPcd = document.getElementById('is_pcd')?.value === 'Sim';
         if(isPcd){
-          if(!ensureField('#tipo_pcd')) return false;
-          if(!ensureField('#necessidade')) return false;
+          const tipoPcd = ensureField('#tipo_pcd');
+          if(tipoPcd) return tipoPcd;
+          const necessidade = ensureField('#necessidade');
+          if(necessidade) return necessidade;
         }else if(condicaoEspecial?.value === 'Sim'){
-          if(!ensureField('#necessidade')) return false;
+          const necessidadeEspecial = ensureField('#necessidade');
+          if(necessidadeEspecial) return necessidadeEspecial;
         }
-        if(!ensureField('#cpf', el => isValidCPF(el.value))) return false;
+        const cpfMessage = ensureField('#cpf', el => isValidCPF(el.value), () => 'Informe um CPF válido.');
+        if(cpfMessage) return cpfMessage;
         if(document.getElementById('foi_jurado')?.value === 'SIM'){
-          if(!ensureFile('#doc_jurado',{required:true})) return false;
+          const juradoFile = ensureFile('#doc_jurado',{required:true});
+          if(juradoFile) return juradoFile;
         }
-        if(!ensureFile('#doc_id_frente',{required:true})) return false;
-        if(!ensureFile('#doc_id_verso',{required:true})) return false;
-        if(!ensureFile('#doc_cpf',{required:true})) return false;
-        if(!ensureFile('#doc_residencia',{required:true})) return false;
-        if(!ensureFile('#doc_quitacao_eleitoral',{required:true})) return false;
+        const docIdFrente = ensureFile('#doc_id_frente',{required:true});
+        if(docIdFrente) return docIdFrente;
+        const docIdVerso = ensureFile('#doc_id_verso',{required:true});
+        if(docIdVerso) return docIdVerso;
+        const docCpf = ensureFile('#doc_cpf',{required:true});
+        if(docCpf) return docCpf;
+        const docResidencia = ensureFile('#doc_residencia',{required:true});
+        if(docResidencia) return docResidencia;
+        const docQuitacao = ensureFile('#doc_quitacao_eleitoral',{required:true});
+        if(docQuitacao) return docQuitacao;
         if(isGeneroMasculino()){
-          if(!ensureFile('#doc_militar',{required:true})) return false;
+          const docMilitar = ensureFile('#doc_militar',{required:true});
+          if(docMilitar) return docMilitar;
         }
-        if(!ensureFile('#doc_escolaridade',{required:true})) return false;
+        const docEscolaridade = ensureFile('#doc_escolaridade',{required:true});
+        if(docEscolaridade) return docEscolaridade;
         if(document.getElementById('cotasPPNI')?.value === 'Sim'){
-          if(!ensureFile('#het_declaracao',{required:true})) return false;
-          if(!ensureFile('#het_video',{video:true, required:true})) return false;
+          const hetDeclaracao = ensureFile('#het_declaracao',{required:true});
+          if(hetDeclaracao) return hetDeclaracao;
+          const hetVideo = ensureFile('#het_video',{video:true, required:true});
+          if(hetVideo) return hetVideo;
         }
         if(isPcd){
-          if(!ensureFile('#pcd_laudo',{required:true})) return false;
-          if(!ensureFile('#pcd_declaracao',{required:true})) return false;
+          const laudo = ensureFile('#pcd_laudo',{required:true});
+          if(laudo) return laudo;
+          const declaracao = ensureFile('#pcd_declaracao',{required:true});
+          if(declaracao) return declaracao;
         }
         for(const cfg of declarationConfigs){
           if(!cfg.checkbox.checked){
             focusElementAndStep(cfg.checkbox);
-            return false;
+            const label = cfg.checkbox.id ? labelFor(`#${cfg.checkbox.id}`) : '';
+            return label ? `Confirme "${label}".` : 'Confirme as declarações obrigatórias.';
           }
         }
-        return true;
+        return null;
       }
 
       function handleStepNav(event){
@@ -2114,7 +2495,7 @@
         if(!input) return;
         const help = helpId ? $(helpId) : null;
         const apply = (value)=>{
-          const digits = onlyDigits(value).slice(0,11);
+          const digits = fmtPhone(value);
           input.value = digits;
           const hasDigits = digits.length > 0;
           const valid = hasDigits ? isValidPhone(digits) : !required;
@@ -2170,6 +2551,37 @@
       bindUppercase('#uf');
       bindUppercase('#alistamento_orgao');
       bindUppercase('#pcd_cid');
+
+      let lastCepLookup = '';
+      let cepLookupToken = 0;
+      async function handleCepLookup(force = false){
+        const cepInput = $('#cep');
+        if(!cepInput) return;
+        const digits = onlyDigits(cepInput.value);
+        if(digits.length !== 8){
+          if(!force){
+            lastCepLookup = '';
+          }
+          return;
+        }
+        if(!force && digits === lastCepLookup) return;
+        const token = ++cepLookupToken;
+        const data = await fetchCepInfo(digits);
+        if(token !== cepLookupToken) return;
+        lastCepLookup = digits;
+        if(data){
+          applyCepData(data);
+        }
+      }
+      const cepField = $('#cep');
+      if(cepField){
+        ['blur','change'].forEach(evt => cepField.addEventListener(evt, ()=>{ handleCepLookup(false); }));
+        cepField.addEventListener('input', ()=>{
+          if(onlyDigits(cepField.value).length === 8){
+            handleCepLookup(false);
+          }
+        });
+      }
 
       function updateDocMilitarStatus(){
         const input = $('#doc_militar');
@@ -2476,29 +2888,24 @@
       nascInput?.addEventListener('change', e=>{
         const value = e.target.value;
         if(value && !isAdult(value)){
-          alert('A inscrição é permitida apenas para maiores de 18 anos.');
+          showAlert('A inscrição é permitida apenas para maiores de 18 anos.');
           e.target.value='';
           e.target.focus();
         }
         refreshSubmitState();
       });
 
-      $('#email').addEventListener('input', e=>{
-        e.target.value = (e.target.value||'').toLowerCase();
-        const v=e.target.value.trim(); const ok=isValidEmail(v);
-        e.target.setCustomValidity(v && !ok ? 'E-mail inválido' : '');
-        $('#emailHelp').textContent = v ? (ok ? '' : 'Informe um e-mail válido.') : '';
-        refreshSubmitState(); updateReview();
-      });
+      const emailInputField = $('#email');
+      emailInputField?.addEventListener('input', ()=>{ updateEmailFeedback(); });
+      emailInputField?.addEventListener('blur', ()=>{ updateEmailFeedback(); });
+      const emailConfirmField = $('#email_confirm');
+      emailConfirmField?.addEventListener('input', ()=>{ updateEmailFeedback(); });
+      emailConfirmField?.addEventListener('blur', ()=>{ updateEmailFeedback(); });
       $('#cpf').addEventListener('input', e=>{
         const ok=isValidCPF(e.target.value);
         $('#cpfHelp').textContent = ok? '' : 'CPF inválido';
         refreshSubmitState();
       });
-
-      // CEP auto-complete
-      $('#cep').addEventListener('blur', autofillAddressByCep);
-      $('#cep').addEventListener('change', autofillAddressByCep);
 
       // Upload validators (badges)
       function bindChecker(inputId, statusId, opts){
@@ -2529,358 +2936,18 @@
       bindChecker('pcd_declaracao','status_pcd_declaracao',()=>({required: $('#is_pcd')?.value === 'Sim'}));
       bindChecker('pcd_exames','status_pcd_exames',{});
 
-      function populateDocIdFields(payload){
-        const entry = Array.isArray(payload)
-          ? payload.find(item => item && typeof item === 'object')
-          : (payload && typeof payload === 'object' ? payload : null);
-        if(!entry) return;
-        const nome = pickDataValue(entry,['nome','nome_completo','name','fullName']);
-        if(nome) applyIfEmpty('#nome', nome);
-        const cpfValue = pickDataValue(entry,['cpf','CPF','cpfNumero']);
-        const cpfDigits = onlyDigits(cpfValue).slice(0,11);
-        const cpfValid = cpfDigits.length === 11 && isValidCPF(cpfDigits);
-        if(cpfValid) applyIfEmpty('#cpf', cpfDigits);
-        const docNumberRaw = pickDataValue(entry,['num_doc']);
-        if(docNumberRaw){
-          const docDigits = onlyDigits(docNumberRaw);
-          if(docDigits){
-            if(!cpfValid && docDigits.length === 11 && isValidCPF(docDigits)){
-              applyIfEmpty('#cpf', docDigits.slice(0,11));
-            }
-            applyIfEmpty('#rg_numero', docDigits.slice(0,14));
-          }else{
-            applyIfEmpty('#rg_numero', docNumberRaw);
-          }
-        }
-        const nascIso = parseToIsoDate(pickDataValue(entry,['data_nascimento','dataNascimento','nascimento','birthDate']));
-        if(nascIso) applyIfEmpty('#nasc', nascIso);
-        const nacionalidade = pickDataValue(entry,['nacionalidade']);
-        if(nacionalidade) applyIfEmpty('#nacionalidade', nacionalidade, v => String(v).toUpperCase());
-        const naturalidadeCidade = pickDataValue(entry,['naturalidade','naturalidade_cidade','cidade_naturalidade']);
-        if(naturalidadeCidade) applyIfEmpty('#naturalidade_cidade', naturalidadeCidade, v => String(v).toUpperCase());
-        const naturalidadeUf = pickDataValue(entry,['naturalidade_uf','uf_naturalidade','naturalidadeUf']);
-        if(naturalidadeUf) applyIfEmpty('#naturalidade_uf', naturalidadeUf, v => String(v).toUpperCase());
-        const rgNumero = pickDataValue(entry,['rg','rg_numero','numero_rg']);
-        if(rgNumero) applyIfEmpty('#rg_numero', onlyDigits(rgNumero).slice(0,14));
-        const rgOrgao = pickDataValue(entry,['rg_orgao','orgao_emissor','orgaoExpedidor','orgao']);
-        if(rgOrgao) applyIfEmpty('#rg_orgao', rgOrgao, v => String(v).toUpperCase());
-        const rgUf = pickDataValue(entry,['rg_uf','uf_rg','uf_doc']);
-        if(rgUf) applyIfEmpty('#rg_uf', rgUf, v => String(v).toUpperCase());
-        const rgData = parseToIsoDate(pickDataValue(entry,['rg_expedicao','data_expedicao','rg_data','exp_doc']));
-        if(rgData) applyIfEmpty('#rg_data', rgData);
-        const pisValue = pickDataValue(entry,['pis','pis_pasep']);
-        if(pisValue) applyIfEmpty('#nis', onlyDigits(pisValue).slice(0,11));
-        updateReview();
-        refreshSubmitState();
-      }
-
-      function populateQuitacaoFields(data){
-        if(!data) return;
-        const titulo = pickDataValue(data,['titulo','titulo_eleitoral','tituloEleitoral']);
-        if(titulo) applyIfEmpty('#titulo', onlyDigits(titulo).slice(0,12));
-        const zona = pickDataValue(data,['zona','zona_eleitoral']);
-        if(zona) applyIfEmpty('#zona', onlyDigits(zona).slice(0,4));
-        const secao = pickDataValue(data,['secao','seção','secao_eleitoral']);
-        if(secao) applyIfEmpty('#secao', onlyDigits(secao).slice(0,4));
-        updateReview();
-        refreshSubmitState();
-      }
-
-      function populateResidenciaFields(data){
-        if(!data) return;
-        const cep = pickDataValue(data,['cep','codigo_postal','postalCode']);
-        if(cep) applyIfEmpty('#cep', onlyDigits(cep).slice(0,8));
-        const logradouro = pickDataValue(data,['logradouro','address','rua','street']);
-        if(logradouro) applyIfEmpty('#logradouro', logradouro, v => String(v).toUpperCase());
-        const numero = pickDataValue(data,['numero','numero_imovel','numeroEndereco']);
-        if(numero) applyIfEmpty('#numero', numero, v => String(v).toUpperCase());
-        const complemento = pickDataValue(data,['complemento','complement']);
-        if(complemento) applyIfEmpty('#complemento', complemento, v => String(v).toUpperCase());
-        const bairro = pickDataValue(data,['bairro','district','bairroEndereco']);
-        if(bairro) applyIfEmpty('#bairro', bairro, v => String(v).toUpperCase());
-        const cidade = pickDataValue(data,['cidade','localidade','municipio','city']);
-        if(cidade) applyIfEmpty('#cidade', cidade, v => String(v).toUpperCase());
-        const uf = pickDataValue(data,['uf','estado','state']);
-        if(uf) applyIfEmpty('#uf', uf, v => String(v).toUpperCase());
-        updateReview();
-        refreshSubmitState();
-        if(cep) autofillAddressByCep();
-      }
-
-      function populateEscolaridadeFields(data){
-        if(!data) return;
-        const nivel = pickDataValue(data,['nivel','nivel_escolaridade','escolaridade']);
-        if(nivel) applyIfEmpty('#nivel', nivel);
-        const instituicao = pickDataValue(data,['instituicao','instituicao_ensino','ies','instituicaoEnsino']);
-        if(instituicao) applyIfEmpty('#ies', instituicao);
-        const curso = pickDataValue(data,['curso','curso_nome','cursoNome']);
-        if(curso) applyIfEmpty('#curso', curso);
-        const ano = pickDataValue(data,['ano','ano_conclusao','anoConclusao']);
-        if(ano) applyIfEmpty('#ano_conclusao', onlyDigits(ano).slice(0,4));
-        updateReview();
-        refreshSubmitState();
-      }
-
-      async function uploadDocIdBundle(){
-        const frente = document.getElementById('doc_id_frente');
-        const verso = document.getElementById('doc_id_verso');
-        const statusVerso = document.getElementById('status_doc_id_verso');
-        if(!frente || !verso || !statusVerso) return;
-        const frontStatus = document.getElementById('status_doc_id_frente');
-        if(!verso.files || verso.files.length === 0){
-          resetUploaderStatus('status_doc_id_verso');
-          refreshSubmitState();
-          return;
-        }
-        if(!frente.files || frente.files.length === 0){
-          if(frontStatus) bad(frontStatus,'Selecione a frente');
-          refreshSubmitState();
-          return;
-        }
-        const frontCheck = checkFiles(frente,{required:true});
-        if(!frontCheck.ok){
-          if(frontStatus) bad(frontStatus, frontCheck.msg);
-          refreshSubmitState();
-          return;
-        }
-        const backCheck = checkFiles(verso,{required:true});
-        if(!backCheck.ok){
-          bad(statusVerso, backCheck.msg);
-          refreshSubmitState();
-          return;
-        }
-        const frontFile = frente.files[0];
-        const backFile = verso.files[0];
-        if(!frontFile || !backFile) return;
-        const fd = new FormData();
-        fd.append('doc_frente', frontFile, frontFile.name);
-        fd.append('doc_verso', backFile, backFile.name);
-        setStatus(statusVerso,'info','Enviando...',true);
-        try{
-          const out = await postForm(DOC_ID_ENDPOINT, fd);
-          if(out.ok){
-            ok(statusVerso,'Enviado');
-            if(frontStatus) ok(frontStatus,'Enviado');
-            populateDocIdFields(out.data || {});
-          }else{
-            bad(statusVerso, `Erro ${out.status}`);
-            if(frontStatus) bad(frontStatus, `Erro ${out.status}`);
-          }
-        }catch(e){
-          console.error('doc-id upload fail', e);
-          bad(statusVerso,'Falha no envio');
-          if(frontStatus) bad(frontStatus,'Falha no envio');
-        }
-        refreshSubmitState();
-      }
-
-      async function uploadSingleDocument(inputId, statusId, endpoint, fileKey, onData){
-        const input=document.getElementById(inputId);
-        const status=document.getElementById(statusId);
-        if(!input || !status) return;
-        if(!input.files || input.files.length === 0){
-          resetUploaderStatus(statusId);
-          refreshSubmitState();
-          return;
-        }
-        const res=checkFiles(input,{required:true});
-        if(!res.ok){ bad(status,res.msg); refreshSubmitState(); return; }
-        const file=input.files[0];
-        if(!file){
-          resetUploaderStatus(statusId);
-          refreshSubmitState();
-          return;
-        }
-        const fd=new FormData();
-        fd.append(fileKey, file, file.name);
-        setStatus(status,'info','Enviando...',true);
-        try{
-          const out=await postForm(endpoint, fd);
-          if(out.ok){
-            ok(status,'Enviado');
-            if(onData && out.data){ onData(out.data); }
-          }else{
-            bad(status, `Erro ${out.status}`);
-          }
-        }catch(e){
-          console.error('upload fail', e);
-          bad(status,'Falha no envio');
-        }
-        refreshSubmitState();
-      }
-
-      document.getElementById('doc_id_verso')?.addEventListener('change', uploadDocIdBundle);
-      document.getElementById('doc_id_frente')?.addEventListener('change', ()=>{
-        const verso = document.getElementById('doc_id_verso');
-        if(verso?.files?.length){
-          uploadDocIdBundle();
-        }
-      });
-      document.getElementById('doc_quitacao_eleitoral')?.addEventListener('change', ()=> uploadSingleDocument('doc_quitacao_eleitoral','status_doc_eleitoral', QUITACAO_ENDPOINT,'doc_quitacao_eleitoral', populateQuitacaoFields));
-      document.getElementById('doc_residencia')?.addEventListener('change', ()=> uploadSingleDocument('doc_residencia','status_doc_res', RESIDENCIA_ENDPOINT,'doc_residencia', populateResidenciaFields));
-      document.getElementById('doc_escolaridade')?.addEventListener('change', ()=> uploadSingleDocument('doc_escolaridade','status_doc_escolaridade', ESCOLARIDADE_ENDPOINT,'doc_escolaridade', populateEscolaridadeFields));
-
       // ========= Build payload & Enviar =========
-      function buildPayload(){
-        const sexoSelect = $('#sexo').value;
-        const generoSelect = $('#genero').value;
-        const generoOutro = $('#genero_outro').value.trim();
-        const cargoSelect = $('#cargo');
-        const cargoValue = cargoSelect?.value || '';
-        const cargoLabel = cargoSelect && cargoSelect.selectedOptions?.length ? cargoSelect.selectedOptions[0].textContent.trim() : '';
-        return {
-          // pessoais
-          nome: $('#nome').value.trim(),
-          nome_social: $('#nome_social').value.trim(),
-          data_nascimento: $('#nasc').value,
-          sexo: sexoSelect,
-          genero: generoSelect,
-          genero_outro: generoSelect === 'Outro' ? generoOutro : '',
-          estado_civil: $('#estado_civil').value,
-          nome_mae: $('#mae').value.trim(),
-          nome_pai: $('#pai').value.trim(),
-          nacionalidade: $('#nacionalidade').value.trim(),
-          naturalidade_cidade: $('#naturalidade_cidade').value.trim(),
-          naturalidade_uf: $('#naturalidade_uf').value.trim().toUpperCase(),
-          rg_numero: $('#rg_numero').value.trim(),
-          rg_orgao: $('#rg_orgao').value.trim().toUpperCase(),
-          rg_uf: $('#rg_uf').value.trim().toUpperCase(),
-          rg_data: $('#rg_data').value,
-          cpf: onlyDigits($('#cpf').value),
-          nis: $('#nis').value.trim(),
-          email: $('#email').value.trim().toLowerCase(),
-          telefone1: onlyDigits($('#tel1').value),
-          telefone2: onlyDigits($('#tel2').value),
-          // endereço
-          cep: onlyDigits($('#cep').value),
-          logradouro: $('#logradouro').value.trim(),
-          numero: $('#numero').value.trim(),
-          complemento: $('#complemento').value.trim(),
-          bairro: $('#bairro').value.trim(),
-          cidade: $('#cidade').value.trim(),
-          uf: $('#uf').value.trim().toUpperCase(),
-          alistamento_numero: $('#alistamento_numero').value.trim(),
-          alistamento_orgao: $('#alistamento_orgao').value.trim().toUpperCase(),
-          alistamento_data: $('#alistamento_data').value,
-          // formação
-          nivel_minimo: $('#nivel').value,
-          ies: $('#ies').value.trim(),
-          curso: $('#curso').value.trim(),
-          ano_conclusao: $('#ano_conclusao').value.trim(),
-          // raça/gênero
-          raca: $('#raca').value,
-          concorrer_ppni: $('#cotasPPNI').value,
-          // pcd
-          is_pcd: $('#is_pcd').value,
-          tipo_pcd: $('#tipo_pcd').value.trim(),
-          pcd_cid: $('#pcd_cid').value.trim(),
-          condicao_especial: document.querySelector('input[name="condicao_especial"]:checked')?.value || '',
-          necessidade: $('#necessidade').value.trim(),
-          // militar/eleitoral
-          militar: document.querySelector('input[name="militar"]:checked')?.value || '',
-          politicos: document.querySelector('input[name="politicos"]:checked')?.value || '',
-          titulo: onlyDigits($('#titulo').value),
-          zona: onlyDigits($('#zona').value),
-          secao: onlyDigits($('#secao').value),
-          // certame
-          cargo: cargoValue,
-          cargo_label: cargoLabel,
-          especialidade: $('#especialidade').value.trim(),
-          foi_jurado: $('#foi_jurado').value,
-          jurado_periodo: $('#jurado_periodo').value.trim(),
-          // vínculos
-          vinculo_publico: $('#vinculo_publico').value,
-          qual_vinculo: $('#qual_vinculo').value.trim(),
-          experiencia_tempo: $('#experiencia_tempo').value.trim(),
-          termo_responsabilidade: responsibilityCheckbox && responsibilityCheckbox.checked ? 'ACEITO' : 'NAO',
-          recurso_tipo: $('#recurso_tipo')?.value || '',
-          recurso_texto: $('#recurso_texto')?.value.trim() || ''
-        };
+      function getCheckedRadioValue(scope, name){
+        const root = scope || document;
+        const escaped = name.replace(/"/g, '\"');
+        const selector = `input[type="radio"][name="${escaped}"]:checked`;
+        const radio = root.querySelector(selector);
+        return radio ? radio.value : '';
       }
-      function getFileExtension(name){
-        const match = /\.([^.]+)$/.exec(name || '');
-        return match ? match[1].toLowerCase() : '';
-      }
-      async function fileToBase64(file){
-        const buffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        const chunkSize = 0x8000;
-        let binary = '';
-        for(let i = 0; i < bytes.length; i += chunkSize){
-          const chunk = bytes.subarray(i, i + chunkSize);
-          binary += String.fromCharCode.apply(null, chunk);
-        }
-        return btoa(binary);
-      }
-      async function collectAttachments(){
-        const defs = [
-          { id:'doc_id_frente', campo:'doc_id_frente' },
-          { id:'doc_id_verso', campo:'doc_id_verso' },
-          { id:'doc_cpf', campo:'doc_cpf' },
-          { id:'doc_residencia', campo:'doc_residencia' },
-          { id:'doc_quitacao_eleitoral', campo:'doc_quitacao_eleitoral' },
-          { id:'doc_militar', campo:'doc_militar' },
-          { id:'doc_jurado', campo:'doc_jurado' },
-          { id:'doc_jurado_440', campo:'doc_jurado_440' },
-          { id:'doc_escolaridade', campo:'doc_escolaridade' },
-          { id:'doc_curriculo', campo:'doc_curriculo' },
-          { id:'het_declaracao', campo:'het_declaracao' },
-          { id:'het_id', campo:'het_id' },
-          { id:'het_frente', campo:'het_frente' },
-          { id:'het_perfil', campo:'het_perfil' },
-          { id:'het_video', campo:'het_video' },
-          { id:'pcd_laudo', campo:'pcd_laudo' },
-          { id:'pcd_declaracao', campo:'pcd_declaracao' },
-          { id:'pcd_exames', campo:'pcd_exames' },
-          { id:'recurso_anexo', campo:'recurso_anexo' }
-        ];
-        const attachments = [];
-        for(const def of defs){
-          const input = document.getElementById(def.id);
-          if(!input || !input.files) continue;
-          const files = Array.from(input.files);
-          for(const file of files){
-            const conteudo = await fileToBase64(file);
-            attachments.push({
-              campo: def.campo,
-              nome: file.name,
-              extensao: getFileExtension(file.name),
-              conteudo
-            });
-          }
-        }
-        return attachments;
-      }
-      async function postForm(url, formData){
-        const res = await fetch(url, { method:'POST', body: formData });
-        const text = await res.text();
-        let data=null; try{ data=JSON.parse(text); }catch(e){}
-        return { ok: res.ok, status: res.status, text, data };
-      }
-      async function postJson(url, payload){
-        const res = await fetch(url, {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const text = await res.text();
-        let data=null; try{ data=JSON.parse(text); }catch(e){}
-        return { ok: res.ok, status: res.status, text, data };
-      }
-      function extractConfirmationRecords(data){
-        if(Array.isArray(data)) return data;
-        if(data && typeof data === 'object'){
-          if(Array.isArray(data.registros)) return data.registros;
-          if(Array.isArray(data.dados)) return data.dados;
-          if(data.dados && typeof data.dados === 'object') return [data.dados];
-          return [data];
-        }
-        return [];
-      }
+      const INSCRICAO_KEYS = ['inscrição','inscricao','Inscrição','Inscricao','INSCRIÇÃO','INSCRICAO','numero_inscricao','numeroInscricao','inscricao_numero'];
       function pickInscricaoValue(record){
         if(!record || typeof record !== 'object') return '';
-        const keys = ['inscrição','inscricao','Inscrição','Inscricao','INSCRIÇÃO','INSCRICAO','numero_inscricao','numeroInscricao','inscricao_numero'];
-        for(const key of keys){
+        for(const key of INSCRICAO_KEYS){
           if(Object.prototype.hasOwnProperty.call(record, key)){
             const value = record[key];
             if(value !== undefined && value !== null){
@@ -2895,119 +2962,59 @@
         }
         return '';
       }
-      function formatConfirmationValue(value){
-        if(value === null || value === undefined) return '<span class="review-placeholder">Sem informação</span>';
-        if(typeof value === 'string'){
-          const trimmed = value.trim();
-          return trimmed ? esc(trimmed) : '<span class="review-placeholder">Sem informação</span>';
+      async function submitAll(event){
+        if(event && typeof event.preventDefault === 'function'){
+          event.preventDefault();
         }
-        if(typeof value === 'number' || typeof value === 'boolean'){
-          return esc(String(value));
-        }
-        if(Array.isArray(value)){
-          if(value.length === 0) return '<span class="review-placeholder">Sem informação</span>';
-          const simple = value.every(item => ['string','number','boolean'].includes(typeof item));
-          if(simple){
-            return value.map(item => esc(String(item))).join(', ');
-          }
-        }
-        try{
-          return `<pre class="json mb-0">${esc(JSON.stringify(value, null, 2))}</pre>`;
-        }catch(e){
-          return esc(String(value));
-        }
-      }
-      function renderConfirmationSection(record, index, total){
-        if(!record || typeof record !== 'object') return '';
-        const entries = Object.entries(record);
-        if(!entries.length) return '';
-        const rows = entries.map(([key,val])=>`
-              <tr>
-                <td width="240"><strong>${esc(humanizeFlag(key))}</strong></td>
-                <td>${formatConfirmationValue(val)}</td>
-              </tr>
-            `).join('');
-        const title = total > 1 ? `Registro ${index + 1}` : 'Dados confirmados';
-        return `
-          <section class="mb-4">
-            <h3 class="h6 section-title mb-2">${esc(title)}</h3>
-            <table class="table table-sm review-table mb-0">
-              <tbody>
-                ${rows}
-              </tbody>
-            </table>
-          </section>
-        `;
-      }
-      function renderConfirmation(result){
-        const app = document.getElementById('app');
-        if(!app) return;
-        const records = extractConfirmationRecords(result);
-        const firstRecord = records[0] || {};
-        const inscricaoValor = pickInscricaoValue(firstRecord) || pickInscricaoValue(result);
-        const sectionsHtml = records.map((record, index)=> renderConfirmationSection(record, index, records.length)).join('') || '<p class="text-muted">Resposta recebida.</p>';
-        app.innerHTML = `
-          <div class="confirm-header d-flex justify-content-between align-items-start mb-4">
-            <div>
-              <h2 class="h4 mb-1">Inscrição enviada</h2>
-              <p class="text-muted mb-0">Confira abaixo os dados retornados pelo sistema.</p>
-            </div>
-            ${inscricaoValor ? `<div class="confirm-code">${esc(inscricaoValor)}</div>` : ''}
-          </div>
-          <div class="confirm-summary">
-            ${sectionsHtml}
-          </div>
-        `;
-      }
-      async function submitAll(){
-        const button = $('#btnSubmitAll');
         if(!isSubmitReady()){
-          focusFirstInvalid();
+          const message = focusFirstInvalid();
+          if(message){
+            showAlert(message);
+          }
+          if(event && typeof event.stopImmediatePropagation === 'function'){
+            event.stopImmediatePropagation();
+          }
           refreshSubmitState();
           return;
         }
-        if(button) button.disabled = true;
-        const guardEl = document.getElementById('btnSubmitGuard');
-        if(guardEl){
-          guardEl.classList.add('d-none');
-          guardEl.setAttribute('aria-hidden','true');
-        }
-        const statusEl = $('#finalStatus');
-        const errorBox = $('#finalOut');
-        if(errorBox){
-          errorBox.textContent='';
-          errorBox.classList.add('d-none');
-        }
-        try{
-          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-secondary">Preparando...</span>';
-          const dados = buildPayload();
-          const anexos = await collectAttachments();
-          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-secondary">Enviando...</span>';
-          const out = await postJson(FINAL_ENDPOINT, { dados, anexos });
-          if(out.ok){
-            renderConfirmation(out.data ?? {});
-          }else{
-            if(statusEl) statusEl.innerHTML = `<span class="badge text-bg-danger">Erro ${out.status || ''}</span>`;
-            if(errorBox){
-              errorBox.textContent = out.text || '';
-              errorBox.classList.remove('d-none');
-            }
-          }
-        }catch(e){
-          if(statusEl) statusEl.innerHTML = '<span class="badge text-bg-danger">Erro de rede</span>';
-          if(errorBox){
-            errorBox.textContent = String(e);
-            errorBox.classList.remove('d-none');
-          }
-        }finally{
-          refreshSubmitState();
-        }
+        refreshSubmitState();
       }
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
+      const formElement = document.getElementById('formHospVet');
+      formElement?.addEventListener('submit', submitAll);
       const submitGuard = document.getElementById('btnSubmitGuard');
-      submitGuard?.addEventListener('click', e=>{ e.preventDefault(); focusFirstInvalid(); });
+      submitGuard?.addEventListener('click', e=>{
+        e.preventDefault();
+        const message = focusFirstInvalid();
+        if(message){
+          showAlert(message);
+        }
+      });
 
       // ========= Init =========
+      function ensureFieldNames(){
+        const overrides = new Map([
+          ['nasc','data_nascimento'],
+          ['mae','nome_mae'],
+          ['pai','nome_pai'],
+          ['tel1','telefone1'],
+          ['tel2','telefone2'],
+          ['nivel','nivel_minimo'],
+          ['cotasPPNI','concorrer_ppni'],
+          ['termoResponsabilidade','termo_responsabilidade']
+        ]);
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+          if(el.name) return;
+          const override = overrides.get(el.id);
+          if(override){
+            el.name = override;
+            return;
+          }
+          if(el.id){
+            el.name = el.id;
+          }
+        });
+      }
       function attachWatchers(){
         const events=['input','change','blur'];
         document.querySelectorAll('input,select,textarea').forEach(el=>{
@@ -3015,10 +3022,15 @@
         });
       }
       function init(){
+        disableAutocomplete();
+        ensureFieldNames();
+        scheduleAutofillNormalization();
         bindWizard();
         declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
         attachWatchers();
         applyPrefillFromContext();
+        handleCepLookup(true);
+        updateEmailFeedback({ skipReview: true });
         toggleVinculoDetails();
         togglePcdDetails();
         toggleHeteroDocs();
@@ -3029,9 +3041,235 @@
         updateResourceAreaVisibility();
         updateReview();
         refreshSubmitState();
-        autofillAddressByCep();
       }
       init();
+    </script>
+    <script>
+      // ====== SUBMIT HOSPVET (multipart) ======
+      (() => {
+        const ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/instanciar-se-hospvet";
+        const formEl    = document.querySelector('#formHospVet');
+        const btnSend   = document.querySelector('#btnSubmitAll');
+        const btnGuard  = document.querySelector('#btnSubmitGuard');
+        const statusEl  = document.querySelector('#finalStatus');
+        const logEl     = document.querySelector('#finalOut');
+        const bannerVal = document.querySelector('#inscricaoBannerValue');
+        const appRoot   = document.querySelector('#app');
+
+        if(!formEl || !btnSend) return;
+
+        const esc = (s)=>{ const d=document.createElement('div'); d.innerText=String(s??''); return d.innerHTML; };
+
+        function addToData(store, name, value){
+          if(Object.prototype.hasOwnProperty.call(store, name)){
+            const current = store[name];
+            if(Array.isArray(current)){
+              current.push(value);
+            }else{
+              store[name] = [current, value];
+            }
+          }else{
+            store[name] = value;
+          }
+        }
+
+        function serializeFormToJSON(form){
+          const data = {};
+          const controls = form.querySelectorAll('input, select, textarea');
+          controls.forEach(el => {
+            if(!el.name || el.disabled) return;
+            if(el.name === 'email_confirm') return;
+            const type = (el.type || '').toLowerCase();
+
+            if(type === 'file') return;
+            if(type === 'checkbox'){
+              if(el.id === 'termoResponsabilidade'){
+                data[el.name] = el.checked ? 'ACEITO' : 'NAO';
+              }else{
+                const rawValue = el.value || 'on';
+                data[el.name] = el.checked ? rawValue.trim() : '';
+              }
+              return;
+            }
+            if(type === 'radio'){
+              if(!el.checked) return;
+              data[el.name] = typeof el.value === 'string' ? el.value.trim() : el.value;
+              return;
+            }
+            if(el.tagName.toLowerCase() === 'select' && el.multiple){
+              addToData(data, el.name, Array.from(el.selectedOptions).map(o => (o.value || '').trim()));
+              return;
+            }
+            const value = typeof el.value === 'string' ? el.value.trim() : '';
+            addToData(data, el.name, value);
+          });
+
+          const cargoSelect = form.querySelector('#cargo');
+          const cargoLabel = cargoSelect?.selectedOptions?.[0]?.textContent?.trim();
+          if(cargoLabel){
+            data.cargo_label = cargoLabel;
+          }
+
+          return data;
+        }
+
+        function buildMultipart(form){
+          const fd = new FormData();
+          const json = serializeFormToJSON(form);
+          fd.append('data', JSON.stringify(json));
+
+          const info = [];
+          form.querySelectorAll('input[type="file"][name]').forEach(input => {
+            const field = input.name;
+            Array.from(input.files || []).forEach(file => {
+              if(!file) return;
+              const safe = file.name || `${field}.bin`;
+              const filename = `${field}__${safe}`;
+              fd.append('anexos', file, filename);
+              info.push({ campo: field, filename });
+            });
+          });
+          fd.append('anexos_info', JSON.stringify(info));
+          return fd;
+        }
+
+        function setBusy(busy){
+          if(busy){
+            btnSend.dataset.originalHtml = btnSend.innerHTML;
+            btnSend.dataset.originalClasses = btnSend.className;
+            btnSend.setAttribute('disabled','true');
+            btnSend.classList.remove('btn-success','btn-secondary');
+            btnSend.classList.add('btn-outline-secondary');
+            btnSend.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando…';
+            if(btnGuard){
+              btnGuard.classList.remove('d-none');
+              btnGuard.setAttribute('aria-hidden','false');
+            }
+            if(statusEl){
+              statusEl.innerHTML = `<span class="badge text-bg-secondary">Enviando…</span>`;
+            }
+            if(logEl){
+              logEl.textContent = '';
+              logEl.classList.add('d-none');
+            }
+          }else{
+            btnSend.removeAttribute('disabled');
+            btnSend.classList.remove('btn-outline-secondary');
+            if(btnSend.dataset.originalClasses){
+              btnSend.className = btnSend.dataset.originalClasses;
+            }
+            if(btnSend.dataset.originalHtml){
+              btnSend.innerHTML = btnSend.dataset.originalHtml;
+            }
+            delete btnSend.dataset.originalClasses;
+            delete btnSend.dataset.originalHtml;
+            if(btnGuard){
+              btnGuard.classList.add('d-none');
+              btnGuard.setAttribute('aria-hidden','true');
+            }
+            if(typeof window.refreshSubmitState === 'function'){
+              try{ window.refreshSubmitState(); }catch(_){}
+            }
+          }
+        }
+
+        async function submitHospVet(){
+          const controller = new AbortController();
+          const kill = setTimeout(()=>controller.abort(), 30000);
+
+          setBusy(true);
+          try{
+            const fd = buildMultipart(formEl);
+            const res = await fetch(ENDPOINT, {
+              method: 'POST',
+              body: fd,
+              signal: controller.signal
+            });
+
+            const text = await res.text();
+            let payload = null;
+            try{
+              payload = JSON.parse(text);
+            }catch{
+              payload = null;
+            }
+
+            if(!res.ok){
+              if(statusEl){
+                statusEl.innerHTML = `<span class="badge text-bg-danger">Falha (${res.status})</span>`;
+              }
+              if(logEl){
+                logEl.textContent = text || `HTTP ${res.status}`;
+                logEl.classList.remove('d-none');
+              }
+              return;
+            }
+
+            if(statusEl){
+              statusEl.innerHTML = `<span class="badge text-bg-success">OK</span>`;
+            }
+
+            const protocolo = payload?.inscricao || payload?.protocolo || payload?.numero || payload?.id || '';
+            if(bannerVal){
+              bannerVal.textContent = protocolo ? String(protocolo) : (bannerVal.textContent || '—');
+            }
+
+            const enviado = (() => {
+              const raw = fd.get('data');
+              if(typeof raw === 'string'){
+                try{ return JSON.parse(raw); }catch{ return {}; }
+              }
+              return {};
+            })();
+            const anexosResumo = (() => {
+              const raw = fd.get('anexos_info');
+              if(typeof raw === 'string'){
+                try{ return JSON.parse(raw); }catch{ return []; }
+              }
+              return [];
+            })();
+            const resumoEnviado = { dados: enviado, anexos: anexosResumo };
+
+            if(appRoot){
+              const retorno = payload ? esc(JSON.stringify(payload, null, 2)) : (text ? esc(text) : '');
+              const retornoBlock = retorno ? `<h6 class="mt-3">Retorno do sistema</h6><pre class="json" style="white-space:pre-wrap">${retorno}</pre>` : '';
+              appRoot.innerHTML = `
+                <div class="py-5 text-center">
+                  <h3 class="mb-3">Inscrição enviada</h3>
+                  ${protocolo ? `<p class="mb-1"><strong>Nº inscrição:</strong> ${esc(protocolo)}</p>` : ``}
+                  <p class="text-muted mb-4">Status: ${esc(payload?.status || 'RECEBIDO')}</p>
+                  <div class="mx-auto" style="max-width:880px;text-align:left">
+                    <h6>Resumo enviado</h6>
+                    <pre class="json" style="white-space:pre-wrap">${esc(JSON.stringify(resumoEnviado, null, 2))}</pre>
+                    ${retornoBlock}
+                  </div>
+                </div>`;
+            }
+          }catch(err){
+            const aborted = err && typeof err === 'object' && err.name === 'AbortError';
+            if(statusEl){
+              statusEl.innerHTML = aborted
+                ? `<span class="badge text-bg-danger">Tempo limite excedido (30s)</span>`
+                : `<span class="badge text-bg-danger">Erro de rede/timeout</span>`;
+            }
+            if(logEl){
+              const message = aborted ? 'Tempo limite excedido após 30 segundos.' : String(err?.message || err);
+              logEl.textContent = message;
+              logEl.classList.remove('d-none');
+            }
+          }finally{
+            clearTimeout(kill);
+            setBusy(false);
+          }
+        }
+
+        btnSend.addEventListener('click', submitHospVet);
+        formEl.addEventListener('submit', ev => {
+          ev.preventDefault();
+          submitHospVet();
+        });
+        window.__submitHospVet = submitHospVet;
+      })();
     </script>
   </body>
 </html>
