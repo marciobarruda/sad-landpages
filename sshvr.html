@@ -1132,7 +1132,6 @@
 
     <script>
       // ========= Config =========
-      const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/instanciar-se-hospvet";
       const DOC_OK_EXT = ['pdf','jpg','jpeg','png'];
       const DOC_MAX_MB = 2;
       const VID_OK_EXT = ['mp4','mov'];
@@ -2938,42 +2937,6 @@
       bindChecker('pcd_exames','status_pcd_exames',{});
 
       // ========= Build payload & Enviar =========
-      function getFileExtension(name){
-        const match = /(\.[^.]+)$/.exec(name || '');
-        return match ? match[1].toLowerCase() : '';
-      }
-      async function readFileAsBase64(file){
-        const buffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        const chunkSize = 0x8000;
-        let binary = '';
-        for(let i = 0; i < bytes.length; i += chunkSize){
-          const chunk = bytes.subarray(i, i + chunkSize);
-          binary += String.fromCharCode.apply(null, chunk);
-        }
-        return btoa(binary);
-      }
-      async function collectAttachmentsBase64(formEl){
-        const scope = formEl || document;
-        const inputs = Array.from(scope.querySelectorAll('input[type="file"]'));
-        const anexos = [];
-        for(const input of inputs){
-          if(!input || input.disabled) continue;
-          const campo = (input.name || '').trim();
-          if(!campo || !input.files || input.files.length === 0) continue;
-          const files = Array.from(input.files);
-          for(const file of files){
-            const conteudo = await readFileAsBase64(file);
-            anexos.push({
-              campo,
-              nome: file.name,
-              extensao: getFileExtension(file.name),
-              conteudo
-            });
-          }
-        }
-        return anexos;
-      }
       function getCheckedRadioValue(scope, name){
         const root = scope || document;
         const escaped = name.replace(/"/g, '\"');
@@ -3029,22 +2992,7 @@
             dados.cargo_label = cargoLabel;
           }
         }
-        const anexos = await collectAttachmentsBase64(scope);
-        const payload = { dados };
-        if(anexos.length){
-          payload.anexos = anexos;
-        }
-        return payload;
-      }
-      function extractConfirmationRecords(data){
-        if(Array.isArray(data)) return data;
-        if(data && typeof data === 'object'){
-          if(Array.isArray(data.registros)) return data.registros;
-          if(Array.isArray(data.dados)) return data.dados;
-          if(data.dados && typeof data.dados === 'object') return [data.dados];
-          return [data];
-        }
-        return [];
+        return { dados };
       }
       const INSCRICAO_KEYS = ['inscrição','inscricao','Inscrição','Inscricao','INSCRIÇÃO','INSCRICAO','numero_inscricao','numeroInscricao','inscricao_numero'];
       function pickInscricaoValue(record){
@@ -3063,84 +3011,6 @@
           if(nested) return nested;
         }
         return '';
-      }
-      function formatConfirmationValue(value){
-        if(value === null || value === undefined) return '<span class="review-placeholder">Sem informação</span>';
-        if(typeof value === 'string'){
-          const trimmed = value.trim();
-          return trimmed ? esc(trimmed) : '<span class="review-placeholder">Sem informação</span>';
-        }
-        if(typeof value === 'number' || typeof value === 'boolean'){
-          return esc(String(value));
-        }
-        if(Array.isArray(value)){
-          if(value.length === 0) return '<span class="review-placeholder">Sem informação</span>';
-          const simple = value.every(item => ['string','number','boolean'].includes(typeof item));
-          if(simple){
-            return value.map(item => esc(String(item))).join(', ');
-          }
-        }
-        try{
-          return `<pre class="json mb-0">${esc(JSON.stringify(value, null, 2))}</pre>`;
-        }catch(e){
-          return esc(String(value));
-        }
-      }
-      function renderConfirmacao(result){
-        const app = document.getElementById('app');
-        if(!app) return;
-        const records = extractConfirmationRecords(result);
-        const baseRecord = (records[0] && typeof records[0] === 'object') ? records[0] : (result && typeof result === 'object' ? result : {});
-        const inscricaoValor = pickInscricaoValue(baseRecord) || pickInscricaoValue(result);
-        if(inscricaoValor){
-          updateInscricaoBanner(inscricaoValor);
-        }
-        const sectionsHtml = (records.length ? records : [baseRecord]).map((record, index, arr)=>{
-          if(!record || typeof record !== 'object') return '';
-          const entries = Object.entries(record).filter(([key])=> !INSCRICAO_KEYS.includes(key) && key !== 'anexos');
-          if(!entries.length) return '';
-          const rows = entries.map(([key,val])=>`
-                <tr>
-                  <td width="240"><strong>${esc(humanizeFlag(key))}</strong></td>
-                  <td>${formatConfirmationValue(val)}</td>
-                </tr>
-              `).join('');
-          const total = arr.length;
-          const title = total > 1 ? `Registro ${index + 1}` : 'Dados confirmados';
-          return `
-            <section class="mb-4">
-              <h3 class="h6 section-title mb-2">${esc(title)}</h3>
-              <table class="table table-sm review-table mb-0">
-                <tbody>
-                  ${rows}
-                </tbody>
-              </table>
-            </section>
-          `;
-        }).join('') || '<p class="text-muted">Resposta recebida.</p>';
-        const codeMarkup = inscricaoValor ? `
-          <div class="confirm-code">
-            <span class="confirm-code-label">Inscrição</span>
-            <span class="confirm-code-value">${esc(inscricaoValor)}</span>
-          </div>
-        ` : '';
-        const headerClass = inscricaoValor ? 'card-header confirm-header has-code' : 'card-header confirm-header';
-        app.innerHTML = `
-          <div class="card card-form">
-            <div class="${headerClass}">
-              <div>
-                <h2 class="h4 mb-1">Inscrição enviada</h2>
-                <p class="text-muted mb-0">Confira abaixo os dados retornados pelo sistema.</p>
-              </div>
-              ${codeMarkup}
-            </div>
-            <div class="card-body">
-              <div class="confirm-summary">
-                ${sectionsHtml}
-              </div>
-            </div>
-          </div>
-        `;
       }
       function setSubmitButtonLoading(isLoading){
         const button = document.getElementById('btnSubmitAll');
@@ -3201,49 +3071,11 @@
             showError('Erro ao preparar os dados para envio. Tente novamente.');
             return;
           }
-          if(payload && payload.dados){
-            const cargoSelect = document.getElementById('cargo');
-            if(cargoSelect){
-              const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
-              if(cargoLabel){
-                payload.dados.cargo_label = cargoLabel;
-              }
-            }
-          }
-          try{
-            const response = await fetch(FINAL_ENDPOINT, {
-              method:'POST',
-              mode:'cors',
-              body: JSON.stringify(payload)
-            });
-            if(!response.ok){
-              const errorText = (await response.text()).trim();
-              const fallback = (response.statusText || '').trim();
-              const message = errorText || fallback || 'Resposta inválida.';
-              showError(`Erro no envio: ${message}`);
-              return;
-            }
-            let data = null;
-            try{
-              data = await response.json();
-            }catch(e){
-              data = null;
-            }
-            showError('');
-            if(data){
-              const records = extractConfirmationRecords(data);
-              const baseRecord = (records[0] && typeof records[0] === 'object') ? records[0] : (data && typeof data === 'object' ? data : {});
-              const inscricaoValor = pickInscricaoValue(baseRecord) || pickInscricaoValue(data);
-              if(inscricaoValor){
-                updateInscricaoBanner(inscricaoValor);
-              }
-            }
-            const statusEl = document.getElementById('finalStatus');
-            if(statusEl){
-              statusEl.innerHTML = '<div class="alert alert-success mb-0 small" role="status">Dados enviados com sucesso.</div>';
-            }
-          }catch(error){
-            showError('Erro de rede ao enviar. Tente novamente.');
+          console.warn('[ROLLBACK] Chamada bloqueada: instanciar-se-hospvet');
+          console.info('[ROLLBACK] Dados locais preparados', payload);
+          const statusEl = document.getElementById('finalStatus');
+          if(statusEl){
+            statusEl.innerHTML = '<div class="alert alert-warning mb-0 small" role="status">Envio externo temporariamente desativado nesta versão. Seus dados não foram transmitidos.</div>';
           }
         }finally{
           setSubmitButtonLoading(false);
