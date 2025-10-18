@@ -3020,8 +3020,7 @@
           const cargoLabel = cargoSelect.selectedOptions?.[0]?.textContent?.trim() || '';
           dados.cargo_label = cargoLabel;
         }
-        const anexos = await collectAttachmentsBase64(scope);
-        return { dados, anexos };
+        return { dados };
       }
       function extractConfirmationRecords(data){
         if(Array.isArray(data)) return data;
