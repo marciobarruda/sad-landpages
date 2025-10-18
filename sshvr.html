@@ -1018,6 +1018,21 @@
 
     <div class="pattern-strip pattern-bottom"></div>
 
+    <div class="modal fade" id="formAlert" tabindex="-1" aria-labelledby="formAlertTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="formAlertTitle">⚠️ Alerta!</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body" id="formAlertMessage"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       // ========= Config =========
       const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/instanciar-se-hospvet";
@@ -1026,6 +1041,20 @@
       const VID_OK_EXT = ['mp4','mov'];
       const VID_MAX_MB = 30;
       const PREFILL = {{ $json ? JSON.stringify($json) : '{}' }};
+
+      function showAlert(message){
+        const modalEl = document.getElementById('formAlert');
+        if(!modalEl || typeof bootstrap === 'undefined' || !bootstrap.Modal){
+          window.alert(String(message ?? ''));
+          return;
+        }
+        const messageEl = modalEl.querySelector('#formAlertMessage');
+        if(messageEl){
+          messageEl.textContent = String(message ?? '');
+        }
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+      }
 
       document.addEventListener('DOMContentLoaded', () => {
         const textInputs = document.querySelectorAll('input[type="text"]');
@@ -2511,7 +2540,7 @@
       nascInput?.addEventListener('change', e=>{
         const value = e.target.value;
         if(value && !isAdult(value)){
-          alert('A inscrição é permitida apenas para maiores de 18 anos.');
+          showAlert('A inscrição é permitida apenas para maiores de 18 anos.');
           e.target.value='';
           e.target.focus();
         }
@@ -2798,7 +2827,7 @@
         if(!isSubmitReady()){
           const message = focusFirstInvalid();
           if(message){
-            alert(message);
+            showAlert(message);
           }
           refreshSubmitState();
           return;
@@ -2846,7 +2875,7 @@
         e.preventDefault();
         const message = focusFirstInvalid();
         if(message){
-          alert(message);
+          showAlert(message);
         }
       });
 
