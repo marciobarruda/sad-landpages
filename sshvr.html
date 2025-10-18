@@ -408,6 +408,10 @@
                   <option>Prefiro não informar</option>
                 </select>
               </div>
+              <div class="col-md-4 col-lg-3">
+                <label class="form-label" for="nome_social">Nome social</label>
+                <input type="text" id="nome_social" class="form-control" value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}">
+              </div>
               <div class="col-md-4 col-lg-3 d-none" id="generoOutroCol">
                 <label class="form-label" for="genero_outro">Informe o gênero</label>
                 <input type="text" id="genero_outro" class="form-control" placeholder="Descreva o gênero" maxlength="80" value="{{ String($json.genero_outro ?? '').trim() }}">
@@ -439,10 +443,6 @@
               <div class="col-md-4">
                 <label class="form-label" for="pai">Nome do pai</label>
                 <input type="text" id="pai" class="form-control" value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label" for="nome_social">Nome social</label>
-                <input type="text" id="nome_social" class="form-control" value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}">
               </div>
             </div>
           </div>
@@ -1021,10 +1021,6 @@
     <script>
       // ========= Config =========
       const FINAL_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/instanciar-se-hospvet";
-      const DOC_ID_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/doc-id";
-      const QUITACAO_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/quitacao-eleitoral";
-      const RESIDENCIA_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-residencia";
-      const ESCOLARIDADE_ENDPOINT = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/comprovante-escolaridade";
       const DOC_OK_EXT = ['pdf','jpg','jpeg','png'];
       const DOC_MAX_MB = 2;
       const VID_OK_EXT = ['mp4','mov'];
@@ -1124,50 +1120,6 @@
       }
       const ok = (el,msg='Ok')=>setStatus(el,'success',msg);
       const bad = (el,msg='Inválido')=>setStatus(el,'danger',msg);
-
-      // ========= CEP (ViaCEP + BrasilAPI) =========
-      async function lookupCep(cep){
-        const normalized = onlyDigits(cep);
-        if(normalized.length !== 8) return null;
-        const providers = [
-          async () => {
-            const res = await fetch(`https://viacep.com.br/ws/${normalized}/json/`);
-            if(!res.ok) throw new Error(`ViaCEP HTTP ${res.status}`);
-            const data = await res.json();
-            if(data?.erro) return null;
-            return { logradouro:data.logradouro, bairro:data.bairro, cidade:data.localidade, uf:data.uf };
-          },
-          async () => {
-            const res = await fetch(`https://brasilapi.com.br/api/cep/v1/${normalized}`);
-            if(!res.ok) throw new Error(`BrasilAPI HTTP ${res.status}`);
-            const data = await res.json();
-            if(data?.errors || data?.error || data?.message) return null;
-            return {
-              logradouro: data.street || data.logradouro,
-              bairro: data.neighborhood || data.bairro,
-              cidade: data.city || data.localidade,
-              uf: data.state || data.uf
-            };
-          }
-        ];
-        for(const p of providers){
-          try{ const r=await p(); if(r) return r; }catch(e){ console.warn('CEP provider fail', e); }
-        }
-        return null;
-      }
-      async function autofillAddressByCep(){
-        const cep = onlyDigits($('#cep').value);
-        if(cep.length !== 8) return;
-        const data = await lookupCep(cep);
-        if(!data) return;
-        $('#logradouro').value=String(data.logradouro||'').toUpperCase();
-        $('#bairro').value=String(data.bairro||'').toUpperCase();
-        $('#cidade').value=String(data.cidade||'').toUpperCase();
-        $('#uf').value=(data.uf||'').toUpperCase();
-        updateReview();
-        updateReview();
-        refreshSubmitState();
-      }
 
       // ========= Review =========
       const reviewPlaceholder = '';
@@ -1523,10 +1475,6 @@
           field.readOnly = true;
           field.setAttribute('readonly','readonly');
         });
-        const cepDigits = onlyDigits($('#cep')?.value || '');
-        if(!($('#uf')?.value || '').trim() && cepDigits.length === 8){
-          autofillAddressByCep();
-        }
       }
 
       function buildQuotaData(){
@@ -1846,7 +1794,6 @@
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
-        if(!isValidEmail($('#email').value)) return false;
         if(!isValidPhone($('#tel1').value)) return false;
         const tel2Val = $('#tel2')?.value || '';
         if(tel2Val && !isValidPhone(tel2Val)) return false;
@@ -1982,96 +1929,165 @@
       }
 
       function focusFirstInvalid(){
-        const ensureField = (selector, validator) => {
-          const field = document.querySelector(selector);
-          if(!field || field.disabled) return true;
-          const ok = validator ? validator(field) : !!String(field.value || '').trim();
-          if(ok) return true;
-          focusElementAndStep(field);
-          return false;
+        const labelFor = (selector) => {
+          const id = selector.startsWith('#') ? selector.slice(1) : selector;
+          const label = id ? document.querySelector(`label[for="${id}"]`) : null;
+          if(label){
+            return label.textContent.replace(/\s*\*\s*$/, '').trim();
+          }
+          return '';
         };
-        const ensureRadio = (name) => {
+        const findGroupLabel = (element) => {
+          if(!element) return '';
+          const wrapper = element.closest('.col-12, .col-md-12, .col-md-9, .col-md-8, .col-md-6, .col-md-4, .col-md-3, .col-lg-6, .col-lg-12, .mb-3, fieldset');
+          const label = wrapper ? wrapper.querySelector('.form-label') : null;
+          if(label){
+            return label.textContent.replace(/\s*\*\s*$/, '').trim();
+          }
+          return '';
+        };
+        const ensureField = (selector, validator, messageBuilder) => {
+          const field = document.querySelector(selector);
+          if(!field || field.disabled) return null;
+          const ok = validator ? validator(field) : !!String(field.value || '').trim();
+          if(ok) return null;
+          focusElementAndStep(field);
+          const label = labelFor(selector);
+          if(typeof messageBuilder === 'function'){
+            return messageBuilder(label, field);
+          }
+          return label ? `Preencha o campo "${label}".` : 'Preencha todos os campos obrigatórios.';
+        };
+        const ensureRadio = (name, messageBuilder) => {
           const radios = Array.from(document.querySelectorAll(`input[name="${name}"]`));
-          if(!radios.length) return true;
-          if(radios.some(r => r.checked)) return true;
+          if(!radios.length) return null;
+          if(radios.some(r => r.checked)) return null;
           focusElementAndStep(radios[0]);
-          return false;
+          const label = findGroupLabel(radios[0]);
+          if(typeof messageBuilder === 'function'){
+            return messageBuilder(label);
+          }
+          return label ? `Selecione uma opção em "${label}".` : 'Selecione uma opção obrigatória.';
         };
         const ensureFile = (selector, opts) => {
           const input = document.querySelector(selector);
-          if(!input || input.disabled) return true;
+          if(!input || input.disabled) return null;
           const res = checkFiles(input, opts);
-          if(res.ok) return true;
+          if(res.ok) return null;
           focusElementAndStep(input);
-          return false;
+          const label = labelFor(selector);
+          const baseMessage = res.msg || 'Verifique os documentos anexados.';
+          return label ? `${label}: ${baseMessage}` : baseMessage;
         };
         const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
         for(const id of baseIds){
-          if(!ensureField(`#${id}`)) return false;
+          const message = ensureField(`#${id}`);
+          if(message) return message;
         }
-        if(!ensureField('#email', el => { const v = String(el.value||'').trim(); return v && isValidEmail(v); })) return false;
-        if(!ensureField('#tel1', el => { const v = String(el.value||'').trim(); return v && isValidPhone(v); })) return false;
+        const emailMessage = ensureField('#email', el => {
+          const v = String(el.value||'').trim();
+          return v && isValidEmail(v);
+        }, () => 'Informe um e-mail válido.');
+        if(emailMessage) return emailMessage;
+        const tel1Message = ensureField('#tel1', el => {
+          const v = String(el.value||'').trim();
+          return v && isValidPhone(v);
+        }, label => label ? `Informe um telefone válido em "${label}".` : 'Informe um telefone válido com DDD.');
+        if(tel1Message) return tel1Message;
         const tel2 = document.getElementById('tel2');
         if(tel2 && tel2.value && !isValidPhone(tel2.value)){
           focusElementAndStep(tel2);
-          return false;
+          const label = labelFor('#tel2');
+          return label ? `Informe um telefone válido em "${label}".` : 'Informe um telefone válido para contato.';
         }
-        if(!ensureField('#nasc', el => { const v = el.value; return v && isAdult(v); })) return false;
+        const nascMessage = ensureField('#nasc', el => {
+          const v = el.value;
+          return v && isAdult(v);
+        }, () => 'Informe uma data de nascimento válida (maior de 18 anos).');
+        if(nascMessage) return nascMessage;
         if(document.getElementById('genero')?.value === 'Outro'){
-          if(!ensureField('#genero_outro')) return false;
+          const generoOutroMessage = ensureField('#genero_outro');
+          if(generoOutroMessage) return generoOutroMessage;
         }
-        if(!ensureRadio('jurado_funcao')) return false;
+        const juradoMessage = ensureRadio('jurado_funcao');
+        if(juradoMessage) return juradoMessage;
         if(document.getElementById('foi_jurado')?.value === 'SIM'){
-          if(!ensureField('#jurado_periodo')) return false;
+          const periodoMessage = ensureField('#jurado_periodo');
+          if(periodoMessage) return periodoMessage;
         }
-        if(!ensureRadio('vinculo_publico_opcao')) return false;
+        const vinculoMessage = ensureRadio('vinculo_publico_opcao');
+        if(vinculoMessage) return vinculoMessage;
         if(document.getElementById('vinculo_publico')?.value === 'Sim'){
-          if(!ensureField('#qual_vinculo')) return false;
-          if(!ensureField('#experiencia_tempo')) return false;
+          const vinculoDetalhe = ensureField('#qual_vinculo');
+          if(vinculoDetalhe) return vinculoDetalhe;
+          const experienciaMessage = ensureField('#experiencia_tempo');
+          if(experienciaMessage) return experienciaMessage;
         }
-        if(!ensureRadio('condicao_especial')) return false;
+        const condicaoMessage = ensureRadio('condicao_especial');
+        if(condicaoMessage) return condicaoMessage;
         const condicaoEspecial = document.querySelector('input[name="condicao_especial"]:checked');
         if(isGeneroMasculino()){
-          if(!ensureRadio('militar')) return false;
-          if(!ensureField('#alistamento_numero')) return false;
-          if(!ensureField('#alistamento_orgao')) return false;
-          if(!ensureField('#alistamento_data')) return false;
+          const militarMessage = ensureRadio('militar');
+          if(militarMessage) return militarMessage;
+          const alistamentoNumero = ensureField('#alistamento_numero');
+          if(alistamentoNumero) return alistamentoNumero;
+          const alistamentoOrgao = ensureField('#alistamento_orgao');
+          if(alistamentoOrgao) return alistamentoOrgao;
+          const alistamentoData = ensureField('#alistamento_data');
+          if(alistamentoData) return alistamentoData;
         }
         const isPcd = document.getElementById('is_pcd')?.value === 'Sim';
         if(isPcd){
-          if(!ensureField('#tipo_pcd')) return false;
-          if(!ensureField('#necessidade')) return false;
+          const tipoPcd = ensureField('#tipo_pcd');
+          if(tipoPcd) return tipoPcd;
+          const necessidade = ensureField('#necessidade');
+          if(necessidade) return necessidade;
         }else if(condicaoEspecial?.value === 'Sim'){
-          if(!ensureField('#necessidade')) return false;
+          const necessidadeEspecial = ensureField('#necessidade');
+          if(necessidadeEspecial) return necessidadeEspecial;
         }
-        if(!ensureField('#cpf', el => isValidCPF(el.value))) return false;
+        const cpfMessage = ensureField('#cpf', el => isValidCPF(el.value), () => 'Informe um CPF válido.');
+        if(cpfMessage) return cpfMessage;
         if(document.getElementById('foi_jurado')?.value === 'SIM'){
-          if(!ensureFile('#doc_jurado',{required:true})) return false;
+          const juradoFile = ensureFile('#doc_jurado',{required:true});
+          if(juradoFile) return juradoFile;
         }
-        if(!ensureFile('#doc_id_frente',{required:true})) return false;
-        if(!ensureFile('#doc_id_verso',{required:true})) return false;
-        if(!ensureFile('#doc_cpf',{required:true})) return false;
-        if(!ensureFile('#doc_residencia',{required:true})) return false;
-        if(!ensureFile('#doc_quitacao_eleitoral',{required:true})) return false;
+        const docIdFrente = ensureFile('#doc_id_frente',{required:true});
+        if(docIdFrente) return docIdFrente;
+        const docIdVerso = ensureFile('#doc_id_verso',{required:true});
+        if(docIdVerso) return docIdVerso;
+        const docCpf = ensureFile('#doc_cpf',{required:true});
+        if(docCpf) return docCpf;
+        const docResidencia = ensureFile('#doc_residencia',{required:true});
+        if(docResidencia) return docResidencia;
+        const docQuitacao = ensureFile('#doc_quitacao_eleitoral',{required:true});
+        if(docQuitacao) return docQuitacao;
         if(isGeneroMasculino()){
-          if(!ensureFile('#doc_militar',{required:true})) return false;
+          const docMilitar = ensureFile('#doc_militar',{required:true});
+          if(docMilitar) return docMilitar;
         }
-        if(!ensureFile('#doc_escolaridade',{required:true})) return false;
+        const docEscolaridade = ensureFile('#doc_escolaridade',{required:true});
+        if(docEscolaridade) return docEscolaridade;
         if(document.getElementById('cotasPPNI')?.value === 'Sim'){
-          if(!ensureFile('#het_declaracao',{required:true})) return false;
-          if(!ensureFile('#het_video',{video:true, required:true})) return false;
+          const hetDeclaracao = ensureFile('#het_declaracao',{required:true});
+          if(hetDeclaracao) return hetDeclaracao;
+          const hetVideo = ensureFile('#het_video',{video:true, required:true});
+          if(hetVideo) return hetVideo;
         }
         if(isPcd){
-          if(!ensureFile('#pcd_laudo',{required:true})) return false;
-          if(!ensureFile('#pcd_declaracao',{required:true})) return false;
+          const laudo = ensureFile('#pcd_laudo',{required:true});
+          if(laudo) return laudo;
+          const declaracao = ensureFile('#pcd_declaracao',{required:true});
+          if(declaracao) return declaracao;
         }
         for(const cfg of declarationConfigs){
           if(!cfg.checkbox.checked){
             focusElementAndStep(cfg.checkbox);
-            return false;
+            const label = cfg.checkbox.id ? labelFor(`#${cfg.checkbox.id}`) : '';
+            return label ? `Confirme "${label}".` : 'Confirme as declarações obrigatórias.';
           }
         }
-        return true;
+        return null;
       }
 
       function handleStepNav(event){
@@ -2515,10 +2531,6 @@
         refreshSubmitState();
       });
 
-      // CEP auto-complete
-      $('#cep').addEventListener('blur', autofillAddressByCep);
-      $('#cep').addEventListener('change', autofillAddressByCep);
-
       // Upload validators (badges)
       function bindChecker(inputId, statusId, opts){
         const input=document.getElementById(inputId);
@@ -2547,197 +2559,6 @@
       bindChecker('pcd_laudo','status_pcd_laudo',()=>({required: $('#is_pcd')?.value === 'Sim'}));
       bindChecker('pcd_declaracao','status_pcd_declaracao',()=>({required: $('#is_pcd')?.value === 'Sim'}));
       bindChecker('pcd_exames','status_pcd_exames',{});
-
-      function populateDocIdFields(payload){
-        const entry = Array.isArray(payload)
-          ? payload.find(item => item && typeof item === 'object')
-          : (payload && typeof payload === 'object' ? payload : null);
-        if(!entry) return;
-        const nome = pickDataValue(entry,['nome','nome_completo','name','fullName']);
-        if(nome) applyIfEmpty('#nome', nome);
-        const cpfValue = pickDataValue(entry,['cpf','CPF','cpfNumero']);
-        const cpfDigits = onlyDigits(cpfValue).slice(0,11);
-        const cpfValid = cpfDigits.length === 11 && isValidCPF(cpfDigits);
-        if(cpfValid) applyIfEmpty('#cpf', cpfDigits);
-        const docNumberRaw = pickDataValue(entry,['num_doc']);
-        if(docNumberRaw){
-          const docDigits = onlyDigits(docNumberRaw);
-          if(docDigits){
-            if(!cpfValid && docDigits.length === 11 && isValidCPF(docDigits)){
-              applyIfEmpty('#cpf', docDigits.slice(0,11));
-            }
-            applyIfEmpty('#rg_numero', docDigits.slice(0,14));
-          }else{
-            applyIfEmpty('#rg_numero', docNumberRaw);
-          }
-        }
-        const nascIso = parseToIsoDate(pickDataValue(entry,['data_nascimento','dataNascimento','nascimento','birthDate']));
-        if(nascIso) applyIfEmpty('#nasc', nascIso);
-        const nacionalidade = pickDataValue(entry,['nacionalidade']);
-        if(nacionalidade) applyIfEmpty('#nacionalidade', nacionalidade, v => String(v).toUpperCase());
-        const naturalidadeCidade = pickDataValue(entry,['naturalidade','naturalidade_cidade','cidade_naturalidade']);
-        if(naturalidadeCidade) applyIfEmpty('#naturalidade_cidade', naturalidadeCidade, v => String(v).toUpperCase());
-        const naturalidadeUf = pickDataValue(entry,['naturalidade_uf','uf_naturalidade','naturalidadeUf']);
-        if(naturalidadeUf) applyIfEmpty('#naturalidade_uf', naturalidadeUf, v => String(v).toUpperCase());
-        const rgNumero = pickDataValue(entry,['rg','rg_numero','numero_rg']);
-        if(rgNumero) applyIfEmpty('#rg_numero', onlyDigits(rgNumero).slice(0,14));
-        const rgOrgao = pickDataValue(entry,['rg_orgao','orgao_emissor','orgaoExpedidor','orgao']);
-        if(rgOrgao) applyIfEmpty('#rg_orgao', rgOrgao, v => String(v).toUpperCase());
-        const rgUf = pickDataValue(entry,['rg_uf','uf_rg','uf_doc']);
-        if(rgUf) applyIfEmpty('#rg_uf', rgUf, v => String(v).toUpperCase());
-        const rgData = parseToIsoDate(pickDataValue(entry,['rg_expedicao','data_expedicao','rg_data','exp_doc']));
-        if(rgData) applyIfEmpty('#rg_data', rgData);
-        const pisValue = pickDataValue(entry,['pis','pis_pasep']);
-        if(pisValue) applyIfEmpty('#nis', onlyDigits(pisValue).slice(0,11));
-        updateReview();
-        refreshSubmitState();
-      }
-
-      function populateQuitacaoFields(data){
-        if(!data) return;
-        const titulo = pickDataValue(data,['titulo','titulo_eleitoral','tituloEleitoral']);
-        if(titulo) applyIfEmpty('#titulo', onlyDigits(titulo).slice(0,12));
-        const zona = pickDataValue(data,['zona','zona_eleitoral']);
-        if(zona) applyIfEmpty('#zona', onlyDigits(zona).slice(0,4));
-        const secao = pickDataValue(data,['secao','seção','secao_eleitoral']);
-        if(secao) applyIfEmpty('#secao', onlyDigits(secao).slice(0,4));
-        updateReview();
-        refreshSubmitState();
-      }
-
-      function populateResidenciaFields(data){
-        if(!data) return;
-        const cep = pickDataValue(data,['cep','codigo_postal','postalCode']);
-        if(cep) applyIfEmpty('#cep', onlyDigits(cep).slice(0,8));
-        const logradouro = pickDataValue(data,['logradouro','address','rua','street']);
-        if(logradouro) applyIfEmpty('#logradouro', logradouro, v => String(v).toUpperCase());
-        const numero = pickDataValue(data,['numero','numero_imovel','numeroEndereco']);
-        if(numero) applyIfEmpty('#numero', numero, v => String(v).toUpperCase());
-        const complemento = pickDataValue(data,['complemento','complement']);
-        if(complemento) applyIfEmpty('#complemento', complemento, v => String(v).toUpperCase());
-        const bairro = pickDataValue(data,['bairro','district','bairroEndereco']);
-        if(bairro) applyIfEmpty('#bairro', bairro, v => String(v).toUpperCase());
-        const cidade = pickDataValue(data,['cidade','localidade','municipio','city']);
-        if(cidade) applyIfEmpty('#cidade', cidade, v => String(v).toUpperCase());
-        const uf = pickDataValue(data,['uf','estado','state']);
-        if(uf) applyIfEmpty('#uf', uf, v => String(v).toUpperCase());
-        updateReview();
-        refreshSubmitState();
-        if(cep) autofillAddressByCep();
-      }
-
-      function populateEscolaridadeFields(data){
-        if(!data) return;
-        const nivel = pickDataValue(data,['nivel','nivel_escolaridade','escolaridade']);
-        if(nivel) applyIfEmpty('#nivel', nivel);
-        const instituicao = pickDataValue(data,['instituicao','instituicao_ensino','ies','instituicaoEnsino']);
-        if(instituicao) applyIfEmpty('#ies', instituicao);
-        const curso = pickDataValue(data,['curso','curso_nome','cursoNome']);
-        if(curso) applyIfEmpty('#curso', curso);
-        const ano = pickDataValue(data,['ano','ano_conclusao','anoConclusao']);
-        if(ano) applyIfEmpty('#ano_conclusao', onlyDigits(ano).slice(0,4));
-        updateReview();
-        refreshSubmitState();
-      }
-
-      async function uploadDocIdBundle(){
-        const frente = document.getElementById('doc_id_frente');
-        const verso = document.getElementById('doc_id_verso');
-        const statusVerso = document.getElementById('status_doc_id_verso');
-        if(!frente || !verso || !statusVerso) return;
-        const frontStatus = document.getElementById('status_doc_id_frente');
-        if(!verso.files || verso.files.length === 0){
-          resetUploaderStatus('status_doc_id_verso');
-          refreshSubmitState();
-          return;
-        }
-        if(!frente.files || frente.files.length === 0){
-          if(frontStatus) bad(frontStatus,'Selecione a frente');
-          refreshSubmitState();
-          return;
-        }
-        const frontCheck = checkFiles(frente,{required:true});
-        if(!frontCheck.ok){
-          if(frontStatus) bad(frontStatus, frontCheck.msg);
-          refreshSubmitState();
-          return;
-        }
-        const backCheck = checkFiles(verso,{required:true});
-        if(!backCheck.ok){
-          bad(statusVerso, backCheck.msg);
-          refreshSubmitState();
-          return;
-        }
-        const frontFile = frente.files[0];
-        const backFile = verso.files[0];
-        if(!frontFile || !backFile) return;
-        const fd = new FormData();
-        fd.append('doc_frente', frontFile, frontFile.name);
-        fd.append('doc_verso', backFile, backFile.name);
-        setStatus(statusVerso,'info','Enviando...',true);
-        try{
-          const out = await postForm(DOC_ID_ENDPOINT, fd);
-          if(out.ok){
-            ok(statusVerso,'Enviado');
-            if(frontStatus) ok(frontStatus,'Enviado');
-            populateDocIdFields(out.data || {});
-          }else{
-            bad(statusVerso, `Erro ${out.status}`);
-            if(frontStatus) bad(frontStatus, `Erro ${out.status}`);
-          }
-        }catch(e){
-          console.error('doc-id upload fail', e);
-          bad(statusVerso,'Falha no envio');
-          if(frontStatus) bad(frontStatus,'Falha no envio');
-        }
-        refreshSubmitState();
-      }
-
-      async function uploadSingleDocument(inputId, statusId, endpoint, fileKey, onData){
-        const input=document.getElementById(inputId);
-        const status=document.getElementById(statusId);
-        if(!input || !status) return;
-        if(!input.files || input.files.length === 0){
-          resetUploaderStatus(statusId);
-          refreshSubmitState();
-          return;
-        }
-        const res=checkFiles(input,{required:true});
-        if(!res.ok){ bad(status,res.msg); refreshSubmitState(); return; }
-        const file=input.files[0];
-        if(!file){
-          resetUploaderStatus(statusId);
-          refreshSubmitState();
-          return;
-        }
-        const fd=new FormData();
-        fd.append(fileKey, file, file.name);
-        setStatus(status,'info','Enviando...',true);
-        try{
-          const out=await postForm(endpoint, fd);
-          if(out.ok){
-            ok(status,'Enviado');
-            if(onData && out.data){ onData(out.data); }
-          }else{
-            bad(status, `Erro ${out.status}`);
-          }
-        }catch(e){
-          console.error('upload fail', e);
-          bad(status,'Falha no envio');
-        }
-        refreshSubmitState();
-      }
-
-      document.getElementById('doc_id_verso')?.addEventListener('change', uploadDocIdBundle);
-      document.getElementById('doc_id_frente')?.addEventListener('change', ()=>{
-        const verso = document.getElementById('doc_id_verso');
-        if(verso?.files?.length){
-          uploadDocIdBundle();
-        }
-      });
-      document.getElementById('doc_quitacao_eleitoral')?.addEventListener('change', ()=> uploadSingleDocument('doc_quitacao_eleitoral','status_doc_eleitoral', QUITACAO_ENDPOINT,'doc_quitacao_eleitoral', populateQuitacaoFields));
-      document.getElementById('doc_residencia')?.addEventListener('change', ()=> uploadSingleDocument('doc_residencia','status_doc_res', RESIDENCIA_ENDPOINT,'doc_residencia', populateResidenciaFields));
-      document.getElementById('doc_escolaridade')?.addEventListener('change', ()=> uploadSingleDocument('doc_escolaridade','status_doc_escolaridade', ESCOLARIDADE_ENDPOINT,'doc_escolaridade', populateEscolaridadeFields));
 
       // ========= Build payload & Enviar =========
       function buildPayload(){
@@ -2870,12 +2691,6 @@
         }
         return attachments;
       }
-      async function postForm(url, formData){
-        const res = await fetch(url, { method:'POST', body: formData });
-        const text = await res.text();
-        let data=null; try{ data=JSON.parse(text); }catch(e){}
-        return { ok: res.ok, status: res.status, text, data };
-      }
       async function postJson(url, payload){
         const res = await fetch(url, {
           method:'POST',
@@ -2981,7 +2796,10 @@
       async function submitAll(){
         const button = $('#btnSubmitAll');
         if(!isSubmitReady()){
-          focusFirstInvalid();
+          const message = focusFirstInvalid();
+          if(message){
+            alert(message);
+          }
           refreshSubmitState();
           return;
         }
@@ -3024,7 +2842,13 @@
       }
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
       const submitGuard = document.getElementById('btnSubmitGuard');
-      submitGuard?.addEventListener('click', e=>{ e.preventDefault(); focusFirstInvalid(); });
+      submitGuard?.addEventListener('click', e=>{
+        e.preventDefault();
+        const message = focusFirstInvalid();
+        if(message){
+          alert(message);
+        }
+      });
 
       // ========= Init =========
       function attachWatchers(){
@@ -3048,7 +2872,6 @@
         updateResourceAreaVisibility();
         updateReview();
         refreshSubmitState();
-        autofillAddressByCep();
       }
       init();
     </script>
