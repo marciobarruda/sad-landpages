@@ -204,7 +204,7 @@
     </style>
   </head>
   <body>
-    <input type="hidden" id="authorization" value="{{ $('Webhook').item.json.headers.authorization }}" />
+    <input type="hidden" id="authorization" value="{{ $('Code in JavaScript2').item.json.authorization }}" />
     <header class="site-header">
       <div class="container">
         <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
@@ -383,9 +383,9 @@
           fetch(targetUrl, {
             method: "POST",
             headers: {
-              "Content-Type": "text/plain;charset=UTF-8",
+              "Content-Type": "application/json",
             },
-            body: authorization,
+            body: JSON.stringify({ authorization: authorization }),
           })
             .catch(function (error) {
               console.error("Falha ao enviar autorização:", error);
