@@ -215,19 +215,6 @@
         box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.15);
       }
 
-      .wizard-step.completed .wizard-index::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 8px;
-        right: 8px;
-        height: 2px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.85);
-        transform: translateY(-50%);
-        z-index: 1;
-      }
-
       .wizard-step.active::before,
       .wizard-step.active::after {
         background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
@@ -377,6 +364,90 @@
         color: #34518a;
       }
 
+      .upload-row {
+        --upload-min-height: 220px;
+      }
+
+      .upload-card {
+        border: 2px dashed rgba(17, 37, 82, 0.18);
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.75);
+        padding: 1.5rem 1.25rem;
+        min-height: var(--upload-min-height);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 0.75rem;
+        position: relative;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+
+      .upload-card.required::after {
+        content: "Obrigatório";
+        position: absolute;
+        top: 0.75rem;
+        right: 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #c2410c;
+      }
+
+      .upload-card .upload-emoji {
+        font-size: 2.4rem;
+        line-height: 1;
+      }
+
+      .upload-card .upload-title {
+        font-weight: 700;
+        color: #132b63;
+      }
+
+      .upload-card .upload-instruction {
+        font-size: 0.85rem;
+        color: #5061a2;
+        margin-bottom: 0;
+      }
+
+      .upload-card .upload-input {
+        display: none;
+      }
+
+      .upload-card .upload-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.45rem 1.35rem;
+        border-radius: 999px;
+        background: var(--brand);
+        color: #ffffff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        text-decoration: none;
+      }
+
+      .upload-card .upload-button:hover,
+      .upload-card .upload-button:focus {
+        background: var(--brand-dark);
+        color: #ffffff;
+      }
+
+      .upload-card .upload-filename {
+        font-size: 0.8rem;
+        color: #1a73e8;
+        word-break: break-word;
+      }
+
+      .upload-card.has-file {
+        border-color: rgba(26, 115, 232, 0.65);
+        background: rgba(232, 240, 254, 0.45);
+      }
+
       .hidden {
         display: none !important;
       }
@@ -489,6 +560,12 @@
         action="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/83d7be28-a3ca-4aca-80be-13155dd4d497"
         enctype="multipart/form-data"
       >
+        <input
+          type="hidden"
+          id="initialAuthorization"
+          name="authorization"
+          value="{{ String($json.authorization ?? $json.Authorization ?? '') }}"
+        />
         <section class="card step-card" data-step-panel="0">
           <div class="card-header">
             <h2>Identificação do candidato</h2>
@@ -994,15 +1071,33 @@
                     value="{{ String($json.especialidade ?? '').trim().toUpperCase() }}"
                   />
                 </div>
-                <div class="col-md-4" data-prefill-radio="{{ String($json.militar ?? '').trim().toUpperCase() }}">
+                <div
+                  class="col-md-4 hidden"
+                  id="militarGroup"
+                  data-prefill-radio="{{ String($json.militar ?? '').trim().toUpperCase() }}"
+                >
                   <span class="form-label required">Serviço militar obrigatório quitado?</span>
                   <div class="d-flex gap-3">
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="militar" id="militar_sim" value="SIM" required />
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="militar"
+                        id="militar_sim"
+                        value="SIM"
+                        data-force-required="true"
+                      />
                       <label class="form-check-label" for="militar_sim">Sim</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="militar" id="militar_nao" value="NAO" required />
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="militar"
+                        id="militar_nao"
+                        value="NAO"
+                        data-force-required="true"
+                      />
                       <label class="form-check-label" for="militar_nao">Não</label>
                     </div>
                   </div>
@@ -1144,7 +1239,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-3 hidden" id="qualVinculoGroup">
+                <div class="col-12 hidden" id="qualVinculoGroup">
                   <label for="qual_vinculo" class="form-label">Qual vínculo?</label>
                   <input
                     type="text"
@@ -1153,9 +1248,10 @@
                     name="qual_vinculo"
                     value="{{ String($json.qual_vinculo ?? '').trim().toUpperCase() }}"
                     oninput="this.value = this.value.toUpperCase();"
+                    data-force-required="true"
                   />
                 </div>
-                <div class="col-md-3 hidden" id="vinculoCargoGroup">
+                <div class="col-12 hidden" id="vinculoCargoGroup">
                   <label for="vinculo_cargo" class="form-label">Cargo</label>
                   <input
                     type="text"
@@ -1164,9 +1260,10 @@
                     name="vinculo_cargo"
                     value="{{ String($json.vinculo_cargo ?? '').trim().toUpperCase() }}"
                     oninput="this.value = this.value.toUpperCase();"
+                    data-force-required="true"
                   />
                 </div>
-                <div class="col-md-3 hidden" id="vinculoOrgaoGroup">
+                <div class="col-12 hidden" id="vinculoOrgaoGroup">
                   <label for="vinculo_orgao" class="form-label">Órgão</label>
                   <input
                     type="text"
@@ -1175,16 +1272,18 @@
                     name="vinculo_orgao"
                     value="{{ String($json.vinculo_orgao ?? '').trim().toUpperCase() }}"
                     oninput="this.value = this.value.toUpperCase();"
+                    data-force-required="true"
                   />
                 </div>
-                <div class="col-md-3 hidden" id="vinculoTempoGroup">
+                <div class="col-12 hidden" id="vinculoTempoGroup">
                   <label for="vinculo_tempo_servico" class="form-label">Tempo de serviço</label>
                   <input
                     type="text"
                     class="form-control"
                     id="vinculo_tempo_servico"
                     name="vinculo_tempo_servico"
-                    value="{{ String($json.vinculo_tempo_servico ?? '').trim() }}"
+                    value="{{ String($json.vinculo_tempo ?? $json.vinculo_tempo_servico ?? '').trim() }}"
+                    data-force-required="true"
                   />
                 </div>
               </div>
@@ -1230,18 +1329,39 @@
                   <span class="form-label">Necessita de condição especial?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_sim" value="Sim" />
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="condicao_especial"
+                        id="condicao_especial_sim"
+                        value="Sim"
+                        data-force-required="true"
+                      />
                       <label class="form-check-label" for="condicao_especial_sim">Sim</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_nao" value="Não" />
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="condicao_especial"
+                        id="condicao_especial_nao"
+                        value="Não"
+                        data-force-required="true"
+                      />
                       <label class="form-check-label" for="condicao_especial_nao">Não</label>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-6 hidden" id="tipoPcdGroup">
                   <label for="tipo_pcd" class="form-label">Tipo de deficiência</label>
-                  <input type="text" class="form-control" id="tipo_pcd" name="tipo_pcd" value="{{ String($json.tipo_pcd ?? '').trim() }}" />
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="tipo_pcd"
+                    name="tipo_pcd"
+                    value="{{ String($json.tipo_pcd ?? '').trim() }}"
+                    data-force-required="true"
+                  />
                 </div>
                 <div class="col-md-6 hidden" id="pcdCidGroup">
                   <label for="pcd_cid" class="form-label">CID (se houver)</label>
@@ -1249,109 +1369,360 @@
                 </div>
                 <div class="col-12 hidden" id="necessidadeGroup">
                   <label for="necessidade" class="form-label">Descreva a necessidade</label>
-                  <textarea class="form-control" id="necessidade" name="necessidade" rows="2" placeholder="Informe recursos ou adaptações necessários">{{ String($json.necessidade ?? $json.specialNeedDescription ?? '').trim() }}</textarea>
+                  <textarea
+                    class="form-control"
+                    id="necessidade"
+                    name="necessidade"
+                    rows="2"
+                    placeholder="Informe recursos ou adaptações necessários"
+                    data-force-required="true"
+                  >{{ String($json.necessidade ?? $json.specialNeedDescription ?? '').trim() }}</textarea>
                 </div>
               </div>
             </div>
 
             <div class="section-block">
               <h3 class="section-title">Documentos pessoais</h3>
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="doc_id_frente" class="form-label required">Documento de identificação (frente)</label>
-                  <input type="file" class="form-control" id="doc_id_frente" name="doc_id_frente" accept=".pdf,image/*" required />
+              <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 upload-row">
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card required" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🪪</div>
+                    <p class="upload-title">Documento de identificação (frente)</p>
+                    <p class="upload-instruction">Formatos aceitos: PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_id_frente"
+                      name="doc_id_frente"
+                      accept=".pdf,image/*"
+                      required
+                      aria-label="Documento de identificação (frente)"
+                    />
+                    <label class="upload-button" for="doc_id_frente">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="doc_id_verso" class="form-label required">Documento de identificação (verso)</label>
-                  <input type="file" class="form-control" id="doc_id_verso" name="doc_id_verso" accept=".pdf,image/*" required />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card required" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🪪</div>
+                    <p class="upload-title">Documento de identificação (verso)</p>
+                    <p class="upload-instruction">Formatos aceitos: PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_id_verso"
+                      name="doc_id_verso"
+                      accept=".pdf,image/*"
+                      required
+                      aria-label="Documento de identificação (verso)"
+                    />
+                    <label class="upload-button" for="doc_id_verso">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="doc_cpf" class="form-label required">CPF</label>
-                  <input type="file" class="form-control" id="doc_cpf" name="doc_cpf" accept=".pdf,image/*" required />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card required" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🧾</div>
+                    <p class="upload-title">CPF</p>
+                    <p class="upload-instruction">Formatos aceitos: PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_cpf"
+                      name="doc_cpf"
+                      accept=".pdf,image/*"
+                      required
+                      aria-label="CPF"
+                    />
+                    <label class="upload-button" for="doc_cpf">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="doc_residencia" class="form-label required">Comprovante de residência</label>
-                  <input type="file" class="form-control" id="doc_residencia" name="doc_residencia" accept=".pdf,image/*" required />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card required" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🏠</div>
+                    <p class="upload-title">Comprovante de residência</p>
+                    <p class="upload-instruction">Formatos aceitos: PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_residencia"
+                      name="doc_residencia"
+                      accept=".pdf,image/*"
+                      required
+                      aria-label="Comprovante de residência"
+                    />
+                    <label class="upload-button" for="doc_residencia">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="doc_quitacao_eleitoral" class="form-label required">Quitação eleitoral</label>
-                  <input type="file" class="form-control" id="doc_quitacao_eleitoral" name="doc_quitacao_eleitoral" accept=".pdf,image/*" required />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card required" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🗳️</div>
+                    <p class="upload-title">Quitação eleitoral</p>
+                    <p class="upload-instruction">Formatos aceitos: PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_quitacao_eleitoral"
+                      name="doc_quitacao_eleitoral"
+                      accept=".pdf,image/*"
+                      required
+                      aria-label="Quitação eleitoral"
+                    />
+                    <label class="upload-button" for="doc_quitacao_eleitoral">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6 hidden" id="docMilitarGroup">
-                  <label for="doc_militar" class="form-label">Quitação do serviço militar</label>
-                  <input type="file" class="form-control" id="doc_militar" name="doc_militar" accept=".pdf,image/*" data-force-required="true" />
+                <div class="col-sm-6 col-lg-4 hidden" id="docMilitarGroup">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🎖️</div>
+                    <p class="upload-title">Quitação do serviço militar</p>
+                    <p class="upload-instruction">Obrigatório apenas para candidatos do sexo masculino.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_militar"
+                      name="doc_militar"
+                      accept=".pdf,image/*"
+                      data-force-required="true"
+                      aria-label="Quitação do serviço militar"
+                    />
+                    <label class="upload-button" for="doc_militar">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="section-block hidden" id="juradoDocs">
               <h3 class="section-title">Documentação de jurado(a)</h3>
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="doc_jurado" class="form-label">Certidão de atuação</label>
-                  <input type="file" class="form-control" id="doc_jurado" name="doc_jurado" accept=".pdf,image/*" />
+              <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 upload-row">
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">⚖️</div>
+                    <p class="upload-title">Certidão de atuação</p>
+                    <p class="upload-instruction">Anexe em PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_jurado"
+                      name="doc_jurado"
+                      accept=".pdf,image/*"
+                      aria-label="Certidão de atuação"
+                    />
+                    <label class="upload-button" for="doc_jurado">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="doc_jurado_440" class="form-label">Certidão (art. 440 do CPP)</label>
-                  <input type="file" class="form-control" id="doc_jurado_440" name="doc_jurado_440" accept=".pdf,image/*" />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">📜</div>
+                    <p class="upload-title">Certidão (art. 440 do CPP)</p>
+                    <p class="upload-instruction">Anexe em PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_jurado_440"
+                      name="doc_jurado_440"
+                      accept=".pdf,image/*"
+                      aria-label="Certidão (art. 440 do CPP)"
+                    />
+                    <label class="upload-button" for="doc_jurado_440">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="section-block">
               <h3 class="section-title">Comprovação profissional</h3>
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="doc_escolaridade" class="form-label required">Comprovação da escolaridade</label>
-                  <input type="file" class="form-control" id="doc_escolaridade" name="doc_escolaridade" accept=".pdf,image/*" required />
+              <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 upload-row">
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card required" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🎓</div>
+                    <p class="upload-title">Comprovação da escolaridade</p>
+                    <p class="upload-instruction">Envie em PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_escolaridade"
+                      name="doc_escolaridade"
+                      accept=".pdf,image/*"
+                      required
+                      aria-label="Comprovação da escolaridade"
+                    />
+                    <label class="upload-button" for="doc_escolaridade">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="doc_curriculo" class="form-label">Experiência / títulos / certificados</label>
-                  <input type="file" class="form-control" id="doc_curriculo" name="doc_curriculo" accept=".pdf,image/*" multiple />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">📁</div>
+                    <p class="upload-title">Experiência / títulos / certificados</p>
+                    <p class="upload-instruction">Você pode anexar vários arquivos.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="doc_curriculo"
+                      name="doc_curriculo"
+                      accept=".pdf,image/*"
+                      multiple
+                      aria-label="Experiência, títulos ou certificados"
+                    />
+                    <label class="upload-button" for="doc_curriculo">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="section-block hidden" id="ppniDocs">
               <h3 class="section-title">Heteroidentificação</h3>
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="het_declaracao" class="form-label">Declaração de heteroidentificação</label>
-                  <input type="file" class="form-control" id="het_declaracao" name="het_declaracao" accept=".pdf,image/*" />
+              <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 upload-row">
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">📝</div>
+                    <p class="upload-title">Declaração de heteroidentificação</p>
+                    <p class="upload-instruction">Anexe em PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="het_declaracao"
+                      name="het_declaracao"
+                      accept=".pdf,image/*"
+                      aria-label="Declaração de heteroidentificação"
+                    />
+                    <label class="upload-button" for="het_declaracao">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="het_id" class="form-label">Documento de identidade (frente/verso)</label>
-                  <input type="file" class="form-control" id="het_id" name="het_id" accept=".pdf,image/*" multiple />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🆔</div>
+                    <p class="upload-title">Documento de identidade (frente/verso)</p>
+                    <p class="upload-instruction">Envie em PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="het_id"
+                      name="het_id"
+                      accept=".pdf,image/*"
+                      multiple
+                      aria-label="Documento de identidade (frente/verso)"
+                    />
+                    <label class="upload-button" for="het_id">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-4">
-                  <label for="het_frente" class="form-label">Foto de frente</label>
-                  <input type="file" class="form-control" id="het_frente" name="het_frente" accept="image/*" />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🤳</div>
+                    <p class="upload-title">Foto de frente</p>
+                    <p class="upload-instruction">Apenas imagens.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="het_frente"
+                      name="het_frente"
+                      accept="image/*"
+                      aria-label="Foto de frente"
+                    />
+                    <label class="upload-button" for="het_frente">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-4">
-                  <label for="het_perfil" class="form-label">Foto de perfil</label>
-                  <input type="file" class="form-control" id="het_perfil" name="het_perfil" accept="image/*" />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">📸</div>
+                    <p class="upload-title">Foto de perfil</p>
+                    <p class="upload-instruction">Apenas imagens.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="het_perfil"
+                      name="het_perfil"
+                      accept="image/*"
+                      aria-label="Foto de perfil"
+                    />
+                    <label class="upload-button" for="het_perfil">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-4">
-                  <label for="het_video" class="form-label">Vídeo (até 20s)</label>
-                  <input type="file" class="form-control" id="het_video" name="het_video" accept="video/mp4,video/quicktime" />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🎥</div>
+                    <p class="upload-title">Vídeo (até 20s)</p>
+                    <p class="upload-instruction">Formatos: MP4 ou Quicktime.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="het_video"
+                      name="het_video"
+                      accept="video/mp4,video/quicktime"
+                      aria-label="Vídeo (até 20 segundos)"
+                    />
+                    <label class="upload-button" for="het_video">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="section-block hidden" id="pcdDocs">
               <h3 class="section-title">Documentação PCD</h3>
-              <div class="row g-3">
-                <div class="col-md-4">
-                  <label for="pcd_laudo" class="form-label">Laudo médico</label>
-                  <input type="file" class="form-control" id="pcd_laudo" name="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif" />
+              <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 upload-row">
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🩺</div>
+                    <p class="upload-title">Laudo médico</p>
+                    <p class="upload-instruction">Formatos: PDF, PNG ou JPG.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="pcd_laudo"
+                      name="pcd_laudo"
+                      accept=".pdf,.png,.jpeg,.jpg,.gif"
+                      aria-label="Laudo médico"
+                    />
+                    <label class="upload-button" for="pcd_laudo">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-4">
-                  <label for="pcd_declaracao" class="form-label">Declaração PCD (modelo do edital)</label>
-                  <input type="file" class="form-control" id="pcd_declaracao" name="pcd_declaracao" accept=".pdf,image/*" />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">📄</div>
+                    <p class="upload-title">Declaração PCD (modelo do edital)</p>
+                    <p class="upload-instruction">Anexe em PDF ou imagem.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="pcd_declaracao"
+                      name="pcd_declaracao"
+                      accept=".pdf,image/*"
+                      aria-label="Declaração PCD (modelo do edital)"
+                    />
+                    <label class="upload-button" for="pcd_declaracao">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
-                <div class="col-md-4">
-                  <label for="pcd_exames" class="form-label">Exames complementares (opcional)</label>
-                  <input type="file" class="form-control" id="pcd_exames" name="pcd_exames" accept=".pdf,image/*" multiple />
+                <div class="col-sm-6 col-lg-4">
+                  <div class="upload-card" data-upload-card>
+                    <div class="upload-emoji" aria-hidden="true">🧪</div>
+                    <p class="upload-title">Exames complementares (opcional)</p>
+                    <p class="upload-instruction">Envie quantos arquivos precisar.</p>
+                    <input
+                      type="file"
+                      class="upload-input"
+                      id="pcd_exames"
+                      name="pcd_exames"
+                      accept=".pdf,image/*"
+                      multiple
+                      aria-label="Exames complementares"
+                    />
+                    <label class="upload-button" for="pcd_exames">Selecionar arquivo</label>
+                    <p class="upload-filename" data-upload-filename>Nenhum arquivo selecionado</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1413,6 +1784,18 @@
       <span>Rascunho salvo com sucesso!</span>
     </div>
 
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true" aria-labelledby="successModalLabel">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 text-center p-4">
+          <div class="modal-body">
+            <div class="display-4 mb-3 text-success">✅</div>
+            <h2 class="h4 mb-2" id="successModalLabel">Inscrição enviada!</h2>
+            <p class="text-muted mb-0">Você será redirecionado automaticamente em instantes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       const form = document.getElementById('inscricaoForm');
       const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
@@ -1421,6 +1804,95 @@
       const storageKey = 'inscricao-hospvet-draft';
       let currentStep = 0;
       let cepController;
+      const visitedSteps = new Set();
+      const authorizationField = document.getElementById('initialAuthorization');
+      const resolveInitialAuthorization = () => {
+        const bodyAuth = document.body?.dataset?.authorization?.trim();
+        const hiddenAuth = authorizationField?.value?.trim();
+        const globalAuth = typeof window !== 'undefined' ? (window.initialAuthorization || window.__AUTHORIZATION__ || '') : '';
+        const queryAuth = new URLSearchParams(window.location.search).get('authorization')?.trim();
+        return hiddenAuth || bodyAuth || globalAuth || queryAuth || '';
+      };
+      let cachedAuthorization = resolveInitialAuthorization();
+      if (authorizationField && !authorizationField.value && cachedAuthorization) {
+        authorizationField.value = cachedAuthorization;
+      }
+
+      const updateUploadIndicator = (input) => {
+        if (!input) return;
+        const card = input.closest('[data-upload-card]');
+        if (!card) return;
+        const output = card.querySelector('[data-upload-filename]');
+        if (!output) return;
+        if (!input.files || input.files.length === 0) {
+          output.textContent = 'Nenhum arquivo selecionado';
+          card.classList.remove('has-file');
+          return;
+        }
+        const names = Array.from(input.files).map((file) => file.name);
+        output.textContent = input.multiple ? names.join(', ') : names[0];
+        card.classList.add('has-file');
+      };
+
+      const resetUploadIndicator = (input) => {
+        if (!input) return;
+        input.value = '';
+        updateUploadIndicator(input);
+      };
+
+      const validateEmailsMatch = () => {
+        const email = document.getElementById('email');
+        const confirm = document.getElementById('email_confirm');
+        if (!email || !confirm) return true;
+        if (confirm.value && email.value && email.value !== confirm.value) {
+          confirm.setCustomValidity('Os e-mails precisam ser iguais.');
+          return false;
+        }
+        confirm.setCustomValidity('');
+        return true;
+      };
+
+      const getAuthorizationValue = () => authorizationField?.value?.trim() || cachedAuthorization || resolveInitialAuthorization();
+
+      const redirectAfterSubmit = (authorization) => {
+        const targetUrl = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/10a4b028-f7d2-423b-9781-1673a7314490';
+        const redirectForm = document.createElement('form');
+        redirectForm.method = 'post';
+        redirectForm.action = targetUrl;
+        redirectForm.classList.add('visually-hidden');
+        redirectForm.style.display = 'none';
+        const authInput = document.createElement('input');
+        authInput.type = 'hidden';
+        authInput.name = 'authorization';
+        authInput.value = authorization || '';
+        redirectForm.appendChild(authInput);
+        document.body.appendChild(redirectForm);
+        redirectForm.submit();
+      };
+
+      const successModalElement = document.getElementById('successModal');
+      const successModalInstance =
+        successModalElement && typeof bootstrap !== 'undefined'
+          ? new bootstrap.Modal(successModalElement)
+          : null;
+
+      const showSuccessFeedback = (authorization) => {
+        const authToSend = authorization || getAuthorizationValue();
+        if (successModalInstance) {
+          successModalInstance.show();
+        } else {
+          alert('Inscrição enviada com sucesso!');
+        }
+        setTimeout(() => {
+          redirectAfterSubmit(authToSend);
+        }, 2000);
+      };
+
+      const markStepVisited = (index) => {
+        if (!Number.isInteger(index)) return;
+        if (index < 0 || index >= stepPanels.length) return;
+        visitedSteps.add(index);
+      };
 
       const selectPrefills = () => {
         document.querySelectorAll('select[data-prefill]').forEach((select) => {
@@ -1447,18 +1919,21 @@
 
       const showStep = (index) => {
         currentStep = Math.max(0, Math.min(index, stepPanels.length - 1));
+        markStepVisited(currentStep);
         stepPanels.forEach((panel, i) => {
           panel.classList.toggle('d-none', i !== currentStep);
         });
         wizardSteps.forEach((step, i) => {
-          step.classList.toggle('active', i === currentStep);
-          step.classList.toggle('completed', i < currentStep);
-          step.setAttribute('aria-selected', i === currentStep ? 'true' : 'false');
-          step.setAttribute('tabindex', i === currentStep ? '0' : '-1');
+          const isActive = i === currentStep;
+          const isCompleted = visitedSteps.has(i) && !isActive;
+          step.classList.toggle('active', isActive);
+          step.classList.toggle('completed', isCompleted);
+          step.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          step.setAttribute('tabindex', '0');
           const indexLabel = step.querySelector('.wizard-index-label');
           if (indexLabel) {
             const original = indexLabel.dataset.stepIndex || String(i + 1);
-            indexLabel.textContent = i < currentStep ? '✓' : original;
+            indexLabel.textContent = isCompleted ? '✓' : original;
           }
         });
         if (currentStep === stepPanels.length - 1) {
@@ -1476,31 +1951,28 @@
             return false;
           }
         }
-        if (currentStep === 1) {
-          const email = document.getElementById('email');
-          const confirm = document.getElementById('email_confirm');
-          if (email.value && confirm.value && email.value !== confirm.value) {
-            confirm.setCustomValidity('Os e-mails precisam ser iguais.');
-            confirm.reportValidity();
-            return false;
-          }
-          confirm.setCustomValidity('');
+        if (currentStep === 1 && !validateEmailsMatch()) {
+          document.getElementById('email_confirm').reportValidity();
+          return false;
         }
         return true;
       };
 
       const goNext = () => {
         if (!validateCurrentStep()) return;
+        markStepVisited(currentStep);
         showStep(currentStep + 1);
       };
 
       const goPrev = () => {
+        markStepVisited(currentStep);
         showStep(currentStep - 1);
       };
 
       const toggleHiddenGroup = (condition, element) => {
         if (!element) return;
         element.classList.toggle('hidden', !condition);
+        element.setAttribute('aria-hidden', (!condition).toString());
         element.querySelectorAll('input, select, textarea').forEach((field) => {
           field.toggleAttribute('required', condition && field.dataset.forceRequired === 'true');
         });
@@ -1517,9 +1989,14 @@
         const show = sexo && sexo.value === 'Masculino';
         const wrapper = document.getElementById('alistamentoWrapper');
         const docGroup = document.getElementById('docMilitarGroup');
+        const militarGroup = document.getElementById('militarGroup');
+        toggleHiddenGroup(show, militarGroup);
         toggleHiddenGroup(show, wrapper);
         toggleHiddenGroup(show, docGroup);
         if (!show) {
+          document.querySelectorAll('input[name="militar"]').forEach((input) => {
+            input.checked = false;
+          });
           if (wrapper) {
             wrapper.querySelectorAll('input').forEach((input) => {
               input.value = '';
@@ -1527,7 +2004,7 @@
           }
           const docMilitar = document.getElementById('doc_militar');
           if (docMilitar) {
-            docMilitar.value = '';
+            resetUploadIndicator(docMilitar);
           }
         }
       };
@@ -1541,6 +2018,16 @@
         document.getElementById('foi_jurado').value = hasSelection ? (juradoSim.checked ? 'SIM' : 'NAO') : '';
         toggleHiddenGroup(juradoSim.checked, detalhes);
         toggleHiddenGroup(juradoSim.checked, docs);
+        if (!juradoSim.checked) {
+          if (detalhes) {
+            detalhes.querySelectorAll('input').forEach((input) => {
+              input.value = '';
+            });
+          }
+          if (docs) {
+            docs.querySelectorAll('.upload-input').forEach(resetUploadIndicator);
+          }
+        }
       };
 
       const updateVinculo = () => {
@@ -1582,9 +2069,13 @@
           const tipo = document.getElementById('tipo_pcd');
           const cid = document.getElementById('pcd_cid');
           const necessidade = document.getElementById('necessidade');
+          const docsGroup = document.getElementById('pcdDocs');
           if (tipo) tipo.value = '';
           if (cid) cid.value = '';
           if (necessidade) necessidade.value = '';
+          if (docsGroup) {
+            docsGroup.querySelectorAll('.upload-input').forEach(resetUploadIndicator);
+          }
           toggleHiddenGroup(false, necessidadeGroup);
         } else {
           updateNecessidade();
@@ -1877,31 +2368,62 @@
           cepController = null;
         }
       };
-
-      const clearEmailValidation = () => {
-        document.getElementById('email_confirm').setCustomValidity('');
-      };
-
       document.querySelectorAll('[data-action="next"]').forEach((btn) => btn.addEventListener('click', goNext));
       document.querySelectorAll('[data-action="prev"]').forEach((btn) => btn.addEventListener('click', goPrev));
       document.querySelectorAll('[data-action="save-draft"]').forEach((btn) => btn.addEventListener('click', saveDraft));
 
       wizardSteps.forEach((step) => {
-        step.addEventListener('click', () => {
+        const navigateToStep = () => {
           const stepIndex = Number(step.dataset.step);
-          if (stepIndex <= currentStep && stepIndex >= 0) {
-            showStep(stepIndex);
+          if (!Number.isInteger(stepIndex) || stepIndex < 0 || stepIndex >= stepPanels.length) return;
+          if (stepIndex === currentStep) return;
+          markStepVisited(currentStep);
+          showStep(stepIndex);
+        };
+        step.addEventListener('click', navigateToStep);
+        step.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            navigateToStep();
           }
         });
       });
 
       form.addEventListener('submit', (event) => {
+        event.preventDefault();
         if (!form.checkValidity() || !validateCurrentStep()) {
-          event.preventDefault();
           event.stopPropagation();
           return;
         }
-        clearEmailValidation();
+        if (!validateEmailsMatch()) {
+          document.getElementById('email_confirm').reportValidity();
+          return;
+        }
+        const formData = new FormData(form);
+        let authValue = formData.get('authorization');
+        authValue = typeof authValue === 'string' ? authValue.trim() : '';
+        if (!authValue) {
+          authValue = getAuthorizationValue();
+          formData.set('authorization', authValue);
+        }
+        if (authorizationField) {
+          authorizationField.value = authValue;
+        }
+        cachedAuthorization = authValue;
+        try {
+          const request = fetch(form.action, {
+            method: 'POST',
+            body: formData,
+          });
+          request.catch((error) => console.error('Erro ao enviar inscrição', error));
+        } catch (error) {
+          console.error('Erro ao enviar inscrição', error);
+        }
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+          submitButton.disabled = true;
+        }
+        showSuccessFeedback(authValue);
       });
 
       document.getElementById('genero').addEventListener('change', updateGeneroOutro);
@@ -1911,8 +2433,12 @@
       document.getElementById('is_pcd').addEventListener('change', updatePCD);
       document.querySelectorAll('input[name="condicao_especial"]').forEach((input) => input.addEventListener('change', updateNecessidade));
       document.getElementById('cotasPPNI').addEventListener('change', updatePPNI);
-      document.getElementById('email').addEventListener('input', clearEmailValidation);
-      document.getElementById('email_confirm').addEventListener('input', clearEmailValidation);
+      document.getElementById('email').addEventListener('input', validateEmailsMatch);
+      document.getElementById('email_confirm').addEventListener('input', validateEmailsMatch);
+      document.querySelectorAll('.upload-input').forEach((input) => {
+        updateUploadIndicator(input);
+        input.addEventListener('change', () => updateUploadIndicator(input));
+      });
       if (cepInput) {
         cepInput.addEventListener('input', handleCepInput);
       }
@@ -1928,6 +2454,7 @@
       updateNecessidade();
       updatePPNI();
       handleCepInput();
+      validateEmailsMatch();
       showStep(0);
     </script>
   </body>
