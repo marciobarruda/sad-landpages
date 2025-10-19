@@ -53,6 +53,13 @@
         background-color: rgba(255, 255, 255, 0.14);
       }
 
+      .user-greeting {
+        font-size: 1.05rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
       .section-title {
         display: flex;
         align-items: center;
@@ -188,6 +195,7 @@
     <input type="hidden" id="authorization" value="{{ $('Webhook').item.json.headers.authorization }}" />
     <header class="site-header">
       <div class="container">
+        <p class="user-greeting">Olá, {{ $json.given_name }}! Que bom ter você aqui.</p>
         <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
         <h1 class="display-6 fw-semibold mt-3">Portal de Formulários e Seleções</h1>
         <p class="lead mt-2">
