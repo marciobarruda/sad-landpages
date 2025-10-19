@@ -48,9 +48,10 @@
       }
 
       header.hero {
-        height: 240px;
-        background: url("https://statics.recife.pe.gov.br/images/dynamics/zonaazul/banner.jpeg") center/cover no-repeat;
         position: relative;
+        height: 240px;
+        overflow: hidden;
+        background-color: #0b2447;
       }
 
       header.hero::after {
@@ -58,6 +59,18 @@
         position: absolute;
         inset: 0;
         background: linear-gradient(180deg, rgba(11, 36, 71, 0.55) 0%, rgba(11, 36, 71, 0.35) 70%, rgba(11, 36, 71, 0.15) 100%);
+      }
+
+      .hero-image {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
       }
 
       header.hero .hero-content {
@@ -105,6 +118,15 @@
         margin-bottom: 1.75rem;
       }
 
+      .wizard-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+
       .wizard-heading {
         font-size: 0.75rem;
         letter-spacing: 0.18em;
@@ -114,6 +136,35 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+      }
+
+      .registration-badge {
+        margin-left: auto;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        border-radius: 0.75rem;
+        background: rgba(26, 115, 232, 0.12);
+        color: #0b2447;
+        font-size: 0.85rem;
+        font-weight: 600;
+        min-width: 220px;
+      }
+
+      .registration-badge .registration-label {
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        color: #4c5aa1;
+        font-weight: 700;
+      }
+
+      .registration-badge .registration-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0b2447;
       }
 
       .wizard-heading::before {
@@ -458,6 +509,44 @@
         display: none !important;
       }
 
+      .submission-success {
+        display: none;
+        margin: 0 auto 80px;
+        max-width: 720px;
+        text-align: center;
+        background: var(--surface);
+        border-radius: 1.25rem;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 18px 40px rgba(26, 115, 232, 0.12), 0 8px 22px rgba(26, 115, 232, 0.08);
+        border: 1px solid rgba(26, 115, 232, 0.12);
+      }
+
+      .submission-success.show {
+        display: block;
+      }
+
+      .submission-success .success-icon {
+        font-size: 2.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .submission-success .success-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: #0b2447;
+      }
+
+      .submission-success .success-text {
+        color: #495057;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .submission-success .success-actions .btn {
+        min-width: 180px;
+      }
+
       .draft-toast {
         position: fixed;
         bottom: 32px;
@@ -484,6 +573,11 @@
 
         .wizard-shell {
           padding: 1.5rem 1.1rem;
+        }
+
+        .registration-badge {
+          width: 100%;
+          align-items: flex-start;
         }
 
         .wizard-steps {
@@ -523,9 +617,14 @@
   </head>
   <body>
     <header class="hero">
+      <img
+        src="https://statics.recife.pe.gov.br/images/dynamics/zonaazul/banner.jpeg"
+        alt="Hospital Veterinário do Recife"
+        class="hero-image"
+      />
       <div class="hero-content">
-        <span class="hero-badge">Secretaria Executiva de Administração</span>
-        <h1 class="hero-title">Seleção Simplificada — HospVet</h1>
+        <span class="hero-badge">Secretaria de Administração e Gestão de Pessoas</span>
+        <h1 class="hero-title">Seleção Simplificada — Hospital Veterinário do Recife</h1>
         <p class="hero-subtitle">Complete as etapas abaixo para enviar sua inscrição</p>
       </div>
     </header>
@@ -533,7 +632,13 @@
 
     <main class="frame-card container">
       <section class="wizard-shell">
-        <h2 class="wizard-heading">Etapas da inscrição</h2>
+        <div class="wizard-header-row">
+          <h2 class="wizard-heading">Etapas da inscrição</h2>
+          <div class="registration-badge" id="registrationNumber" aria-live="polite">
+            <span class="registration-label">Nº da inscrição</span>
+            <span class="registration-value">{{ String($json.inscricao ?? '').trim() || '—' }}</span>
+          </div>
+        </div>
         <ol class="wizard-steps" id="wizardSteps" role="tablist">
           <li class="wizard-step active" data-step="0" role="tab" aria-selected="true" tabindex="0">
             <span class="wizard-index"><span class="wizard-index-label" data-step-index="1">1</span></span>
@@ -611,6 +716,9 @@
                     name="cpf"
                     maxlength="11"
                     inputmode="numeric"
+                    pattern="\d{11}"
+                    title="Informe 11 dígitos"
+                    data-numeric-only="true"
                     value="{{ String(($json.cpf ?? $json.preferred_username ?? '')).replace(/\D+/g, '').slice(0,11) }}"
                     required
                   />
@@ -628,14 +736,17 @@
                 </div>
                 <div class="col-md-4">
                   <label for="nacionalidade" class="form-label required">Nacionalidade</label>
-                  <input
-                    type="text"
-                    class="form-control"
+                  <select
                     id="nacionalidade"
                     name="nacionalidade"
-                    value="{{ String($json.nacionalidade ?? $json.nationality ?? '').trim().toUpperCase() }}"
+                    class="form-select"
+                    data-prefill="{{ $json.nacionalidade ?? $json.nationality ?? '' }}"
+                    data-nacionalidade
                     required
-                  />
+                  >
+                    <option value="">Selecione...</option>
+                    <option value="BRASILEIRA">BRASILEIRA</option>
+                  </select>
                 </div>
                 <div class="col-md-4">
                   <label for="nis" class="form-label">NIS</label>
@@ -646,6 +757,9 @@
                     name="nis"
                     maxlength="11"
                     inputmode="numeric"
+                    pattern="\d{0,11}"
+                    title="Informe apenas números (até 11 dígitos)"
+                    data-numeric-only="true"
                     value="{{ String($json.nis ?? $json.pis ?? $json.pis_pasep ?? '').replace(/\D+/g, '').slice(0,11) }}"
                   />
                 </div>
@@ -668,15 +782,17 @@
                 </div>
                 <div class="col-md-2 col-lg-3 col-xl-2">
                   <label for="naturalidade_uf" class="form-label required">UF</label>
-                  <input
-                    type="text"
-                    class="form-control"
+                  <select
                     id="naturalidade_uf"
                     name="naturalidade_uf"
-                    maxlength="2"
-                    value="{{ String($json.uf_naturalidade ?? '').trim().toUpperCase() }}"
+                    class="form-select"
+                    data-prefill="{{ $json.uf_naturalidade ?? '' }}"
+                    data-uf-select
+                    data-force-required="true"
                     required
-                  />
+                  >
+                    <option value="">Selecione...</option>
+                  </select>
                 </div>
               </div>
               <div class="row g-3">
@@ -688,7 +804,7 @@
                     id="mae"
                     name="mae"
                     value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}"
-                    oninput="this.value = this.value.toUpperCase();"
+                   
                     required
                   />
                 </div>
@@ -700,7 +816,7 @@
                     id="pai"
                     name="pai"
                     value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}"
-                    oninput="this.value = this.value.toUpperCase();"
+                   
                   />
                 </div>
               </div>
@@ -718,6 +834,9 @@
                     name="rg_numero"
                     maxlength="14"
                     inputmode="numeric"
+                    pattern="\d{1,14}"
+                    title="Informe apenas números"
+                    data-numeric-only="true"
                     value="{{ String($json.num_doc ?? '').replace(/\D+/g, '').slice(0,14) }}"
                     required
                   />
@@ -735,15 +854,16 @@
                 </div>
                 <div class="col-md-2">
                   <label for="rg_uf" class="form-label required">UF</label>
-                  <input
-                    type="text"
-                    class="form-control"
+                  <select
                     id="rg_uf"
                     name="rg_uf"
-                    maxlength="2"
-                    value="{{ String($json.uf_doc ?? '').trim().toUpperCase() }}"
+                    class="form-select"
+                    data-prefill="{{ $json.uf_doc ?? '' }}"
+                    data-uf-select
                     required
-                  />
+                  >
+                    <option value="">Selecione...</option>
+                  </select>
                 </div>
                 <div class="col-md-2">
                   <label for="rg_data" class="form-label required">Expedição</label>
@@ -853,6 +973,7 @@
                     class="form-control"
                     id="email"
                     name="email"
+                    data-allow-lowercase="true"
                     value="{{ String($json.email ?? '').trim().toLowerCase() }}"
                     required
                   />
@@ -864,6 +985,7 @@
                     class="form-control"
                     id="email_confirm"
                     name="email_confirm"
+                    data-allow-lowercase="true"
                     value=""
                     required
                   />
@@ -1045,6 +1167,9 @@
                     name="ano_conclusao"
                     maxlength="4"
                     inputmode="numeric"
+                    pattern="\d{4}"
+                    title="Informe 4 dígitos"
+                    data-numeric-only="true"
                     value="{{ String($json.ano ?? $json.ano_conclusao ?? '').replace(/\D+/g, '').slice(0,4) }}"
                     required
                   />
@@ -1134,7 +1259,12 @@
                     class="form-control"
                     id="alistamento_numero"
                     name="alistamento_numero"
-                    value="{{ String($json.alistamento_numero ?? '').trim().toUpperCase() }}"
+                    maxlength="12"
+                    inputmode="numeric"
+                    pattern="\d{12}"
+                    title="Informe 12 dígitos"
+                    data-numeric-only="true"
+                    value="{{ String($json.alistamento_numero ?? '').replace(/\D+/g, '').slice(0,12) }}"
                     data-force-required="true"
                   />
                 </div>
@@ -1175,6 +1305,9 @@
                     name="titulo"
                     maxlength="12"
                     inputmode="numeric"
+                    pattern="\d{0,12}"
+                    title="Informe apenas números"
+                    data-numeric-only="true"
                     value="{{ String($json.titulo ?? $json.titulo_eleitor ?? '').replace(/\D+/g, '').slice(0,12) }}"
                   />
                 </div>
@@ -1187,6 +1320,9 @@
                     name="zona"
                     maxlength="4"
                     inputmode="numeric"
+                    pattern="\d{0,4}"
+                    title="Informe apenas números"
+                    data-numeric-only="true"
                     value="{{ String($json.zona ?? '').replace(/\D+/g, '').slice(0,4) }}"
                   />
                 </div>
@@ -1199,6 +1335,9 @@
                     name="secao"
                     maxlength="4"
                     inputmode="numeric"
+                    pattern="\d{0,4}"
+                    title="Informe apenas números"
+                    data-numeric-only="true"
                     value="{{ String($json.secao ?? '').replace(/\D+/g, '').slice(0,4) }}"
                   />
                 </div>
@@ -1253,7 +1392,7 @@
                     id="qual_vinculo"
                     name="qual_vinculo"
                     value="{{ String($json.qual_vinculo ?? '').trim().toUpperCase() }}"
-                    oninput="this.value = this.value.toUpperCase();"
+                   
                     data-force-required="true"
                   />
                 </div>
@@ -1265,7 +1404,7 @@
                     id="vinculo_cargo"
                     name="vinculo_cargo"
                     value="{{ String($json.vinculo_cargo ?? '').trim().toUpperCase() }}"
-                    oninput="this.value = this.value.toUpperCase();"
+                   
                     data-force-required="true"
                   />
                 </div>
@@ -1277,7 +1416,7 @@
                     id="vinculo_orgao"
                     name="vinculo_orgao"
                     value="{{ String($json.vinculo_orgao ?? '').trim().toUpperCase() }}"
-                    oninput="this.value = this.value.toUpperCase();"
+                   
                     data-force-required="true"
                   />
                 </div>
@@ -1689,6 +1828,7 @@
                       id="pcd_laudo"
                       name="pcd_laudo"
                       accept=".pdf,.png,.jpeg,.jpg,.gif"
+                      data-force-required="true"
                       aria-label="Laudo médico"
                     />
                     <label class="upload-button" for="pcd_laudo">Selecionar arquivo</label>
@@ -1706,6 +1846,7 @@
                       id="pcd_declaracao"
                       name="pcd_declaracao"
                       accept=".pdf,image/*"
+                      data-force-required="true"
                       aria-label="Declaração PCD (modelo do edital)"
                     />
                     <label class="upload-button" for="pcd_declaracao">Selecionar arquivo</label>
@@ -1783,6 +1924,17 @@
           </div>
         </section>
       </form>
+      <div class="submission-success" id="submissionSuccess" aria-live="polite">
+        <div class="success-icon" aria-hidden="true">🎉</div>
+        <h2 class="success-title">Inscrição enviada com sucesso!</h2>
+        <p class="success-text">
+          Recebemos seus documentos e dados. Guarde o número de inscrição
+          <strong id="successRegistrationNumber">{{ String($json.inscricao ?? '').trim() || '—' }}</strong> para eventuais consultas.
+        </p>
+        <div class="success-actions d-flex justify-content-center">
+          <button type="button" class="btn btn-primary" id="newSubmissionButton">Nova inscrição</button>
+        </div>
+      </div>
     </main>
     <div class="pattern-bottom"></div>
 
@@ -1790,23 +1942,53 @@
       <span>Rascunho salvo com sucesso!</span>
     </div>
 
-    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true" aria-labelledby="successModalLabel">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 text-center p-4">
-          <div class="modal-body">
-            <div class="display-4 mb-3 text-success">✅</div>
-            <h2 class="h4 mb-2" id="successModalLabel">Inscrição enviada!</h2>
-            <p class="text-muted mb-0">Você será redirecionado automaticamente em instantes.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <script>
       const form = document.getElementById('inscricaoForm');
       const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
       const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
       const draftToast = document.getElementById('draftToast');
+      const registrationNumberElement = document.getElementById('registrationNumber');
+      const registrationValueElement = registrationNumberElement?.querySelector('.registration-value');
+      const successScreen = document.getElementById('submissionSuccess');
+      const successRegistrationNumber = document.getElementById('successRegistrationNumber');
+      const newSubmissionButton = document.getElementById('newSubmissionButton');
+      const nacionalidadeSelect = document.getElementById('nacionalidade');
+      const naturalidadeUfSelect = document.getElementById('naturalidade_uf');
+      const naturalidadeUfLabel = document.querySelector('label[for="naturalidade_uf"]');
+      const ufSelects = Array.from(document.querySelectorAll('[data-uf-select]'));
+      const generoSelect = document.getElementById('genero');
+      const generoBaseOptions = generoSelect
+        ? Array.from(generoSelect.options).map((option) => ({ value: option.value, label: option.textContent }))
+        : [];
+      const ufValues = [
+        'AC',
+        'AL',
+        'AP',
+        'AM',
+        'BA',
+        'CE',
+        'DF',
+        'ES',
+        'GO',
+        'MA',
+        'MT',
+        'MS',
+        'MG',
+        'PA',
+        'PB',
+        'PR',
+        'PE',
+        'PI',
+        'RJ',
+        'RN',
+        'RO',
+        'RR',
+        'RS',
+        'SC',
+        'SE',
+        'SP',
+        'TO',
+      ];
       const storageKey = 'inscricao-hospvet-draft';
       let currentStep = 0;
       let cepController;
@@ -1823,6 +2005,16 @@
       if (authorizationField && !authorizationField.value && cachedAuthorization) {
         authorizationField.value = cachedAuthorization;
       }
+
+      const isRadioGroup = (field) => {
+        if (!field) return false;
+        if (typeof RadioNodeList !== 'undefined' && field instanceof RadioNodeList) return true;
+        if (Array.isArray(field)) return field.length > 0 && field[0] instanceof HTMLInputElement && field[0].type === 'radio';
+        const length = typeof field.length === 'number' ? field.length : 0;
+        if (!length) return false;
+        const first = field[0];
+        return first instanceof HTMLInputElement && first.type === 'radio';
+      };
 
       const updateUploadIndicator = (input) => {
         if (!input) return;
@@ -1850,7 +2042,9 @@
 
       const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
 
-      const validateEmailsMatch = () => {
+      let emailMismatchAlertShown = false;
+
+      const validateEmailsMatch = (shouldAlert = false) => {
         const email = document.getElementById('email');
         const confirm = document.getElementById('email_confirm');
         if (!email || !confirm) return true;
@@ -1859,8 +2053,13 @@
         if (confirm.value && email.value && normalizedEmail !== normalizedConfirm) {
           confirm.setCustomValidity('Os e-mails precisam ser iguais.');
           confirm.classList.add('is-invalid');
+          if ((shouldAlert || document.activeElement !== confirm) && !emailMismatchAlertShown) {
+            emailMismatchAlertShown = true;
+            alert('Os e-mails informados não coincidem.');
+          }
           return false;
         }
+        emailMismatchAlertShown = false;
         confirm.setCustomValidity('');
         if (confirm.classList.contains('is-invalid') && confirm.checkValidity()) {
           confirm.classList.remove('is-invalid');
@@ -1869,39 +2068,24 @@
       };
 
       const getAuthorizationValue = () => authorizationField?.value?.trim() || cachedAuthorization || resolveInitialAuthorization();
-
-      const redirectAfterSubmit = (authorization) => {
-        const targetUrl = 'https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/10a4b028-f7d2-423b-9781-1673a7314490';
-        const redirectForm = document.createElement('form');
-        redirectForm.method = 'post';
-        redirectForm.action = targetUrl;
-        redirectForm.classList.add('visually-hidden');
-        redirectForm.style.display = 'none';
-        const authInput = document.createElement('input');
-        authInput.type = 'hidden';
-        authInput.name = 'authorization';
-        authInput.value = authorization || '';
-        redirectForm.appendChild(authInput);
-        document.body.appendChild(redirectForm);
-        redirectForm.submit();
-      };
-
-      const successModalElement = document.getElementById('successModal');
-      const successModalInstance =
-        successModalElement && typeof bootstrap !== 'undefined'
-          ? new bootstrap.Modal(successModalElement)
-          : null;
-
-      const showSuccessFeedback = (authorization) => {
-        const authToSend = authorization || getAuthorizationValue();
-        if (successModalInstance) {
-          successModalInstance.show();
+      const showSuccessFeedback = () => {
+        const registrationText = registrationValueElement?.textContent?.trim();
+        if (successRegistrationNumber && registrationText) {
+          successRegistrationNumber.textContent = registrationText;
+        }
+        if (form) {
+          form.classList.add('d-none');
+        }
+        const wizardShell = document.querySelector('.wizard-shell');
+        if (wizardShell) {
+          wizardShell.classList.add('d-none');
+        }
+        if (successScreen) {
+          successScreen.classList.add('show');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           alert('Inscrição enviada com sucesso!');
         }
-        setTimeout(() => {
-          redirectAfterSubmit(authToSend);
-        }, 2000);
       };
 
       const markStepVisited = (index) => {
@@ -1937,15 +2121,23 @@
         }
       };
 
-      const selectPrefills = () => {
-        document.querySelectorAll('select[data-prefill]').forEach((select) => {
-          const value = select.dataset.prefill?.trim();
-          if (!value) return;
-          const option = Array.from(select.options).find((opt) => opt.value.toUpperCase() === value.toUpperCase());
-          if (option) {
-            select.value = option.value;
+      const applySelectPrefill = (select) => {
+        if (!select) return;
+        const value = select.dataset.prefill?.trim();
+        if (!value) return;
+        if (!select.options || !select.options.length) return;
+        const option = Array.from(select.options).find((opt) => opt.value.toUpperCase() === value.toUpperCase());
+        if (option) {
+          select.value = option.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          if (select.id === 'is_pcd') {
+            requestAnimationFrame(() => updatePCD());
           }
-        });
+        }
+      };
+
+      const selectPrefills = () => {
+        document.querySelectorAll('select[data-prefill]').forEach((select) => applySelectPrefill(select));
       };
 
       const radioPrefills = () => {
@@ -1994,7 +2186,7 @@
             return false;
           }
         }
-        if (currentStep === 1 && !validateEmailsMatch()) {
+        if (currentStep === 1 && !validateEmailsMatch(true)) {
           document.getElementById('email_confirm').reportValidity();
           return false;
         }
@@ -2059,6 +2251,7 @@
             resetUploadIndicator(docMilitar);
           }
         }
+        updateGeneroOptions();
       };
 
       const updateJurado = () => {
@@ -2110,10 +2303,18 @@
         const isYes = select && select.value === 'Sim';
         const condicaoGroup = document.getElementById('condicaoEspecialGroup');
         const necessidadeGroup = document.getElementById('necessidadeGroup');
+        const docsGroup = document.getElementById('pcdDocs');
         toggleHiddenGroup(isYes, condicaoGroup);
         toggleHiddenGroup(isYes, document.getElementById('tipoPcdGroup'));
         toggleHiddenGroup(isYes, document.getElementById('pcdCidGroup'));
-        toggleHiddenGroup(isYes, document.getElementById('pcdDocs'));
+        toggleHiddenGroup(isYes, docsGroup);
+        if (docsGroup) {
+          docsGroup.querySelectorAll('.upload-card').forEach((card) => {
+            const input = card.querySelector('.upload-input[data-force-required="true"]');
+            const shouldRequire = Boolean(input) && isYes;
+            card.classList.toggle('required', shouldRequire);
+          });
+        }
         if (!isYes) {
           document.querySelectorAll('input[name="condicao_especial"]').forEach((input) => {
             input.checked = false;
@@ -2121,7 +2322,6 @@
           const tipo = document.getElementById('tipo_pcd');
           const cid = document.getElementById('pcd_cid');
           const necessidade = document.getElementById('necessidade');
-          const docsGroup = document.getElementById('pcdDocs');
           if (tipo) tipo.value = '';
           if (cid) cid.value = '';
           if (necessidade) necessidade.value = '';
@@ -2150,14 +2350,221 @@
         toggleHiddenGroup(select.value === 'Sim', document.getElementById('ppniDocs'));
       };
 
+      const updateGeneroOptions = () => {
+        if (!generoSelect || !generoBaseOptions.length) return;
+        const sexoValue = document.getElementById('sexo')?.value || '';
+        const currentValue = generoSelect.value;
+        generoSelect.innerHTML = '';
+        generoBaseOptions.forEach((option) => {
+          if (sexoValue === 'Masculino' && option.value === 'Mulher cisgênero') return;
+          if (sexoValue === 'Feminino' && option.value === 'Homem cisgênero') return;
+          const opt = document.createElement('option');
+          opt.value = option.value;
+          opt.textContent = option.label;
+          generoSelect.appendChild(opt);
+        });
+        if (Array.from(generoSelect.options).some((option) => option.value === currentValue)) {
+          generoSelect.value = currentValue;
+        } else {
+          generoSelect.value = '';
+        }
+        generoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+
+      const updateNacionalidadeRequirement = () => {
+        if (!naturalidadeUfSelect) return;
+        const selected = (nacionalidadeSelect?.value || '').toUpperCase();
+        const isBrasileira = !selected || selected === 'BRASILEIRA';
+        if (isBrasileira) {
+          naturalidadeUfSelect.setAttribute('required', '');
+        } else {
+          naturalidadeUfSelect.removeAttribute('required');
+          naturalidadeUfSelect.classList.remove('is-invalid');
+        }
+        if (naturalidadeUfLabel) {
+          naturalidadeUfLabel.classList.toggle('required', isBrasileira);
+        }
+      };
+
+      const populateUfSelects = () => {
+        ufSelects.forEach((select) => {
+          if (!select) return;
+          const fragment = document.createDocumentFragment();
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = 'Selecione...';
+          fragment.appendChild(defaultOption);
+          ufValues.forEach((uf) => {
+            const option = document.createElement('option');
+            option.value = uf;
+            option.textContent = uf;
+            fragment.appendChild(option);
+          });
+          select.innerHTML = '';
+          select.appendChild(fragment);
+          applySelectPrefill(select);
+        });
+      };
+
+      const extractNacionalidadeLabel = (entry) => {
+        if (!entry) return '';
+        if (typeof entry === 'string') return entry;
+        return (
+          entry.descricao ||
+          entry.descr ||
+          entry.description ||
+          entry.nome ||
+          entry.nacionalidade ||
+          entry.label ||
+          entry.title ||
+          ''
+        );
+      };
+
+      const populateNacionalidades = async () => {
+        if (!nacionalidadeSelect) return;
+        const fallback = [
+          'ALEMÃ',
+          'ANGOLANA',
+          'ARGENTINA',
+          'BOLIVIANA',
+          'CANADENSE',
+          'CHILIENA',
+          'CHINESA',
+          'COLOMBIANA',
+          'CUBANA',
+          'ESPANHOLA',
+          'ESTADUNIDENSE',
+          'FRANCESA',
+          'HOLANDESA',
+          'ITALIANA',
+          'JAPONESA',
+          'MOÇAMBICANA',
+          'PARAGUAIA',
+          'PERUANA',
+          'PORTUGUESA',
+          'URUGUAIA',
+          'VENEZUELANA',
+        ];
+        const seen = new Set();
+        const addLabel = (label) => {
+          const normalized = String(label || '').trim().toUpperCase();
+          if (!normalized) return;
+          seen.add(normalized);
+        };
+        addLabel('BRASILEIRA');
+        try {
+          const response = await fetch('https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/nacionalidades');
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const data = await response.json();
+          const entries = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+          entries.map(extractNacionalidadeLabel).filter(Boolean).forEach(addLabel);
+        } catch (error) {
+          console.error('Erro ao carregar nacionalidades', error);
+        }
+        if (seen.size === 1) {
+          fallback.forEach(addLabel);
+        }
+        const ordered = ['BRASILEIRA', ...Array.from(seen).filter((value) => value !== 'BRASILEIRA').sort()];
+        const currentValue = nacionalidadeSelect.value;
+        nacionalidadeSelect.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Selecione...';
+        nacionalidadeSelect.appendChild(defaultOption);
+        ordered.forEach((label) => {
+          const option = document.createElement('option');
+          option.value = label;
+          option.textContent = label;
+          nacionalidadeSelect.appendChild(option);
+        });
+        if (currentValue) {
+          nacionalidadeSelect.value = currentValue.toUpperCase();
+        }
+        applySelectPrefill(nacionalidadeSelect);
+        updateNacionalidadeRequirement();
+      };
+
+      const applyUppercaseTransform = () => {
+        if (!form) return;
+        const inputs = Array.from(form.querySelectorAll('input[type="text"]')).filter(
+          (field) => field.dataset.allowLowercase !== 'true' && field.dataset.numericOnly !== 'true',
+        );
+        inputs.forEach((field) => {
+          field.value = field.value.toUpperCase();
+          field.addEventListener('input', () => {
+            const { selectionStart, selectionEnd } = field;
+            const upper = field.value.toUpperCase();
+            if (field.value !== upper) {
+              field.value = upper;
+              if (typeof field.setSelectionRange === 'function') {
+                const start = selectionStart ?? upper.length;
+                const end = selectionEnd ?? upper.length;
+                field.setSelectionRange(start, end);
+              }
+            }
+          });
+          field.addEventListener('blur', () => {
+            field.value = field.value.toUpperCase();
+          });
+        });
+      };
+
+      const applyLowercaseToEmails = () => {
+        const emailFields = [document.getElementById('email'), document.getElementById('email_confirm')].filter(Boolean);
+        emailFields.forEach((field) => {
+          field.value = field.value.toLowerCase();
+          field.addEventListener('input', () => {
+            const { selectionStart, selectionEnd } = field;
+            const lower = field.value.toLowerCase();
+            if (field.value !== lower) {
+              field.value = lower;
+              if (typeof field.setSelectionRange === 'function') {
+                const start = selectionStart ?? lower.length;
+                const end = selectionEnd ?? lower.length;
+                field.setSelectionRange(start, end);
+              }
+            }
+          });
+          field.addEventListener('blur', () => {
+            field.value = field.value.toLowerCase();
+          });
+        });
+      };
+
+      const enforceNumericOnly = () => {
+        document.querySelectorAll('input[data-numeric-only="true"]').forEach((field) => {
+          field.addEventListener('input', () => {
+            const { selectionStart, selectionEnd } = field;
+            const digits = field.value.replace(/\D+/g, '');
+            const max = field.maxLength && field.maxLength > 0 ? field.maxLength : undefined;
+            const nextValue = typeof max === 'number' ? digits.slice(0, max) : digits;
+            if (field.value !== nextValue) {
+              field.value = nextValue;
+              if (document.activeElement === field && typeof field.setSelectionRange === 'function') {
+                const position = selectionStart ?? nextValue.length;
+                const end = selectionEnd ?? nextValue.length;
+                field.setSelectionRange(position, end);
+              }
+            }
+          });
+        });
+      };
+
       const buildReview = () => {
         const summary = document.getElementById('reviewSummary');
         summary.innerHTML = '';
         const getValue = (name) => {
           const field = form.elements[name];
           if (!field) return '';
-          if (field instanceof RadioNodeList) {
-            return field.value || '';
+          if (isRadioGroup(field)) {
+            if (typeof field.value === 'string') {
+              return field.value || '';
+            }
+            const checked = Array.from(field).find((input) => input.checked);
+            return checked ? checked.value : '';
           }
           if (field.type === 'file') {
             const files = Array.from(field.files || []);
@@ -2303,7 +2710,11 @@
         });
       };
 
-      const saveDraft = () => {
+      const saveDraft = (event) => {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
         const data = {};
         Array.from(form.elements).forEach((field) => {
           if (!field.name) return;
@@ -2319,9 +2730,18 @@
           }
           data[field.name] = field.value;
         });
-        localStorage.setItem(storageKey, JSON.stringify(data));
-        draftToast.classList.add('show');
-        setTimeout(() => draftToast.classList.remove('show'), 3200);
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(data));
+          if (draftToast) {
+            draftToast.classList.add('show');
+            setTimeout(() => draftToast.classList.remove('show'), 3200);
+          } else {
+            alert('Rascunho salvo com sucesso!');
+          }
+        } catch (error) {
+          console.error('Erro ao salvar rascunho', error);
+          alert('Não foi possível salvar o rascunho neste navegador.');
+        }
       };
 
       const loadDraft = () => {
@@ -2332,11 +2752,12 @@
           Object.entries(data).forEach(([name, value]) => {
             const field = form.elements[name];
             if (!field) return;
-            if (field instanceof RadioNodeList) {
-              const radio = Array.from(field).find((input) => input.value === value);
+            if (isRadioGroup(field)) {
+              const radios = Array.from(field);
+              const radio = radios.find((input) => input.value === value);
               if (radio) {
                 radio.checked = true;
-                radio.dispatchEvent(new Event('change'));
+                radio.dispatchEvent(new Event('change', { bubbles: true }));
               }
               return;
             }
@@ -2344,7 +2765,23 @@
               field.checked = Boolean(value);
               return;
             }
-            field.value = value;
+            let newValue = value;
+            if (field.dataset.numericOnly === 'true') {
+              newValue = String(value || '').replace(/\D+/g, '');
+              if (field.maxLength && field.maxLength > 0) {
+                newValue = newValue.slice(0, field.maxLength);
+              }
+            }
+            if (field.type === 'text' && field.dataset.allowLowercase !== 'true' && field.dataset.numericOnly !== 'true') {
+              newValue = String(value || '').toUpperCase();
+            }
+            if (field.type === 'email') {
+              newValue = String(value || '').toLowerCase();
+            }
+            if (field === nacionalidadeSelect) {
+              nacionalidadeSelect.dataset.prefill = newValue;
+            }
+            field.value = newValue;
             field.dispatchEvent(new Event('change'));
           });
         } catch (err) {
@@ -2438,7 +2875,7 @@
         if (target.type === 'hidden') return;
         if (target instanceof HTMLInputElement && (target.type === 'radio' || target.type === 'checkbox')) {
           const controls = target.form && target.name ? target.form.elements[target.name] : null;
-          if (controls instanceof RadioNodeList) {
+          if (target.type === 'radio' && isRadioGroup(controls)) {
             Array.from(controls).forEach((control) => control.classList.remove('is-invalid'));
           } else {
             target.classList.remove('is-invalid');
@@ -2476,12 +2913,12 @@
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        validateEmailsMatch();
+        validateEmailsMatch(true);
         if (!form.checkValidity() || !validateCurrentStep()) {
           event.stopPropagation();
           return;
         }
-        if (!validateEmailsMatch()) {
+        if (!validateEmailsMatch(true)) {
           document.getElementById('email_confirm').reportValidity();
           return;
         }
@@ -2508,7 +2945,7 @@
         if (submitButton) {
           submitButton.disabled = true;
         }
-        showSuccessFeedback(authValue);
+        showSuccessFeedback();
       });
 
       document.getElementById('genero').addEventListener('change', updateGeneroOutro);
@@ -2520,6 +2957,18 @@
       document.getElementById('cotasPPNI').addEventListener('change', updatePPNI);
       document.getElementById('email').addEventListener('input', validateEmailsMatch);
       document.getElementById('email_confirm').addEventListener('input', validateEmailsMatch);
+      document.getElementById('email').addEventListener('blur', () => {
+        if (document.getElementById('email_confirm')?.value) {
+          validateEmailsMatch(true);
+        }
+      });
+      document.getElementById('email_confirm').addEventListener('blur', () => validateEmailsMatch(true));
+      if (nacionalidadeSelect) {
+        nacionalidadeSelect.addEventListener('change', updateNacionalidadeRequirement);
+      }
+      if (newSubmissionButton) {
+        newSubmissionButton.addEventListener('click', () => window.location.reload());
+      }
       document.querySelectorAll('.upload-input').forEach((input) => {
         updateUploadIndicator(input);
         input.addEventListener('change', () => updateUploadIndicator(input));
@@ -2528,16 +2977,24 @@
         cepInput.addEventListener('input', handleCepInput);
       }
 
+      applyLowercaseToEmails();
+      applyUppercaseTransform();
+      enforceNumericOnly();
+      populateUfSelects();
       selectPrefills();
+      void populateNacionalidades();
       radioPrefills();
       loadDraft();
+      updateGeneroOptions();
       updateGeneroOutro();
       updateMilitar();
       updateJurado();
       updateVinculo();
       updatePCD();
+      requestAnimationFrame(() => updatePCD());
       updateNecessidade();
       updatePPNI();
+      updateNacionalidadeRequirement();
       handleCepInput();
       validateEmailsMatch();
       showStep(0);
