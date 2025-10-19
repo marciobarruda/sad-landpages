@@ -517,12 +517,19 @@
                 <input type="email" id="email" class="form-control" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
                 <div class="help tiny" id="emailHelp"></div>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-6">
+                <label class="form-label required" for="email_confirm">Confirme o e-mail</label>
+                <input type="email" id="email_confirm" class="form-control" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required>
+                <div class="help tiny" id="emailConfirmHelp"></div>
+              </div>
+            </div>
+            <div class="row g-3 mt-0">
+              <div class="col-md-6">
                 <label class="form-label required" for="tel1">Telefone 1</label>
                 <input type="text" id="tel1" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone1 ?? $json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}" required>
                 <div class="help tiny" id="tel1Help"></div>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-6">
                 <label class="form-label" for="tel2">Telefone 2</label>
                 <input type="text" id="tel2" class="form-control" inputmode="numeric" maxlength="11" placeholder="DDD + número" value="{{ String($json.telefone2 ?? $json.phone2 ?? '').replace(/\D+/g, '') }}">
                 <div class="help tiny" id="tel2Help"></div>
@@ -1070,9 +1077,56 @@
       const fmtCPF = v => { const d = onlyDigits(v||''); return d.length===11 ? d.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/,'$1.$2.$3-$4') : (d||''); };
       const fmtCEP = v => { const d = onlyDigits(v||''); return d.length===8 ? d.replace(/(\\d{5})(\\d{3})/,'$1-$2') : (d||''); };
       const toMB = bytes => Math.round((bytes/1024/1024)*100)/100;
+      const normalizeEmail = (value) => String(value ?? '').trim().toLowerCase();
 
       // ========= Validators =========
       function isValidEmail(v){ return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(String(v||'').trim()); }
+      function getEmailValues(){
+        const emailInput = $('#email');
+        const confirmInput = $('#email_confirm');
+        return {
+          email: emailInput ? normalizeEmail(emailInput.value) : '',
+          confirm: confirmInput ? normalizeEmail(confirmInput.value) : ''
+        };
+      }
+      function emailsMatch(){
+        const { email, confirm } = getEmailValues();
+        if(!email || !confirm) return false;
+        if(!isValidEmail(email)) return false;
+        return email === confirm;
+      }
+      function updateEmailFeedback(){
+        const emailInput = $('#email');
+        const confirmInput = $('#email_confirm');
+        const helpPrimary = $('#emailHelp');
+        const helpConfirm = $('#emailConfirmHelp');
+        if(!emailInput || !confirmInput) return;
+        const { email, confirm } = getEmailValues();
+        if(emailInput.value !== email) emailInput.value = email;
+        if(confirmInput.value !== confirm) confirmInput.value = confirm;
+        const emailValid = email ? isValidEmail(email) : false;
+        emailInput.setCustomValidity(email && !emailValid ? 'E-mail inválido' : '');
+        if(helpPrimary){
+          helpPrimary.textContent = email ? (emailValid ? '' : 'Informe um e-mail válido.') : '';
+        }
+        let confirmMessage = '';
+        let confirmValidity = '';
+        if(confirm){
+          if(!emailValid){
+            confirmValidity = 'Informe um e-mail válido antes de confirmar.';
+            confirmMessage = 'Corrija o e-mail principal antes de confirmar.';
+          }else if(email !== confirm){
+            confirmValidity = 'Os e-mails não coincidem.';
+            confirmMessage = 'O e-mail digitado não coincide.';
+          }
+        }else if(email){
+          confirmMessage = 'Repita o e-mail informado.';
+        }
+        confirmInput.setCustomValidity(confirmValidity);
+        if(helpConfirm){
+          helpConfirm.textContent = confirmMessage;
+        }
+      }
       function isValidCPF(cpf){
         cpf = onlyDigits(cpf);
         if(!cpf || cpf.length !== 11) return false;
@@ -1411,6 +1465,7 @@
         assignValue('#mae', data.mae ?? data.motherName, value => String(value).trim().toUpperCase());
         assignValue('#pai', data.pai ?? data.fatherName, value => String(value).trim().toUpperCase());
         assignValue('#email', data.email, value => String(value).trim().toLowerCase());
+        assignValue('#email_confirm', data.email, value => String(value).trim().toLowerCase());
         assignValue('#tel1', data.telefone1 ?? data.telefone ?? data.phone, fmtPhone);
         assignValue('#tel2', data.telefone2 ?? data.phone2, fmtPhone);
         assignValue('#cep', data.postal_code ?? data.cep, value => onlyDigits(value).slice(0,8));
@@ -1490,7 +1545,7 @@
           if(normalized === 'SIM') setRadioValue('condicao_especial','Sim');
           else if(normalized === 'NAO') setRadioValue('condicao_especial','Não');
         }
-        const selectorsToTrigger = ['#cpf','#nome','#nome_social','#nasc','#sexo','#genero','#nacionalidade','#naturalidade_cidade','#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis','#mae','#pai','#email','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf','#ies','#curso','#ano_conclusao','#especialidade','#jurado_periodo','#qual_vinculo','#experiencia_tempo','#tipo_pcd','#pcd_cid','#necessidade'];
+        const selectorsToTrigger = ['#cpf','#nome','#nome_social','#nasc','#sexo','#genero','#nacionalidade','#naturalidade_cidade','#naturalidade_uf','#rg_numero','#rg_orgao','#rg_uf','#rg_data','#nis','#mae','#pai','#email','#email_confirm','#tel1','#tel2','#cep','#logradouro','#numero','#complemento','#bairro','#cidade','#uf','#ies','#curso','#ano_conclusao','#especialidade','#jurado_periodo','#qual_vinculo','#experiencia_tempo','#tipo_pcd','#pcd_cid','#necessidade'];
         selectorsToTrigger.forEach(selector => {
           const el = $(selector);
           if(el && el.value){
@@ -1823,11 +1878,12 @@
 
       // ========= Submit state =========
       function baseFieldsOk(){
-        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
+        const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','vinculo_publico','cargo','mae'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isAdult($('#nasc').value)) return false;
         if(!isValidCPF($('#cpf').value)) return false;
         if(!isValidEmail($('#email').value)) return false;
+        if(!emailsMatch()) return false;
         if(!isValidPhone($('#tel1').value)) return false;
         const tel2Val = $('#tel2')?.value || '';
         if(tel2Val && !isValidPhone(tel2Val)) return false;
@@ -1986,11 +2042,12 @@
           focusElementAndStep(input);
           return false;
         };
-        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
+        const baseIds = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','email_confirm','tel1','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','sexo','genero','estado_civil','raca','cotasPPNI','is_pcd','cargo','mae'];
         for(const id of baseIds){
           if(!ensureField(`#${id}`)) return false;
         }
         if(!ensureField('#email', el => { const v = String(el.value||'').trim(); return v && isValidEmail(v); })) return false;
+        if(!ensureField('#email_confirm', () => emailsMatch())) return false;
         if(!ensureField('#tel1', el => { const v = String(el.value||'').trim(); return v && isValidPhone(v); })) return false;
         const tel2 = document.getElementById('tel2');
         if(tel2 && tel2.value && !isValidPhone(tel2.value)){
@@ -2483,12 +2540,17 @@
         refreshSubmitState();
       });
 
-      $('#email').addEventListener('input', e=>{
-        e.target.value = (e.target.value||'').toLowerCase();
-        const v=e.target.value.trim(); const ok=isValidEmail(v);
-        e.target.setCustomValidity(v && !ok ? 'E-mail inválido' : '');
-        $('#emailHelp').textContent = v ? (ok ? '' : 'Informe um e-mail válido.') : '';
-        refreshSubmitState(); updateReview();
+      const handleEmailInputs = () => {
+        updateEmailFeedback();
+        refreshSubmitState();
+        updateReview();
+      };
+      ['#email','#email_confirm'].forEach(selector => {
+        const element = $(selector);
+        if(!element) return;
+        element.addEventListener('input', handleEmailInputs);
+        element.addEventListener('blur', handleEmailInputs);
+        element.addEventListener('change', handleEmailInputs);
       });
       $('#cpf').addEventListener('input', e=>{
         const ok=isValidCPF(e.target.value);
@@ -2749,6 +2811,7 @@
           cpf: onlyDigits($('#cpf').value),
           nis: $('#nis').value.trim(),
           email: $('#email').value.trim().toLowerCase(),
+          email_confirmacao: $('#email_confirm').value.trim().toLowerCase(),
           telefone1: onlyDigits($('#tel1').value),
           telefone2: onlyDigits($('#tel2').value),
           // endereço
@@ -3019,6 +3082,7 @@
         declarationConfigs.forEach(cfg => resetDeclaration(cfg.box, cfg.checkbox, cfg.hint));
         attachWatchers();
         applyPrefillFromContext();
+        updateEmailFeedback();
         toggleVinculoDetails();
         togglePcdDetails();
         toggleHeteroDocs();
