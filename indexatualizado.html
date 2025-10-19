@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Secretaria de Administração e Gestão de Pessoas - SADGP — Portal de Formulários</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      :root {
+        --brand-primary: #0053a4;
+        --brand-secondary: #003a73;
+        --brand-highlight: #00a3ff;
+        --surface: #f4f7fb;
+        --surface-strong: #ffffff;
+        --border-color: #d0d7e2;
+        --text-strong: #1b263b;
+        --text-muted: #5b6c8c;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--surface);
+        color: var(--text-strong);
+        min-height: 100vh;
+      }
+
+      header.site-header {
+        background: linear-gradient(135deg, rgba(0, 83, 164, 0.96), rgba(0, 58, 115, 0.88));
+        color: #ffffff;
+        padding: 3.5rem 0 2.75rem;
+      }
+
+      header .lead {
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 720px;
+      }
+
+      .badge-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        background-color: rgba(255, 255, 255, 0.14);
+      }
+
+      .user-greeting {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgba(0, 83, 164, 0.09), rgba(0, 163, 255, 0.12));
+        color: var(--text-strong);
+        box-shadow: 0 10px 30px rgba(0, 45, 98, 0.08);
+      }
+
+      .user-greeting::before {
+        content: "👋";
+        font-size: 1.4rem;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 0.02em;
+        color: var(--text-strong);
+      }
+
+      .section-title::before {
+        content: "";
+        display: inline-block;
+        width: 32px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--brand-highlight);
+      }
+
+      .card-programa {
+        border: 1px solid rgba(0, 83, 164, 0.08);
+        border-radius: 1.1rem;
+        background: var(--surface-strong);
+        box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: 100%;
+      }
+
+      .card-programa:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 38px rgba(0, 45, 98, 0.12);
+      }
+
+      .card-programa .card-header {
+        border-bottom: 1px solid rgba(0, 83, 164, 0.08);
+        background: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+        padding: 1.5rem 1.6rem 1.1rem;
+      }
+
+      .card-programa .card-body {
+        padding: 1.6rem 1.6rem 1.75rem;
+      }
+
+      .card-programa .badge {
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+
+      .card-programa ul {
+        padding-left: 1.25rem;
+        margin-bottom: 1.25rem;
+        color: var(--text-muted);
+      }
+
+      .card-programa .btn {
+        border-radius: 999px;
+        padding-inline: 1.6rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+      .downloads-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+      }
+
+      .download-card {
+        border: 1px solid var(--border-color);
+        background: var(--surface-strong);
+        border-radius: 1rem;
+        padding: 1.35rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-height: 170px;
+      }
+
+      .download-card strong {
+        font-size: 1rem;
+        color: var(--text-strong);
+      }
+
+      .download-card p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+
+      .download-card a {
+        font-weight: 600;
+      }
+
+      .updates-panel {
+        border-left: 3px solid var(--brand-highlight);
+        padding-left: 1.2rem;
+        color: var(--text-muted);
+      }
+
+      .updates-panel time {
+        font-size: 0.85rem;
+        color: var(--brand-secondary);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      footer {
+        color: var(--text-muted);
+        padding: 2.5rem 0 2rem;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        header.site-header {
+          padding: 2.5rem 0 2rem;
+        }
+
+        .badge-open {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .section-title {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <input type="hidden" id="authorization" value="{{ $('Code in JavaScript2').item.json.authorization }}" />
+    <header class="site-header">
+      <div class="container">
+        <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
+        <h1 class="display-6 fw-semibold mt-3">Portal de Formulários e Seleções</h1>
+        <p class="lead mt-2">
+          Centralize o acesso a editais, formulários e documentos obrigatórios utilizados nas seleções
+          simplificadas conduzidas pela Secretaria de Administração e Gestão de Pessoas - SADGP. Confira os prazos, leia os editais e realize o envio das
+          documentações exigidas com segurança.
+        </p>
+      </div>
+    </header>
+
+    <main class="container my-5">
+      <p class="user-greeting">Olá, {{ $json.given_name }}! Que bom ter você aqui.</p>
+      <section class="mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+          <h2 class="section-title mb-0">Inscrições em andamento</h2>
+          <div class="text-muted small">
+            Última atualização em <strong>outubro de 2025</strong> • Horário oficial do Recife (GMT-3)
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <article class="card card-programa">
+              <div class="card-header">
+                <span class="badge text-bg-light text-uppercase text-primary">Seleção simplificada</span>
+                <h3 class="h5 mt-3 mb-1">Hospital Veterinário do Recife</h3>
+                <p class="mb-0 text-muted">Processo seletivo para contratação temporária — Edital SAD Nº 01/2025</p>
+              </div>
+              <div class="card-body">
+                <ul class="mb-0">
+                  <li>Período de inscrição: 10 a 24 de outubro de 2025.</li>
+                  <li>Envio de documentos comprobatórios em formato PDF.</li>
+                  <li>Etapas conduzidas no Sistema SAD Seleções.</li>
+                </ul>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-primary" id="btn-preencher-inscricao" type="button">Preencher formulário de inscrição</button>
+                  <a class="btn btn-outline-primary" href="NOVO%20FORM%20DE%20INSCRIÇÃO%20(FORMULÁRIO%20PRINCIPAL).pdf" target="_blank" rel="noopener">Baixar edital</a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="card card-programa">
+              <div class="card-header">
+                <span class="badge text-bg-light text-uppercase text-primary">Atualização cadastral</span>
+                <h3 class="h5 mt-3 mb-1">Hospital Veterinário — Cadastro de Reservas</h3>
+                <p class="mb-0 text-muted">Formulário para manutenção dos dados dos candidatos aprovados</p>
+              </div>
+              <div class="card-body">
+                <ul class="mb-0">
+                  <li>Destinado aos candidatos classificados nas seleções de 2024-2025.</li>
+                  <li>Atualize telefones, endereços e anexos de comprovação.</li>
+                  <li>Suporte: sad.hvr@recife.pe.gov.br.</li>
+                </ul>
+                <a class="btn btn-outline-primary" href="selecao-hvet.html">Acessar painel do cadastro</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-5">
+        <h2 class="section-title mb-3">Documentos obrigatórios e modelos</h2>
+        <p class="text-muted mb-4">
+          Utilize os modelos oficiais disponibilizados abaixo. Todos os anexos devem ser assinados, digitalizados em alta
+          resolução e enviados em formato PDF conforme orientações do edital.
+        </p>
+
+        <div class="downloads-grid">
+          <article class="download-card">
+            <strong>Modelo de Laudo Médico para Pessoas com Deficiência</strong>
+            <p>Documento comprobatório exigido para candidatos que solicitam reserva de vagas PcD.</p>
+            <a class="link-primary" href="FORM%20MODELO%20DE%20LAUDO%20MÉDICO%20PARA%20PESSOAS%20COM%20DEFICIÊNCIA.pdf" target="_blank" rel="noopener">Baixar modelo em PDF</a>
+          </article>
+
+          <article class="download-card">
+            <strong>Termo de Autodeclaração — Candidatos Negros (Preto e Pardo)</strong>
+            <p>Assinatura obrigatória para candidatos que optarem pela reserva de vagas para pessoas negras.</p>
+            <a class="link-primary" href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20CANDIDATOS%20NEGROS%20(PRETO%20E%20PARDO).pdf" target="_blank" rel="noopener">Baixar termo em PDF</a>
+          </article>
+
+          <article class="download-card">
+            <strong>Termo de Autodeclaração de Identidade Indígena (TADII)</strong>
+            <p>Documento exigido para autodeclaração de pertencimento a povos indígenas.</p>
+            <a class="link-primary" href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20IDENTIDADE%20INDÍGENA%20-%20TADII.pdf" target="_blank" rel="noopener">Baixar termo em PDF</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="row g-4 align-items-start mb-5">
+        <div class="col-lg-7">
+          <h2 class="section-title mb-3">Orientações para inscrição</h2>
+          <ol class="list-group list-group-numbered shadow-sm">
+            <li class="list-group-item">
+              Leia atentamente o edital e verifique os requisitos de participação, prazos e critérios de classificação.
+            </li>
+            <li class="list-group-item">
+              Separe toda a documentação obrigatória em formato PDF, com tamanho máximo de 10&nbsp;MB por arquivo.
+            </li>
+            <li class="list-group-item">
+              Utilize o formulário eletrônico para preencher seus dados pessoais, profissionais e anexar a documentação.
+            </li>
+            <li class="list-group-item">
+              Após o envio, acompanhe o e-mail cadastrado e o portal oficial para publicações de listas e comunicados.
+            </li>
+          </ol>
+        </div>
+        <div class="col-lg-5">
+          <div class="updates-panel bg-white rounded-4 p-4 shadow-sm">
+            <h3 class="h6 text-uppercase text-secondary fw-bold mb-3">Comunicados recentes</h3>
+            <div class="mb-4">
+              <time datetime="2025-10-18">18 out 2025</time>
+              <p class="mb-1 fw-semibold">Publicação da retificação nº 01 do edital SAD Nº 01/2025.</p>
+              <p class="mb-0">Inclui novos modelos de autodeclaração e ajustes no cronograma das entrevistas.</p>
+            </div>
+            <div>
+              <time datetime="2025-10-15">15 out 2025</time>
+              <p class="mb-1 fw-semibold">Disponibilização do formulário eletrônico atualizado.</p>
+              <p class="mb-0">Todas as inscrições enviadas antes dessa data permanecem válidas e não necessitam reenvio.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-5">
+        <h2 class="section-title mb-3">Canais de suporte</h2>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
+              <h3 class="h6 text-uppercase text-secondary">Atendimento eletrônico</h3>
+              <p class="mb-1 fw-semibold">sad.selecao@recife.pe.gov.br</p>
+              <p class="mb-0 text-muted">Resposta em até 2 dias úteis.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
+              <h3 class="h6 text-uppercase text-secondary">Telefone</h3>
+              <p class="mb-1 fw-semibold">(81) 3355-0000</p>
+              <p class="mb-0 text-muted">Segunda a sexta-feira, das 9h às 16h.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
+              <h3 class="h6 text-uppercase text-secondary">Atendimento presencial</h3>
+              <p class="mb-1 fw-semibold">Av. Cais do Apolo, 925 — Bairro do Recife</p>
+              <p class="mb-0 text-muted">Agendamento prévio obrigatório.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-white border-top">
+      <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+        <span>Secretaria de Administração e Gestão de Pessoas - SADGP — Prefeitura do Recife</span>
+        <span class="text-muted">© 2025 • Coordenadoria de Processos Seletivos</span>
+      </div>
+    </footer>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var button = document.getElementById("btn-preencher-inscricao");
+        var authorizationField = document.getElementById("authorization");
+        var targetUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
+        var redirectUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
+
+        if (!button) {
+          return;
+        }
+
+        button.addEventListener("click", function () {
+          var authorization = authorizationField ? authorizationField.value : "";
+
+          fetch(targetUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ authorization: authorization }),
+          })
+            .catch(function (error) {
+              console.error("Falha ao enviar autorização:", error);
+            })
+            .finally(function () {
+              window.location.href = redirectUrl;
+            });
+        });
+      });
+    </script>
+  </body>
+</html>
