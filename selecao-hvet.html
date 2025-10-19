@@ -610,7 +610,10 @@
 
       // ========= Review =========
       function updateReview(){
+<<<<<<< HEAD
         enforceUppercaseTextInputs();
+=======
+>>>>>>> b918f0586cd64c02accd7946fdd670a07a317cef
         const nome=esc($('#nome').value), email=esc(($('#email').value||'').toLowerCase());
         const cpf=fmtCPF($('#cpf').value);
         const tel = esc(`(${onlyDigits($('#tel1_ddd').value)}) ${onlyDigits($('#tel1_num').value)}`);
@@ -663,7 +666,11 @@
         const ids = ['nome','nasc','nacionalidade','naturalidade_cidade','naturalidade_uf','rg_numero','rg_orgao','rg_uf','rg_data','cpf','email','tel1_ddd','tel1_num','cep','logradouro','numero','bairro','cidade','uf','nivel','ies','curso','ano_conclusao','genero','raca','cotasPNP','is_pcd','vinculo_publico'];
         for(const id of ids){ const el=document.getElementById(id); if(!el || !String(el.value||'').trim()) return false; }
         if(!isValidCPF($('#cpf').value)) return false;
+<<<<<<< HEAD
         if(!isValidEmail($('#email').value.trim())) return false;
+=======
+        if(!isValidEmail($('#email').value)) return false;
+>>>>>>> b918f0586cd64c02accd7946fdd670a07a317cef
         return true;
       }
       function docsRequiredOk(){
@@ -876,6 +883,26 @@
       document.getElementById('btnSubmitAll').addEventListener('click', submitAll);
 
       // ========= Init =========
+      function enforceUppercaseTextInputs(){
+        const textInputs = document.querySelectorAll('input[type="text"]');
+        textInputs.forEach(input => {
+          if(input.type !== 'text') return;
+          if(input.id === 'email') return;
+          input.classList.add('text-uppercase');
+          const apply = () => {
+            const { selectionStart, selectionEnd, value } = input;
+            const upper = value.toUpperCase();
+            if(value !== upper){
+              input.value = upper;
+              if(document.activeElement === input && selectionStart != null && selectionEnd != null){
+                input.setSelectionRange(selectionStart, selectionEnd);
+              }
+            }
+          };
+          apply();
+          input.addEventListener('input', apply);
+        });
+      }
       function attachWatchers(){
         const events=['input','change','blur'];
         document.querySelectorAll('input,select,textarea').forEach(el=>{
@@ -883,7 +910,10 @@
         });
       }
       function init(){
+<<<<<<< HEAD
         disableAutocomplete();
+=======
+>>>>>>> b918f0586cd64c02accd7946fdd670a07a317cef
         loadDraft();
         enforceUppercaseTextInputs();
         attachWatchers();
