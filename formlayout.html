@@ -1935,6 +1935,22 @@
           <button type="button" class="btn btn-primary" id="newSubmissionButton">Nova inscrição</button>
         </div>
       </div>
+      <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="alertModalTitle">Aviso!</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+              <p id="alertModalMessage" class="mb-0"></p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
     <div class="pattern-bottom"></div>
 
@@ -1951,6 +1967,19 @@
       const registrationValueElement = registrationNumberElement?.querySelector('.registration-value');
       const successScreen = document.getElementById('submissionSuccess');
       const successRegistrationNumber = document.getElementById('successRegistrationNumber');
+      const alertModalElement = document.getElementById('alertModal');
+      const alertModalMessage = document.getElementById('alertModalMessage');
+      const alertModalInstance = alertModalElement ? new bootstrap.Modal(alertModalElement) : null;
+      const showAlert = (message) => {
+        if (alertModalMessage) {
+          alertModalMessage.textContent = message;
+        }
+        if (alertModalInstance) {
+          alertModalInstance.show();
+        } else {
+          window.alert(message);
+        }
+      };
       const newSubmissionButton = document.getElementById('newSubmissionButton');
       const nacionalidadeSelect = document.getElementById('nacionalidade');
       const naturalidadeUfSelect = document.getElementById('naturalidade_uf');
@@ -2055,7 +2084,7 @@
           confirm.classList.add('is-invalid');
           if ((shouldAlert || document.activeElement !== confirm) && !emailMismatchAlertShown) {
             emailMismatchAlertShown = true;
-            alert('Os e-mails informados não coincidem.');
+            showAlert('Os e-mails informados não coincidem.');
           }
           return false;
         }
@@ -2084,7 +2113,7 @@
           successScreen.classList.add('show');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-          alert('Inscrição enviada com sucesso!');
+          showAlert('Inscrição enviada com sucesso!');
         }
       };
 
@@ -2736,11 +2765,11 @@
             draftToast.classList.add('show');
             setTimeout(() => draftToast.classList.remove('show'), 3200);
           } else {
-            alert('Rascunho salvo com sucesso!');
+            showAlert('Rascunho salvo com sucesso!');
           }
         } catch (error) {
           console.error('Erro ao salvar rascunho', error);
-          alert('Não foi possível salvar o rascunho neste navegador.');
+          showAlert('Não foi possível salvar o rascunho neste navegador.');
         }
       };
 
