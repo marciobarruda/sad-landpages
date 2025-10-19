@@ -7,942 +7,1759 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
+      :root {
+        --brand: #1a73e8;
+        --brand-dark: #1559b0;
+        --brand-light: #e8f0fe;
+        --surface: #ffffff;
+        --muted: #6c757d;
+        --border-soft: #dbe4ff;
+      }
+
       body {
-        background-color: #f5f7fb;
-        color: #1d2a44;
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(900px 480px at 10% -10%, #e9f1ff 0%, rgba(233, 241, 255, 0) 65%),
+          radial-gradient(900px 480px at 90% -20%, #f4f8ff 0%, rgba(244, 248, 255, 0) 70%),
+          linear-gradient(180deg, #f7f9fc 0%, #f1f4fb 100%);
+        color: #0b2447;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
+
+      .pattern-top,
+      .pattern-bottom {
+        height: 140px;
+        background: url("https://statics.recife.pe.gov.br/images/dynamics/zonaazul/background.jpeg") center/1000px auto;
+        opacity: 0.25;
+      }
+
       .frame-card {
-        max-width: 1120px;
-        margin: 2rem auto;
+        max-width: 1100px;
+        margin: -120px auto 60px;
+        position: relative;
+        z-index: 2;
       }
-      .card-form {
+
+      header.hero {
+        height: 240px;
+        background: url("https://statics.recife.pe.gov.br/images/dynamics/zonaazul/banner.jpeg") center/cover no-repeat;
+        position: relative;
+      }
+
+      header.hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(11, 36, 71, 0.55) 0%, rgba(11, 36, 71, 0.35) 70%, rgba(11, 36, 71, 0.15) 100%);
+      }
+
+      header.hero .hero-content {
+        position: relative;
+        z-index: 1;
+        color: #ffffff;
+        padding: 2.75rem 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+      }
+
+      .hero-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-top: 0.75rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+        opacity: 0.86;
+      }
+
+      .wizard-shell {
+        background: var(--surface);
+        border-radius: 1.25rem;
+        padding: 1.75rem 1.5rem;
+        box-shadow: 0 18px 40px rgba(26, 115, 232, 0.12), 0 8px 22px rgba(26, 115, 232, 0.08);
+        border: 1px solid rgba(26, 115, 232, 0.12);
+        margin-bottom: 1.75rem;
+      }
+
+      .wizard-heading {
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #4c5aa1;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .wizard-heading::before {
+        content: "";
+        display: inline-block;
+        width: 34px;
+        height: 2px;
+        border-radius: 999px;
+        background: rgba(26, 115, 232, 0.4);
+      }
+
+      .wizard-steps {
+        list-style: none;
+        padding: 1.25rem 0 0;
+        margin: 0;
+        display: flex;
+        gap: 0;
+        counter-reset: wizard-step;
+      }
+
+      .wizard-step {
+        flex: 1 1 0;
+        min-width: 0;
+        text-align: center;
+        position: relative;
+        padding: 0 1.25rem;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .wizard-step::before,
+      .wizard-step::after {
+        content: "";
+        position: absolute;
+        top: 22px;
+        height: 2px;
+        width: 50%;
+        background: rgba(26, 115, 232, 0.2);
+        z-index: 0;
+      }
+
+      .wizard-step::before {
+        left: 0;
+      }
+
+      .wizard-step::after {
+        left: 50%;
+      }
+
+      .wizard-step:first-child::before {
+        display: none;
+      }
+
+      .wizard-step:last-child::after {
+        display: none;
+      }
+
+      .wizard-index {
+        display: inline-flex;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4c5aa1;
+        font-weight: 700;
+        z-index: 1;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+      }
+
+      .wizard-label {
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: #4c5aa1;
+      }
+
+      .wizard-step.active .wizard-index {
+        background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+        color: #ffffff;
+        border-color: rgba(26, 115, 232, 0.8);
+      }
+
+      .wizard-step.completed .wizard-index {
+        background: rgba(26, 115, 232, 0.12);
+        color: var(--brand);
+        border-color: rgba(26, 115, 232, 0.35);
+      }
+
+      .wizard-step.active::before,
+      .wizard-step.active::after,
+      .wizard-step.completed::before,
+      .wizard-step.completed::after {
+        background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
+      }
+
+      .step-card {
         border: 0;
-        border-radius: 1rem;
-        box-shadow: 0 10px 30px rgba(13, 110, 253, 0.12);
+        border-radius: 1.25rem;
         overflow: hidden;
+        box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
+        margin-bottom: 2.5rem;
       }
-      .card-form .card-header {
-        background: linear-gradient(180deg, #ffffff 0%, #f3f7ff 100%);
+
+      .step-card .card-header {
+        background: linear-gradient(180deg, #ffffff 0%, #f5f7ff 100%);
+        border-bottom: 1px solid rgba(26, 115, 232, 0.12);
+        padding: 1.5rem;
       }
+
+      .step-card .card-header h2 {
+        font-size: 1.1rem;
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .step-card .card-body {
+        padding: 1.75rem;
+      }
+
+      .section-block {
+        margin-bottom: 2rem;
+      }
+
+      .section-block:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0b2447;
+        margin-bottom: 0.75rem;
+      }
+
+      .section-subtitle {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+      }
+
       .required::after {
         content: " *";
         color: #dc3545;
+        font-weight: 600;
+      }
+
+      .form-text {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .wizard-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .wizard-controls .spacer {
+        flex: 1;
+      }
+
+      .wizard-controls .btn {
+        min-width: 140px;
+        font-weight: 600;
+        padding: 0.65rem 1.5rem;
+      }
+
+      .wizard-controls .btn-outline-secondary {
+        color: #4c5aa1;
+        border-color: #c3cffb;
+      }
+
+      .wizard-controls .btn-outline-secondary:hover {
+        background: #e9eeff;
+        border-color: #9daef5;
+        color: #2a3a87;
+      }
+
+      .wizard-controls .btn-primary {
+        background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+        border: none;
+        box-shadow: 0 10px 24px rgba(26, 115, 232, 0.25);
+      }
+
+      .wizard-controls .btn-primary:disabled {
+        opacity: 0.65;
+        box-shadow: none;
+      }
+
+      .summary-section {
+        border: 1px solid rgba(26, 115, 232, 0.08);
+        border-radius: 1rem;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        background: #ffffff;
+      }
+
+      .summary-section h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+      }
+
+      .summary-table {
+        width: 100%;
+      }
+
+      .summary-table th {
+        width: 32%;
+        font-weight: 600;
+        color: #22315b;
+        padding: 0.35rem 0.5rem 0.35rem 0;
+      }
+
+      .summary-table td {
+        padding: 0.35rem 0;
+        color: #3f4d7a;
+      }
+
+      .summary-placeholder {
+        color: #94a3d3;
+        font-style: italic;
+      }
+
+      .dropzone {
+        border: 2px dashed rgba(26, 115, 232, 0.25);
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+        background: rgba(232, 240, 254, 0.55);
+        color: #34518a;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .draft-toast {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        background: #0f5132;
+        color: #fff;
+        padding: 0.85rem 1.25rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 20px 45px rgba(15, 81, 50, 0.35);
+        display: none;
+        align-items: center;
+        gap: 0.75rem;
+        z-index: 50;
+      }
+
+      .draft-toast.show {
+        display: inline-flex;
+      }
+
+      @media (max-width: 992px) {
+        header.hero {
+          height: 210px;
+        }
+
+        .wizard-shell {
+          padding: 1.5rem 1.1rem;
+        }
+
+        .wizard-steps {
+          overflow-x: auto;
+          gap: 1.25rem;
+          justify-content: flex-start;
+          padding-bottom: 0.5rem;
+        }
+
+        .wizard-step {
+          min-width: 170px;
+          padding: 0 0.75rem;
+          align-items: flex-start;
+        }
+
+        .wizard-step::before,
+        .wizard-step::after {
+          display: none;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .card-body {
+          padding: 1.5rem 1.25rem !important;
+        }
+
+        .wizard-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .wizard-controls .btn {
+          width: 100%;
+        }
       }
     </style>
   </head>
   <body>
-    <main class="container frame-card">
-      <header class="text-center mb-4">
-        <h1 class="h3 mb-1">Seleção Simplificada</h1>
-        <p class="text-muted">Formulário de inscrição</p>
-      </header>
+    <header class="hero">
+      <div class="hero-content">
+        <span class="hero-badge">Secretaria Executiva de Administração</span>
+        <h1 class="hero-title">Seleção Simplificada — HospVet</h1>
+        <p class="hero-subtitle">Complete as etapas abaixo para enviar sua inscrição</p>
+      </div>
+    </header>
+    <div class="pattern-top"></div>
+
+    <main class="frame-card container">
+      <section class="wizard-shell">
+        <h2 class="wizard-heading">Etapas da inscrição</h2>
+        <ol class="wizard-steps" id="wizardSteps" role="tablist">
+          <li class="wizard-step active" data-step="0" role="tab" aria-selected="true" tabindex="0">
+            <span class="wizard-index">1</span>
+            <span class="wizard-label">Dados pessoais</span>
+          </li>
+          <li class="wizard-step" data-step="1" role="tab" aria-selected="false" tabindex="-1">
+            <span class="wizard-index">2</span>
+            <span class="wizard-label">Endereço e contato</span>
+          </li>
+          <li class="wizard-step" data-step="2" role="tab" aria-selected="false" tabindex="-1">
+            <span class="wizard-index">3</span>
+            <span class="wizard-label">Perfil profissional</span>
+          </li>
+          <li class="wizard-step" data-step="3" role="tab" aria-selected="false" tabindex="-1">
+            <span class="wizard-index">4</span>
+            <span class="wizard-label">Documentos</span>
+          </li>
+          <li class="wizard-step" data-step="4" role="tab" aria-selected="false" tabindex="-1">
+            <span class="wizard-index">5</span>
+            <span class="wizard-label">Revisão</span>
+          </li>
+        </ol>
+      </section>
 
       <form
+        id="inscricaoForm"
         class="needs-validation"
         novalidate
         method="post"
         action="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/atualizarinstancia"
         enctype="multipart/form-data"
       >
-        <!-- Dados Pessoais -->
-        <section class="card card-form mb-4">
+        <section class="card step-card" data-step-panel="0">
           <div class="card-header">
-            <h2 class="h5 mb-0">Dados pessoais</h2>
+            <h2>Identificação do candidato</h2>
           </div>
           <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label for="cpf" class="form-label required">CPF</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="cpf"
-                  name="cpf"
-                  maxlength="11"
-                  inputmode="numeric"
-                  value="{{ String(($json.cpf ?? $json.preferred_username ?? '')).replace(/\D+/g, '').slice(0,11) }}"
-                  required
-                />
-              </div>
-              <div class="col-md-9">
-                <label for="nome" class="form-label required">Nome completo</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="nome"
-                  name="nome"
-                  value="{{ String($json.nome ?? $json.name ?? '').trim() || String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="nome_social" class="form-label">Nome social</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="nome_social"
-                  name="nome_social"
-                  value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}"
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="nasc" class="form-label required">Data de nascimento</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="nasc"
-                  name="nasc"
-                  value="{{ (($json.nasc ?? $json.dob) || '').split('/').reverse().join('-') }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="nacionalidade" class="form-label required">Nacionalidade</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="nacionalidade"
-                  name="nacionalidade"
-                  value="{{ String($json.nacionalidade ?? $json.nationality ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="estado_civil" class="form-label required">Estado civil</label>
-                <select
-                  id="estado_civil"
-                  name="estado_civil"
-                  class="form-select"
-                  data-prefill="{{ $json.estado_civil ?? $json.maritalStatus ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Solteiro(a)">Solteiro(a)</option>
-                  <option value="Casado(a)">Casado(a)</option>
-                  <option value="União estável">União estável</option>
-                  <option value="Divorciado(a)">Divorciado(a)</option>
-                  <option value="Viúvo(a)">Viúvo(a)</option>
-                  <option value="Separado(a)">Separado(a)</option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label for="naturalidade_cidade" class="form-label required">Naturalidade</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="naturalidade_cidade"
-                  name="naturalidade_cidade"
-                  value="{{ String($json.naturalidade ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="naturalidade_uf" class="form-label required">UF</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="naturalidade_uf"
-                  name="naturalidade_uf"
-                  maxlength="2"
-                  value="{{ String($json.uf_naturalidade ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="mae" class="form-label required">Nome da mãe</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="mae"
-                  name="mae"
-                  value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="pai" class="form-label">Nome do pai</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="pai"
-                  name="pai"
-                  value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}"
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="sexo" class="form-label required">Sexo</label>
-                <select
-                  id="sexo"
-                  name="sexo"
-                  class="form-select"
-                  data-prefill="{{ $json.sexo ?? $json.sex ?? $json.genero ?? $json.gender ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Feminino">Feminino</option>
-                  <option value="Masculino">Masculino</option>
-                  <option value="Prefiro não informar">Prefiro não informar</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="genero" class="form-label required">Gênero</label>
-                <select
-                  id="genero"
-                  name="genero"
-                  class="form-select"
-                  data-prefill="{{ $json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Mulher cisgênero">Mulher cisgênero</option>
-                  <option value="Mulher trans">Mulher trans</option>
-                  <option value="Homem cisgênero">Homem cisgênero</option>
-                  <option value="Homem trans">Homem trans</option>
-                  <option value="Pessoa não binária">Pessoa não binária</option>
-                  <option value="Travesti">Travesti</option>
-                  <option value="Outro">Outro</option>
-                  <option value="Prefiro não informar">Prefiro não informar</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="genero_outro" class="form-label">Informe o gênero</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="genero_outro"
-                  name="genero_outro"
-                  placeholder="Descreva o gênero"
-                  maxlength="80"
-                  value="{{ String($json.genero_outro ?? '').trim() }}"
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="nis" class="form-label">NIS</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="nis"
-                  name="nis"
-                  maxlength="11"
-                  inputmode="numeric"
-                  value="{{ String($json.nis ?? $json.pis ?? $json.pis_pasep ?? '').replace(/\D+/g, '').slice(0,11) }}"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Documentos de Identificação -->
-        <section class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Documentos de identificação</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label for="rg_numero" class="form-label required">RG</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="rg_numero"
-                  name="rg_numero"
-                  maxlength="14"
-                  inputmode="numeric"
-                  value="{{ String($json.num_doc ?? '').replace(/\D+/g, '').slice(0,14) }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="rg_orgao" class="form-label required">Órgão</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="rg_orgao"
-                  name="rg_orgao"
-                  value="{{ String($json.orgao ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="rg_uf" class="form-label required">UF</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="rg_uf"
-                  name="rg_uf"
-                  maxlength="2"
-                  value="{{ String($json.uf_doc ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="rg_data" class="form-label required">Expedição</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="rg_data"
-                  name="rg_data"
-                  value="{{ String($json.exp_doc ?? '').split('/').reverse().join('-') }}"
-                  required
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="alistamento_numero" class="form-label">Número do Certificado de Reservista</label>
-                <input type="text" class="form-control" id="alistamento_numero" name="alistamento_numero" />
-              </div>
-              <div class="col-md-2">
-                <label for="alistamento_orgao" class="form-label">Órgão Emissor</label>
-                <input type="text" class="form-control" id="alistamento_orgao" name="alistamento_orgao" />
-              </div>
-              <div class="col-md-2">
-                <label for="alistamento_data" class="form-label">Data de emissão</label>
-                <input type="date" class="form-control" id="alistamento_data" name="alistamento_data" />
-              </div>
-              <div class="col-md-3">
-                <label for="titulo" class="form-label">Título de Eleitor</label>
-                <input type="text" class="form-control" id="titulo" name="titulo" maxlength="12" inputmode="numeric" />
-              </div>
-              <div class="col-md-2">
-                <label for="zona" class="form-label">Zona</label>
-                <input type="text" class="form-control" id="zona" name="zona" maxlength="4" inputmode="numeric" />
-              </div>
-              <div class="col-md-2">
-                <label for="secao" class="form-label">Seção</label>
-                <input type="text" class="form-control" id="secao" name="secao" maxlength="4" inputmode="numeric" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Informações complementares -->
-        <section class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Informações complementares</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-4">
-              <div class="col-md-6">
-                <span class="form-label d-block">Serviço militar obrigatório</span>
-                <div class="d-flex gap-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="militar" id="militar_sim" value="SIM" />
-                    <label class="form-check-label" for="militar_sim">Sim</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="militar" id="militar_nao" value="NAO" />
-                    <label class="form-check-label" for="militar_nao">Não</label>
-                  </div>
+            <div class="section-block">
+              <h3 class="section-title">Dados básicos</h3>
+              <p class="section-subtitle">Informe seus dados pessoais conforme documento oficial.</p>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="nome" class="form-label required">Nome completo</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nome"
+                    name="nome"
+                    value="{{ String($json.nome ?? $json.name ?? '').trim() || String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="nome_social" class="form-label">Nome social</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nome_social"
+                    name="nome_social"
+                    value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="cpf" class="form-label required">CPF</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cpf"
+                    name="cpf"
+                    maxlength="11"
+                    inputmode="numeric"
+                    value="{{ String(($json.cpf ?? $json.preferred_username ?? '')).replace(/\D+/g, '').slice(0,11) }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="nasc" class="form-label required">Data de nascimento</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="nasc"
+                    name="nasc"
+                    value="{{ (($json.nasc ?? $json.dob) || '').split('/').reverse().join('-') }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="nacionalidade" class="form-label required">Nacionalidade</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nacionalidade"
+                    name="nacionalidade"
+                    value="{{ String($json.nacionalidade ?? $json.nationality ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="nis" class="form-label">NIS</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nis"
+                    name="nis"
+                    maxlength="11"
+                    inputmode="numeric"
+                    value="{{ String($json.nis ?? $json.pis ?? $json.pis_pasep ?? '').replace(/\D+/g, '').slice(0,11) }}"
+                  />
                 </div>
               </div>
-              <div class="col-md-6">
-                <span class="form-label d-block">Atuou em função pública ou política</span>
-                <div class="d-flex gap-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="politicos" id="politicos_sim" value="SIM" />
-                    <label class="form-check-label" for="politicos_sim">Sim</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO" />
-                    <label class="form-check-label" for="politicos_nao">Não</label>
-                  </div>
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Naturalidade e filiação</h3>
+              <div class="row g-3">
+                <div class="col-md-5">
+                  <label for="naturalidade_cidade" class="form-label required">Naturalidade</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="naturalidade_cidade"
+                    name="naturalidade_cidade"
+                    value="{{ String($json.naturalidade ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="naturalidade_uf" class="form-label required">UF</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="naturalidade_uf"
+                    name="naturalidade_uf"
+                    maxlength="2"
+                    value="{{ String($json.uf_naturalidade ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-5">
+                  <label for="mae" class="form-label required">Nome da mãe</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="mae"
+                    name="mae"
+                    value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-5">
+                  <label for="pai" class="form-label">Nome do pai</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="pai"
+                    name="pai"
+                    value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Documentos de identificação</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="rg_numero" class="form-label required">RG</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="rg_numero"
+                    name="rg_numero"
+                    maxlength="14"
+                    inputmode="numeric"
+                    value="{{ String($json.num_doc ?? '').replace(/\D+/g, '').slice(0,14) }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="rg_orgao" class="form-label required">Órgão emissor</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="rg_orgao"
+                    name="rg_orgao"
+                    value="{{ String($json.orgao ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="rg_uf" class="form-label required">UF</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="rg_uf"
+                    name="rg_uf"
+                    maxlength="2"
+                    value="{{ String($json.uf_doc ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="rg_data" class="form-label required">Expedição</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="rg_data"
+                    name="rg_data"
+                    value="{{ String($json.exp_doc ?? '').split('/').reverse().join('-') }}"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Informações complementares</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="sexo" class="form-label required">Sexo</label>
+                  <select id="sexo" name="sexo" class="form-select" data-prefill="{{ $json.sexo ?? $json.sex ?? $json.genero ?? $json.gender ?? '' }}" required>
+                    <option value="">Selecione...</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Prefiro não informar">Prefiro não informar</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="genero" class="form-label required">Gênero</label>
+                  <select
+                    id="genero"
+                    name="genero"
+                    class="form-select"
+                    data-prefill="{{ $json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '' }}"
+                    required
+                  >
+                    <option value="">Selecione...</option>
+                    <option value="Mulher cisgênero">Mulher cisgênero</option>
+                    <option value="Mulher trans">Mulher trans</option>
+                    <option value="Homem cisgênero">Homem cisgênero</option>
+                    <option value="Homem trans">Homem trans</option>
+                    <option value="Pessoa não binária">Pessoa não binária</option>
+                    <option value="Travesti">Travesti</option>
+                    <option value="Outro">Outro</option>
+                    <option value="Prefiro não informar">Prefiro não informar</option>
+                  </select>
+                </div>
+                <div class="col-md-4 hidden" id="generoOutroGroup">
+                  <label for="genero_outro" class="form-label">Informe o gênero</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="genero_outro"
+                    name="genero_outro"
+                    maxlength="80"
+                    placeholder="Descreva o gênero"
+                    value="{{ String($json.genero_outro ?? '').trim() }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="estado_civil" class="form-label required">Estado civil</label>
+                  <select id="estado_civil" name="estado_civil" class="form-select" data-prefill="{{ $json.estado_civil ?? $json.maritalStatus ?? '' }}" required>
+                    <option value="">Selecione...</option>
+                    <option value="Solteiro(a)">Solteiro(a)</option>
+                    <option value="Casado(a)">Casado(a)</option>
+                    <option value="União estável">União estável</option>
+                    <option value="Divorciado(a)">Divorciado(a)</option>
+                    <option value="Viúvo(a)">Viúvo(a)</option>
+                    <option value="Separado(a)">Separado(a)</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="raca" class="form-label required">Cor/Raça (IBGE)</label>
+                  <select id="raca" name="raca" class="form-select" data-prefill="{{ $json.raca ?? $json.race ?? '' }}" required>
+                    <option value="">Selecione...</option>
+                    <option value="Branca">Branca</option>
+                    <option value="Preta">Preta</option>
+                    <option value="Parda">Parda</option>
+                    <option value="Amarela">Amarela</option>
+                    <option value="Indígena">Indígena</option>
+                  </select>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-
-        <!-- Contato -->
-        <section class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Contato</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label for="email" class="form-label required">E-mail</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="email"
-                  name="email"
-                  value="{{ String($json.email ?? '').trim().toLowerCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-4">
-                <label for="email_confirm" class="form-label required">Confirme o e-mail</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="email_confirm"
-                  name="email_confirm"
-                  value="{{ String($json.email ?? '').trim().toLowerCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="tel1" class="form-label required">Telefone 1</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="tel1"
-                  name="tel1"
-                  placeholder="DDD + número"
-                  value="{{ String($json.telefone1 ?? $json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}"
-                  maxlength="11"
-                  inputmode="numeric"
-                  required
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="tel2" class="form-label">Telefone 2</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="tel2"
-                  name="tel2"
-                  placeholder="DDD + número"
-                  value="{{ String($json.telefone2 ?? $json.phone2 ?? '').replace(/\D+/g, '') }}"
-                  maxlength="11"
-                  inputmode="numeric"
-                />
-              </div>
+          <div class="card-footer bg-transparent border-top-0 pt-0">
+            <div class="wizard-controls">
+              <button type="button" class="btn btn-outline-secondary" id="prevBtn0" disabled>Voltar</button>
+              <div class="spacer"></div>
+              <button type="button" class="btn btn-outline-secondary" data-action="save-draft">Salvar rascunho</button>
+              <button type="button" class="btn btn-primary" data-action="next">Avançar</button>
             </div>
           </div>
         </section>
-
-        <!-- Endereço -->
-        <section class="card card-form mb-4">
+        <section class="card step-card d-none" data-step-panel="1">
           <div class="card-header">
-            <h2 class="h5 mb-0">Endereço</h2>
+            <h2>Endereço e contato</h2>
           </div>
           <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-2">
-                <label for="cep" class="form-label required">CEP</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="cep"
-                  name="cep"
-                  placeholder="00000-000"
-                  value="{{ String($json.postal_code ?? $json.cep ?? '').replace(/\D+/g, '') }}"
-                  maxlength="8"
-                  inputmode="numeric"
-                  required
-                />
-              </div>
-              <div class="col-md-5">
-                <label for="logradouro" class="form-label required">Logradouro</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="logradouro"
-                  name="logradouro"
-                  value="{{ String($json.addressStreet ?? $json.logradouro ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-2">
-                <label for="numero" class="form-label required">Número</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="numero"
-                  name="numero"
-                  value="{{ String($json.numero ?? $json.addressNumber ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="complemento" class="form-label">Complemento</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="complemento"
-                  name="complemento"
-                  value="{{ String($json.complemento ?? $json.addressComplement ?? '').trim().toUpperCase() }}"
-                />
-              </div>
-              <div class="col-md-4">
-                <label for="bairro" class="form-label required">Bairro</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="bairro"
-                  name="bairro"
-                  value="{{ String($json.neighborhood ?? $json.bairro ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-5">
-                <label for="cidade" class="form-label required">Cidade</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="cidade"
-                  name="cidade"
-                  value="{{ String($json.cidade ?? $json.locality ?? $json.city ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="uf" class="form-label required">UF</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="uf"
-                  name="uf"
-                  maxlength="2"
-                  value="{{ String(($json.state ?? $json.addressState ?? $json.uf ?? '')).trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Formação acadêmica -->
-        <section class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Formação acadêmica</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label for="nivel" class="form-label required">Nível</label>
-                <select
-                  id="nivel"
-                  name="nivel"
-                  class="form-select"
-                  data-prefill="{{ $json.nivel ?? $json.nivel_escolaridade ?? $json.escolaridade ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Fundamental">Fundamental</option>
-                  <option value="Médio">Médio</option>
-                  <option value="Técnico">Técnico</option>
-                  <option value="Graduação">Graduação</option>
-                  <option value="Pós-graduação">Pós-graduação</option>
-                  <option value="Mestrado">Mestrado</option>
-                  <option value="Doutorado">Doutorado</option>
-                </select>
-              </div>
-              <div class="col-md-5">
-                <label for="ies" class="form-label required">Instituição</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="ies"
-                  name="ies"
-                  value="{{ String($json.instituicao ?? $json.ies ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-4">
-                <label for="curso" class="form-label required">Curso</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="curso"
-                  name="curso"
-                  value="{{ String($json.curso ?? '').trim().toUpperCase() }}"
-                  required
-                />
-              </div>
-              <div class="col-md-3">
-                <label for="ano_conclusao" class="form-label required">Ano de conclusão</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="ano_conclusao"
-                  name="ano_conclusao"
-                  maxlength="4"
-                  inputmode="numeric"
-                  value="{{ String($json.ano ?? $json.ano_conclusao ?? '').replace(/\D+/g, '').slice(0,4) }}"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Cargo pretendido -->
-        <section class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Cargo pretendido</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="cargo" class="form-label required">Cargo pretendido</label>
-                <select
-                  id="cargo"
-                  name="cargo"
-                  class="form-select"
-                  data-prefill="{{ $json.cargo ?? $json.cargo_pretendido ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Analista em Saúde Animal – Veterinário 40h">Analista em Saúde Animal – Veterinário 40h</option>
-                  <option value="Analista em Saúde Animal – Veterinário 20h">Analista em Saúde Animal – Veterinário 20h</option>
-                  <option value="Analista em Saúde Animal – Veterinário 40h Plantonista">Analista em Saúde Animal – Veterinário 40h Plantonista</option>
-                  <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h</option>
-                  <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista</option>
-                  <option value="Técnico em Saúde Animal - Radiologia e Imagenologia 24h">Técnico em Saúde Animal - Radiologia e Imagenologia 24h</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="especialidade" class="form-label">Especialidade (quando houver)</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="especialidade"
-                  name="especialidade"
-                  value="{{ String($json.especialidade ?? '').trim().toUpperCase() }}"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Experiências -->
-        <section class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Experiências e vínculos</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-4">
-              <div class="col-lg-6">
-                <span class="form-label d-block">Já atuou como jurado(a)?</span>
-                <div class="d-flex gap-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_sim" value="SIM" />
-                    <label class="form-check-label" for="jurado_sim">Sim</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_nao" value="NAO" />
-                    <label class="form-check-label" for="jurado_nao">Não</label>
-                  </div>
+            <div class="section-block">
+              <h3 class="section-title">Contato</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="email" class="form-label required">E-mail</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    value="{{ String($json.email ?? '').trim().toLowerCase() }}"
+                    required
+                  />
                 </div>
-                <input
-                  type="hidden"
-                  id="foi_jurado"
-                  name="foi_jurado"
-                  value="{{ String($json.foi_jurado ?? $json.jurado ?? '').trim().toUpperCase() }}"
-                />
-              </div>
-              <div class="col-lg-6">
-                <label for="jurado_periodo" class="form-label">Informações sobre a atuação como jurado(a)</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="jurado_periodo"
-                  name="jurado_periodo"
-                  placeholder="Tribunal, período ou outros detalhes"
-                  value="{{ String($json.jurado_periodo ?? '').trim() }}"
-                />
-              </div>
-              <div class="col-lg-6">
-                <span class="form-label d-block">Possui vínculo com administração pública?</span>
-                <div class="d-flex gap-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_sim" value="Sim" />
-                    <label class="form-check-label" for="vinculo_publico_sim">Sim</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_nao" value="Não" />
-                    <label class="form-check-label" for="vinculo_publico_nao">Não</label>
-                  </div>
+                <div class="col-md-6">
+                  <label for="email_confirm" class="form-label required">Confirme o e-mail</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email_confirm"
+                    name="email_confirm"
+                    value="{{ String($json.email ?? '').trim().toLowerCase() }}"
+                    required
+                  />
                 </div>
-                <input
-                  type="hidden"
-                  id="vinculo_publico"
-                  name="vinculo_publico"
-                  value="{{ String($json.vinculo_publico ?? '').trim() }}"
-                />
-              </div>
-              <div class="col-lg-6">
-                <label for="qual_vinculo" class="form-label">Qual vínculo</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="qual_vinculo"
-                  name="qual_vinculo"
-                  value="{{ String($json.qual_vinculo ?? '').trim() }}"
-                />
-              </div>
-              <div class="col-lg-6">
-                <label for="experiencia_tempo" class="form-label">Tempo (meses/anos)</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="experiencia_tempo"
-                  name="experiencia_tempo"
-                  value="{{ String($json.experiencia_tempo ?? '').trim() }}"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Diversidade e inclusão -->
-        <section class="card card-form mb-4">
-          <div class="card-header">
-            <h2 class="h5 mb-0">Diversidade e inclusão</h2>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label for="raca" class="form-label required">Cor/Raça (IBGE)</label>
-                <select
-                  id="raca"
-                  name="raca"
-                  class="form-select"
-                  data-prefill="{{ $json.raca ?? $json.race ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Branca">Branca</option>
-                  <option value="Preta">Preta</option>
-                  <option value="Parda">Parda</option>
-                  <option value="Amarela">Amarela</option>
-                  <option value="Indígena">Indígena</option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label for="cotasPPNI" class="form-label required">Concorrer às vagas PPNI?</label>
-                <select
-                  id="cotasPPNI"
-                  name="cotasPPNI"
-                  class="form-select"
-                  data-prefill="{{ $json.cotasPPNI ?? $json.concorrer_ppni ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Sim">Sim</option>
-                  <option value="Não">Não</option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label for="is_pcd" class="form-label required">É PCD?</label>
-                <select
-                  id="is_pcd"
-                  name="is_pcd"
-                  class="form-select"
-                  data-prefill="{{ $json.is_pcd ?? $json.withDisability ?? '' }}"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  <option value="Sim">Sim</option>
-                  <option value="Não">Não</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="tipo_pcd" class="form-label">Tipo de deficiência</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="tipo_pcd"
-                  name="tipo_pcd"
-                  value="{{ String($json.tipo_pcd ?? '').trim() }}"
-                />
-              </div>
-              <div class="col-md-6">
-                <label for="pcd_cid" class="form-label">CID (se houver)</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="pcd_cid"
-                  name="pcd_cid"
-                  value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}"
-                />
-              </div>
-              <div class="col-12">
-                <span class="form-label d-block">Necessita de condição especial?</span>
-                <div class="d-flex gap-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_sim" value="Sim" />
-                    <label class="form-check-label" for="condicao_especial_sim">Sim</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_nao" value="Não" />
-                    <label class="form-check-label" for="condicao_especial_nao">Não</label>
-                  </div>
+                <div class="col-md-4">
+                  <label for="tel1" class="form-label required">Telefone 1</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="tel1"
+                    name="tel1"
+                    maxlength="11"
+                    inputmode="numeric"
+                    placeholder="DDD + número"
+                    value="{{ String($json.telefone1 ?? $json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="tel2" class="form-label">Telefone 2</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="tel2"
+                    name="tel2"
+                    maxlength="11"
+                    inputmode="numeric"
+                    placeholder="DDD + número"
+                    value="{{ String($json.telefone2 ?? $json.phone2 ?? '').replace(/\D+/g, '') }}"
+                  />
                 </div>
               </div>
-              <div class="col-12">
-                <label for="necessidade" class="form-label">Descreva a necessidade</label>
-                <textarea
-                  class="form-control"
-                  id="necessidade"
-                  name="necessidade"
-                  rows="2"
-                  placeholder="Informe recursos ou adaptações necessários"
-                >{{ String($json.necessidade ?? $json.specialNeedDescription ?? '').trim() }}</textarea>
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Endereço residencial</h3>
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label for="cep" class="form-label required">CEP</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cep"
+                    name="cep"
+                    maxlength="8"
+                    inputmode="numeric"
+                    placeholder="00000-000"
+                    value="{{ String($json.postal_code ?? $json.cep ?? '').replace(/\D+/g, '') }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-5">
+                  <label for="logradouro" class="form-label required">Logradouro</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="logradouro"
+                    name="logradouro"
+                    value="{{ String($json.addressStreet ?? $json.logradouro ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="numero" class="form-label required">Número</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="numero"
+                    name="numero"
+                    value="{{ String($json.numero ?? $json.addressNumber ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="complemento" class="form-label">Complemento</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="complemento"
+                    name="complemento"
+                    value="{{ String($json.complemento ?? $json.addressComplement ?? '').trim().toUpperCase() }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="bairro" class="form-label required">Bairro</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="bairro"
+                    name="bairro"
+                    value="{{ String($json.neighborhood ?? $json.bairro ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="cidade" class="form-label required">Cidade</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cidade"
+                    name="cidade"
+                    value="{{ String($json.cidade ?? $json.locality ?? $json.city ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label for="uf" class="form-label required">UF</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="uf"
+                    name="uf"
+                    maxlength="2"
+                    value="{{ String(($json.state ?? $json.addressState ?? $json.uf ?? '')).trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>
+          <div class="card-footer bg-transparent border-top-0 pt-0">
+            <div class="wizard-controls">
+              <button type="button" class="btn btn-outline-secondary" data-action="prev">Voltar</button>
+              <div class="spacer"></div>
+              <button type="button" class="btn btn-outline-secondary" data-action="save-draft">Salvar rascunho</button>
+              <button type="button" class="btn btn-primary" data-action="next">Avançar</button>
+            </div>
+          </div>
         </section>
-
-        <!-- Envio de documentos obrigatórios -->
-        <section class="card card-form mb-4">
+        <section class="card step-card d-none" data-step-panel="2">
           <div class="card-header">
-            <h2 class="h5 mb-0">Documentação obrigatória</h2>
+            <h2>Perfil profissional e vínculos</h2>
           </div>
           <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="doc_id_frente" class="form-label required">Documento de identificação oficial com foto (frente)</label>
-                <input type="file" class="form-control" id="doc_id_frente" name="doc_id_frente" accept=".pdf,image/*" required />
+            <div class="section-block">
+              <h3 class="section-title">Formação acadêmica</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="nivel" class="form-label required">Nível</label>
+                  <select id="nivel" name="nivel" class="form-select" data-prefill="{{ $json.nivel ?? $json.nivel_escolaridade ?? $json.escolaridade ?? '' }}" required>
+                    <option value="">Selecione...</option>
+                    <option value="Fundamental">Fundamental</option>
+                    <option value="Médio">Médio</option>
+                    <option value="Técnico">Técnico</option>
+                    <option value="Graduação">Graduação</option>
+                    <option value="Pós-graduação">Pós-graduação</option>
+                    <option value="Mestrado">Mestrado</option>
+                    <option value="Doutorado">Doutorado</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="ies" class="form-label required">Instituição</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="ies"
+                    name="ies"
+                    value="{{ String($json.instituicao ?? $json.ies ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="curso" class="form-label required">Curso</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="curso"
+                    name="curso"
+                    value="{{ String($json.curso ?? '').trim().toUpperCase() }}"
+                    required
+                  />
+                </div>
+                <div class="col-md-3">
+                  <label for="ano_conclusao" class="form-label required">Ano de conclusão</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="ano_conclusao"
+                    name="ano_conclusao"
+                    maxlength="4"
+                    inputmode="numeric"
+                    value="{{ String($json.ano ?? $json.ano_conclusao ?? '').replace(/\D+/g, '').slice(0,4) }}"
+                    required
+                  />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="doc_id_verso" class="form-label required">Documento de identificação oficial com foto (verso)</label>
-                <input type="file" class="form-control" id="doc_id_verso" name="doc_id_verso" accept=".pdf,image/*" required />
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Atuação profissional</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="cargo" class="form-label required">Cargo pretendido</label>
+                  <select id="cargo" name="cargo" class="form-select" data-prefill="{{ $json.cargo ?? $json.cargo_pretendido ?? '' }}" required>
+                    <option value="">Selecione...</option>
+                    <option value="Analista em Saúde Animal – Veterinário 40h">Analista em Saúde Animal – Veterinário 40h</option>
+                    <option value="Analista em Saúde Animal – Veterinário 20h">Analista em Saúde Animal – Veterinário 20h</option>
+                    <option value="Analista em Saúde Animal – Veterinário 40h Plantonista">Analista em Saúde Animal – Veterinário 40h Plantonista</option>
+                    <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h</option>
+                    <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista</option>
+                    <option value="Técnico em Saúde Animal - Radiologia e Imagenologia 24h">Técnico em Saúde Animal - Radiologia e Imagenologia 24h</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="especialidade" class="form-label">Especialidade (quando houver)</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="especialidade"
+                    name="especialidade"
+                    value="{{ String($json.especialidade ?? '').trim().toUpperCase() }}"
+                  />
+                </div>
+                <div class="col-md-4" data-prefill-radio="{{ String($json.militar ?? '').trim().toUpperCase() }}">
+                  <span class="form-label required">Serviço militar obrigatório quitado?</span>
+                  <div class="d-flex gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="militar" id="militar_sim" value="SIM" required />
+                      <label class="form-check-label" for="militar_sim">Sim</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="militar" id="militar_nao" value="NAO" required />
+                      <label class="form-check-label" for="militar_nao">Não</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <span class="form-label required">Tem parentesco com agentes políticos?</span>
+                  <div class="d-flex gap-3" data-prefill-radio="{{ String($json.politicos ?? '').trim().toUpperCase() }}">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="politicos" id="politicos_sim" value="SIM" required />
+                      <label class="form-check-label" for="politicos_sim">Sim</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO" required />
+                      <label class="form-check-label" for="politicos_nao">Não</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="experiencia_tempo" class="form-label">Tempo de experiência (meses/anos)</label>
+                  <input type="text" class="form-control" id="experiencia_tempo" name="experiencia_tempo" value="{{ String($json.experiencia_tempo ?? '').trim() }}" />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="doc_cpf" class="form-label required">CPF</label>
-                <input type="file" class="form-control" id="doc_cpf" name="doc_cpf" accept=".pdf,image/*" required />
+            </div>
+
+            <div id="alistamentoWrapper" class="section-block hidden">
+              <h3 class="section-title">Certificado de reservista</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="alistamento_numero" class="form-label">Número</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="alistamento_numero"
+                    name="alistamento_numero"
+                    value="{{ String($json.alistamento_numero ?? '').trim().toUpperCase() }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="alistamento_orgao" class="form-label">Órgão emissor</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="alistamento_orgao"
+                    name="alistamento_orgao"
+                    value="{{ String($json.alistamento_orgao ?? '').trim().toUpperCase() }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="alistamento_data" class="form-label">Data de emissão</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="alistamento_data"
+                    name="alistamento_data"
+                    value="{{ String($json.alistamento_data ?? '').split('/').reverse().join('-') }}"
+                  />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="doc_residencia" class="form-label required">Comprovante de residência</label>
-                <input type="file" class="form-control" id="doc_residencia" name="doc_residencia" accept=".pdf,image/*" required />
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Situação eleitoral</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="titulo" class="form-label">Título de Eleitor</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="titulo"
+                    name="titulo"
+                    maxlength="12"
+                    inputmode="numeric"
+                    value="{{ String($json.titulo ?? $json.titulo_eleitor ?? '').replace(/\D+/g, '').slice(0,12) }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="zona" class="form-label">Zona</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="zona"
+                    name="zona"
+                    maxlength="4"
+                    inputmode="numeric"
+                    value="{{ String($json.zona ?? '').replace(/\D+/g, '').slice(0,4) }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="secao" class="form-label">Seção</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="secao"
+                    name="secao"
+                    maxlength="4"
+                    inputmode="numeric"
+                    value="{{ String($json.secao ?? '').replace(/\D+/g, '').slice(0,4) }}"
+                  />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="doc_quitacao_eleitoral" class="form-label required">Quitação eleitoral</label>
-                <input type="file" class="form-control" id="doc_quitacao_eleitoral" name="doc_quitacao_eleitoral" accept=".pdf,image/*" required />
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Experiências adicionais</h3>
+              <div class="row g-3">
+                <div class="col-md-4" data-prefill-radio="{{ String($json.jurado ?? $json.foi_jurado ?? '').trim().toUpperCase() }}">
+                  <span class="form-label">Já atuou como jurado(a)?</span>
+                  <div class="d-flex gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_sim" value="SIM" />
+                      <label class="form-check-label" for="jurado_sim">Sim</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_nao" value="NAO" />
+                      <label class="form-check-label" for="jurado_nao">Não</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-8 hidden" id="juradoDetalhes">
+                  <label for="jurado_periodo" class="form-label">Informações sobre atuação como jurado(a)</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="jurado_periodo"
+                    name="jurado_periodo"
+                    placeholder="Tribunal, período ou outros detalhes"
+                    value="{{ String($json.jurado_periodo ?? '').trim() }}"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <span class="form-label">Possui vínculo com o serviço público?</span>
+                  <div class="d-flex gap-3" data-prefill-radio="{{ String($json.vinculo_publico ?? '').trim() }}">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_sim" value="Sim" />
+                      <label class="form-check-label" for="vinculo_publico_sim">Sim</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_nao" value="Não" />
+                      <label class="form-check-label" for="vinculo_publico_nao">Não</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4 hidden" id="qualVinculoGroup">
+                  <label for="qual_vinculo" class="form-label">Qual vínculo?</label>
+                  <input type="text" class="form-control" id="qual_vinculo" name="qual_vinculo" value="{{ String($json.qual_vinculo ?? '').trim() }}" />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="doc_militar" class="form-label">Quitação do serviço militar</label>
-                <input type="file" class="form-control" id="doc_militar" name="doc_militar" accept=".pdf,image/*" />
-              </div>
-              <div class="col-md-6">
-                <label for="doc_jurado" class="form-label">Certidão de atuação na função de jurado</label>
-                <input type="file" class="form-control" id="doc_jurado" name="doc_jurado" accept=".pdf,image/*" />
-              </div>
-              <div class="col-md-6">
-                <label for="doc_jurado_440" class="form-label">Certidão de atuação na função de jurado (art. 440 do CPP)</label>
-                <input type="file" class="form-control" id="doc_jurado_440" name="doc_jurado_440" accept=".pdf,image/*" />
-              </div>
-              <div class="col-md-6">
-                <label for="doc_escolaridade" class="form-label required">Comprovação da escolaridade</label>
-                <input type="file" class="form-control" id="doc_escolaridade" name="doc_escolaridade" accept=".pdf,image/*" required />
-              </div>
-              <div class="col-md-6">
-                <label for="doc_curriculo" class="form-label">Experiência / títulos / certificados</label>
-                <input type="file" class="form-control" id="doc_curriculo" name="doc_curriculo" accept=".pdf,image/*" multiple />
-              </div>
+            </div>
+
+            <input type="hidden" id="foi_jurado" name="foi_jurado" value="{{ String($json.foi_jurado ?? $json.jurado ?? '').trim().toUpperCase() }}" />
+            <input type="hidden" id="vinculo_publico" name="vinculo_publico" value="{{ String($json.vinculo_publico ?? '').trim() }}" />
+          </div>
+          <div class="card-footer bg-transparent border-top-0 pt-0">
+            <div class="wizard-controls">
+              <button type="button" class="btn btn-outline-secondary" data-action="prev">Voltar</button>
+              <div class="spacer"></div>
+              <button type="button" class="btn btn-outline-secondary" data-action="save-draft">Salvar rascunho</button>
+              <button type="button" class="btn btn-primary" data-action="next">Avançar</button>
             </div>
           </div>
         </section>
-
-        <!-- Documentação para heteroidentificação e PCD -->
-        <section class="card card-form mb-4">
+        <section class="card step-card d-none" data-step-panel="3">
           <div class="card-header">
-            <h2 class="h5 mb-0">Documentação adicional</h2>
+            <h2>Documentos e declarações</h2>
           </div>
           <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="het_declaracao" class="form-label">Declaração de heteroidentificação</label>
-                <input type="file" class="form-control" id="het_declaracao" name="het_declaracao" accept=".pdf,image/*" />
+            <div class="section-block">
+              <h3 class="section-title">Cotas e acessibilidade</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="cotasPPNI" class="form-label required">Concorrer às vagas PPNI?</label>
+                  <select id="cotasPPNI" name="cotasPPNI" class="form-select" data-prefill="{{ $json.cotasPPNI ?? $json.concorrer_ppni ?? '' }}" required>
+                    <option value="">Selecione...</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="is_pcd" class="form-label required">É PCD?</label>
+                  <select id="is_pcd" name="is_pcd" class="form-select" data-prefill="{{ $json.is_pcd ?? $json.withDisability ?? '' }}" required>
+                    <option value="">Selecione...</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <span class="form-label">Necessita de condição especial?</span>
+                  <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_sim" value="Sim" />
+                      <label class="form-check-label" for="condicao_especial_sim">Sim</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_nao" value="Não" />
+                      <label class="form-check-label" for="condicao_especial_nao">Não</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 hidden" id="tipoPcdGroup">
+                  <label for="tipo_pcd" class="form-label">Tipo de deficiência</label>
+                  <input type="text" class="form-control" id="tipo_pcd" name="tipo_pcd" value="{{ String($json.tipo_pcd ?? '').trim() }}" />
+                </div>
+                <div class="col-md-6 hidden" id="pcdCidGroup">
+                  <label for="pcd_cid" class="form-label">CID (se houver)</label>
+                  <input type="text" class="form-control" id="pcd_cid" name="pcd_cid" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}" />
+                </div>
+                <div class="col-12 hidden" id="necessidadeGroup">
+                  <label for="necessidade" class="form-label">Descreva a necessidade</label>
+                  <textarea class="form-control" id="necessidade" name="necessidade" rows="2" placeholder="Informe recursos ou adaptações necessários">{{ String($json.necessidade ?? $json.specialNeedDescription ?? '').trim() }}</textarea>
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="het_id" class="form-label">Documento de identidade (frente/verso)</label>
-                <input type="file" class="form-control" id="het_id" name="het_id" accept=".pdf,image/*" multiple />
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Documentos pessoais</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="doc_id_frente" class="form-label required">Documento de identificação (frente)</label>
+                  <input type="file" class="form-control" id="doc_id_frente" name="doc_id_frente" accept=".pdf,image/*" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="doc_id_verso" class="form-label required">Documento de identificação (verso)</label>
+                  <input type="file" class="form-control" id="doc_id_verso" name="doc_id_verso" accept=".pdf,image/*" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="doc_cpf" class="form-label required">CPF</label>
+                  <input type="file" class="form-control" id="doc_cpf" name="doc_cpf" accept=".pdf,image/*" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="doc_residencia" class="form-label required">Comprovante de residência</label>
+                  <input type="file" class="form-control" id="doc_residencia" name="doc_residencia" accept=".pdf,image/*" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="doc_quitacao_eleitoral" class="form-label required">Quitação eleitoral</label>
+                  <input type="file" class="form-control" id="doc_quitacao_eleitoral" name="doc_quitacao_eleitoral" accept=".pdf,image/*" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="doc_militar" class="form-label">Quitação do serviço militar</label>
+                  <input type="file" class="form-control" id="doc_militar" name="doc_militar" accept=".pdf,image/*" />
+                </div>
               </div>
-              <div class="col-md-4">
-                <label for="het_frente" class="form-label">Foto de frente</label>
-                <input type="file" class="form-control" id="het_frente" name="het_frente" accept="image/*" />
+            </div>
+
+            <div class="section-block hidden" id="juradoDocs">
+              <h3 class="section-title">Documentação de jurado(a)</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="doc_jurado" class="form-label">Certidão de atuação</label>
+                  <input type="file" class="form-control" id="doc_jurado" name="doc_jurado" accept=".pdf,image/*" />
+                </div>
+                <div class="col-md-6">
+                  <label for="doc_jurado_440" class="form-label">Certidão (art. 440 do CPP)</label>
+                  <input type="file" class="form-control" id="doc_jurado_440" name="doc_jurado_440" accept=".pdf,image/*" />
+                </div>
               </div>
-              <div class="col-md-4">
-                <label for="het_perfil" class="form-label">Foto de perfil</label>
-                <input type="file" class="form-control" id="het_perfil" name="het_perfil" accept="image/*" />
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Comprovação profissional</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="doc_escolaridade" class="form-label required">Comprovação da escolaridade</label>
+                  <input type="file" class="form-control" id="doc_escolaridade" name="doc_escolaridade" accept=".pdf,image/*" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="doc_curriculo" class="form-label">Experiência / títulos / certificados</label>
+                  <input type="file" class="form-control" id="doc_curriculo" name="doc_curriculo" accept=".pdf,image/*" multiple />
+                </div>
               </div>
-              <div class="col-md-4">
-                <label for="het_video" class="form-label">Vídeo (até 20s)</label>
-                <input type="file" class="form-control" id="het_video" name="het_video" accept="video/mp4,video/quicktime" />
+            </div>
+
+            <div class="section-block hidden" id="ppniDocs">
+              <h3 class="section-title">Heteroidentificação</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="het_declaracao" class="form-label">Declaração de heteroidentificação</label>
+                  <input type="file" class="form-control" id="het_declaracao" name="het_declaracao" accept=".pdf,image/*" />
+                </div>
+                <div class="col-md-6">
+                  <label for="het_id" class="form-label">Documento de identidade (frente/verso)</label>
+                  <input type="file" class="form-control" id="het_id" name="het_id" accept=".pdf,image/*" multiple />
+                </div>
+                <div class="col-md-4">
+                  <label for="het_frente" class="form-label">Foto de frente</label>
+                  <input type="file" class="form-control" id="het_frente" name="het_frente" accept="image/*" />
+                </div>
+                <div class="col-md-4">
+                  <label for="het_perfil" class="form-label">Foto de perfil</label>
+                  <input type="file" class="form-control" id="het_perfil" name="het_perfil" accept="image/*" />
+                </div>
+                <div class="col-md-4">
+                  <label for="het_video" class="form-label">Vídeo (até 20s)</label>
+                  <input type="file" class="form-control" id="het_video" name="het_video" accept="video/mp4,video/quicktime" />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="pcd_laudo" class="form-label">Laudo médico</label>
-                <input type="file" class="form-control" id="pcd_laudo" name="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif" />
+            </div>
+
+            <div class="section-block hidden" id="pcdDocs">
+              <h3 class="section-title">Documentação PCD</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="pcd_laudo" class="form-label">Laudo médico</label>
+                  <input type="file" class="form-control" id="pcd_laudo" name="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif" />
+                </div>
+                <div class="col-md-4">
+                  <label for="pcd_declaracao" class="form-label">Declaração de deficiência (modelo do edital)</label>
+                  <input type="file" class="form-control" id="pcd_declaracao" name="pcd_declaracao" accept=".pdf,image/*" />
+                </div>
+                <div class="col-md-4">
+                  <label for="pcd_exames" class="form-label">Exames complementares (opcional)</label>
+                  <input type="file" class="form-control" id="pcd_exames" name="pcd_exames" accept=".pdf,image/*" multiple />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="pcd_declaracao" class="form-label">Declaração de deficiência (modelo do edital)</label>
-                <input type="file" class="form-control" id="pcd_declaracao" name="pcd_declaracao" accept=".pdf,image/*" />
-              </div>
-              <div class="col-12">
-                <label for="pcd_exames" class="form-label">Exames complementares (opcional)</label>
-                <input type="file" class="form-control" id="pcd_exames" name="pcd_exames" accept=".pdf,image/*" multiple />
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Recursos</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="recurso_tipo" class="form-label">Tipo de recurso</label>
+                  <select id="recurso_tipo" name="recurso_tipo" class="form-select" data-prefill="{{ $json.recurso_tipo ?? '' }}">
+                    <option value="">Selecione...</option>
+                    <option value="analise_curricular">Resultado Preliminar da Análise Curricular</option>
+                    <option value="heteroidentificacao">Resultado Preliminar do Procedimento de Heteroidentificação</option>
+                    <option value="biopsicossocial">Resultado Preliminar da Avaliação Biopsicossocial</option>
+                  </select>
+                </div>
+                <div class="col-12 hidden" id="recursoTextoGroup">
+                  <label for="recurso_texto" class="form-label">Justificativa</label>
+                  <textarea class="form-control" id="recurso_texto" name="recurso_texto" rows="4" placeholder="Descreva o motivo do recurso">{{ String($json.recurso_texto ?? '').trim() }}</textarea>
+                </div>
+                <div class="col-md-6 hidden" id="recursoAnexoGroup">
+                  <label for="recurso_anexo" class="form-label">Anexo (opcional)</label>
+                  <input type="file" class="form-control" id="recurso_anexo" name="recurso_anexo" accept=".pdf,image/*" />
+                </div>
               </div>
             </div>
           </div>
+          <div class="card-footer bg-transparent border-top-0 pt-0">
+            <div class="wizard-controls">
+              <button type="button" class="btn btn-outline-secondary" data-action="prev">Voltar</button>
+              <div class="spacer"></div>
+              <button type="button" class="btn btn-outline-secondary" data-action="save-draft">Salvar rascunho</button>
+              <button type="button" class="btn btn-primary" data-action="next">Avançar</button>
+            </div>
+          </div>
         </section>
-
-        <!-- Recursos -->
-        <section class="card card-form mb-4">
+        <section class="card step-card d-none" data-step-panel="4">
           <div class="card-header">
-            <h2 class="h5 mb-0">Recurso</h2>
+            <h2>Revisão e envio</h2>
           </div>
           <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label for="recurso_tipo" class="form-label">Tipo de recurso</label>
-                <select id="recurso_tipo" name="recurso_tipo" class="form-select">
-                  <option value="">Selecione...</option>
-                  <option value="analise_curricular">Resultado Preliminar da Análise Curricular</option>
-                  <option value="heteroidentificacao">Resultado Preliminar do Procedimento de Heteroidentificação</option>
-                  <option value="biopsicossocial">Resultado Preliminar da Avaliação Biopsicossocial</option>
-                </select>
+            <div class="section-block">
+              <h3 class="section-title">Revise seus dados</h3>
+              <p class="section-subtitle">Confira atentamente todas as informações antes de concluir a inscrição. Você poderá retornar às etapas anteriores para ajustar qualquer dado.</p>
+              <div id="reviewSummary">
+                <div class="summary-section">
+                  <h3>Resumo</h3>
+                  <p class="summary-placeholder mb-0">Os dados preenchidos aparecerão aqui quando você chegar a esta etapa.</p>
+                </div>
               </div>
-              <div class="col-md-8">
-                <label for="recurso_texto" class="form-label">Justificativa</label>
-                <textarea
-                  class="form-control"
-                  id="recurso_texto"
-                  name="recurso_texto"
-                  rows="4"
-                  placeholder="Descreva o motivo do recurso"
-                ></textarea>
-              </div>
-              <div class="col-md-6">
-                <label for="recurso_anexo" class="form-label">Anexo (opcional)</label>
-                <input type="file" class="form-control" id="recurso_anexo" name="recurso_anexo" accept=".pdf,image/*" />
+            </div>
+
+            <div class="section-block">
+              <h3 class="section-title">Declaração</h3>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="termoResponsabilidade" name="termoResponsabilidade" required />
+                <label class="form-check-label" for="termoResponsabilidade">Li e estou de acordo com a declaração de responsabilidade.</label>
               </div>
             </div>
           </div>
-        </section>
-
-        <!-- Declaração -->
-        <section class="card card-form mb-4">
-          <div class="card-body">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="termoResponsabilidade" name="termoResponsabilidade" required />
-              <label class="form-check-label" for="termoResponsabilidade">
-                Li e estou de acordo com a declaração de responsabilidade.
-              </label>
+          <div class="card-footer bg-transparent border-top-0 pt-0">
+            <div class="wizard-controls">
+              <button type="button" class="btn btn-outline-secondary" data-action="prev">Voltar</button>
+              <div class="spacer"></div>
+              <button type="button" class="btn btn-outline-secondary" data-action="save-draft">Salvar rascunho</button>
+              <button type="submit" class="btn btn-primary">Enviar inscrição</button>
             </div>
           </div>
         </section>
-
-        <div class="text-end">
-          <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
-        </div>
       </form>
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          document.querySelectorAll('[data-prefill]').forEach((field) => {
-            const prefillValue = (field.getAttribute('data-prefill') || '').trim();
-            if (!prefillValue) return;
-            const match = Array.from(field.options || []).find((option) => {
-              return option.value === prefillValue || option.value.toLowerCase() === prefillValue.toLowerCase();
-            });
-            if (match) {
-              field.value = match.value;
-            }
-          });
-        });
-      </script>
     </main>
+    <div class="pattern-bottom"></div>
+
+    <div class="draft-toast" id="draftToast" role="status" aria-live="polite">
+      <span>Rascunho salvo com sucesso!</span>
+    </div>
+
+    <script>
+      const form = document.getElementById('inscricaoForm');
+      const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
+      const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
+      const draftToast = document.getElementById('draftToast');
+      const storageKey = 'inscricao-hospvet-draft';
+      let currentStep = 0;
+
+      const selectPrefills = () => {
+        document.querySelectorAll('select[data-prefill]').forEach((select) => {
+          const value = select.dataset.prefill?.trim();
+          if (!value) return;
+          const option = Array.from(select.options).find((opt) => opt.value.toUpperCase() === value.toUpperCase());
+          if (option) {
+            select.value = option.value;
+          }
+        });
+      };
+
+      const radioPrefills = () => {
+        document.querySelectorAll('[data-prefill-radio]').forEach((group) => {
+          const value = group.dataset.prefillRadio?.trim();
+          if (!value) return;
+          const input = group.querySelector(`input[type="radio"][value="${value}"]`) || group.querySelector(`input[type="radio"][value="${value.toUpperCase()}"]`);
+          if (input) {
+            input.checked = true;
+            input.dispatchEvent(new Event('change'));
+          }
+        });
+      };
+
+      const showStep = (index) => {
+        currentStep = Math.max(0, Math.min(index, stepPanels.length - 1));
+        stepPanels.forEach((panel, i) => {
+          panel.classList.toggle('d-none', i !== currentStep);
+        });
+        wizardSteps.forEach((step, i) => {
+          step.classList.toggle('active', i === currentStep);
+          step.classList.toggle('completed', i < currentStep);
+          step.setAttribute('aria-selected', i === currentStep ? 'true' : 'false');
+          step.setAttribute('tabindex', i === currentStep ? '0' : '-1');
+        });
+        if (currentStep === stepPanels.length - 1) {
+          buildReview();
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      const validateCurrentStep = () => {
+        const panel = stepPanels[currentStep];
+        const inputs = Array.from(panel.querySelectorAll('input, select, textarea'));
+        for (const field of inputs) {
+          if (!field.checkValidity()) {
+            field.reportValidity();
+            return false;
+          }
+        }
+        if (currentStep === 1) {
+          const email = document.getElementById('email');
+          const confirm = document.getElementById('email_confirm');
+          if (email.value && confirm.value && email.value !== confirm.value) {
+            confirm.setCustomValidity('Os e-mails precisam ser iguais.');
+            confirm.reportValidity();
+            return false;
+          }
+          confirm.setCustomValidity('');
+        }
+        return true;
+      };
+
+      const goNext = () => {
+        if (!validateCurrentStep()) return;
+        showStep(currentStep + 1);
+      };
+
+      const goPrev = () => {
+        showStep(currentStep - 1);
+      };
+
+      const toggleHiddenGroup = (condition, element) => {
+        if (!element) return;
+        element.classList.toggle('hidden', !condition);
+        element.querySelectorAll('input, select, textarea').forEach((field) => {
+          field.toggleAttribute('required', condition && field.dataset.forceRequired === 'true');
+        });
+      };
+
+      const updateGeneroOutro = () => {
+        const genero = document.getElementById('genero');
+        const outro = document.getElementById('generoOutroGroup');
+        toggleHiddenGroup(genero.value === 'Outro', outro);
+      };
+
+      const updateMilitar = () => {
+        const militarSim = document.getElementById('militar_sim');
+        const wrapper = document.getElementById('alistamentoWrapper');
+        const required = militarSim.checked;
+        toggleHiddenGroup(required, wrapper);
+        if (required) {
+          wrapper.querySelectorAll('input').forEach((input) => input.setAttribute('required', 'required'));
+        } else {
+          wrapper.querySelectorAll('input').forEach((input) => input.removeAttribute('required'));
+        }
+      };
+
+      const updateJurado = () => {
+        const juradoSim = document.getElementById('jurado_sim');
+        const juradoNao = document.getElementById('jurado_nao');
+        const detalhes = document.getElementById('juradoDetalhes');
+        const docs = document.getElementById('juradoDocs');
+        const hasSelection = juradoSim.checked || juradoNao.checked;
+        document.getElementById('foi_jurado').value = hasSelection ? (juradoSim.checked ? 'SIM' : 'NAO') : '';
+        toggleHiddenGroup(juradoSim.checked, detalhes);
+        toggleHiddenGroup(juradoSim.checked, docs);
+      };
+
+      const updateVinculo = () => {
+        const radioSim = document.getElementById('vinculo_publico_sim');
+        const radioNao = document.getElementById('vinculo_publico_nao');
+        const group = document.getElementById('qualVinculoGroup');
+        const hasSelection = radioSim.checked || radioNao.checked;
+        document.getElementById('vinculo_publico').value = hasSelection ? (radioSim.checked ? 'Sim' : 'Não') : '';
+        toggleHiddenGroup(radioSim.checked, group);
+      };
+
+      const updatePCD = () => {
+        const select = document.getElementById('is_pcd');
+        const isYes = select.value === 'Sim';
+        toggleHiddenGroup(isYes, document.getElementById('tipoPcdGroup'));
+        toggleHiddenGroup(isYes, document.getElementById('pcdCidGroup'));
+        toggleHiddenGroup(isYes, document.getElementById('pcdDocs'));
+      };
+
+      const updateNecessidade = () => {
+        const sim = document.getElementById('condicao_especial_sim');
+        toggleHiddenGroup(sim.checked, document.getElementById('necessidadeGroup'));
+      };
+
+      const updatePPNI = () => {
+        const select = document.getElementById('cotasPPNI');
+        toggleHiddenGroup(select.value === 'Sim', document.getElementById('ppniDocs'));
+      };
+
+      const updateRecurso = () => {
+        const tipo = document.getElementById('recurso_tipo');
+        const hasValue = !!tipo.value;
+        toggleHiddenGroup(hasValue, document.getElementById('recursoTextoGroup'));
+        toggleHiddenGroup(hasValue, document.getElementById('recursoAnexoGroup'));
+        document.getElementById('recurso_texto').toggleAttribute('required', hasValue);
+      };
+
+      const buildReview = () => {
+        const summary = document.getElementById('reviewSummary');
+        summary.innerHTML = '';
+        const getValue = (name) => {
+          const field = form.elements[name];
+          if (!field) return '';
+          if (field instanceof RadioNodeList) {
+            return field.value || '';
+          }
+          if (field.type === 'file') {
+            const files = Array.from(field.files || []);
+            return files.length ? files.map((file) => file.name).join(', ') : '';
+          }
+          return field.value || '';
+        };
+
+        const sections = [
+          {
+            title: 'Dados pessoais',
+            fields: [
+              { label: 'Nome completo', name: 'nome' },
+              { label: 'Nome social', name: 'nome_social' },
+              { label: 'CPF', name: 'cpf' },
+              { label: 'Data de nascimento', name: 'nasc' },
+              { label: 'Nacionalidade', name: 'nacionalidade' },
+              { label: 'Naturalidade', name: 'naturalidade_cidade' },
+              { label: 'UF', name: 'naturalidade_uf' },
+              { label: 'Nome da mãe', name: 'mae' },
+              { label: 'Nome do pai', name: 'pai' },
+              { label: 'Sexo', name: 'sexo' },
+              { label: 'Gênero', name: 'genero' },
+              { label: 'Outro gênero', name: 'genero_outro' },
+              { label: 'Estado civil', name: 'estado_civil' },
+              { label: 'Raça', name: 'raca' },
+              { label: 'NIS', name: 'nis' },
+              { label: 'RG', name: 'rg_numero' },
+              { label: 'Órgão RG', name: 'rg_orgao' },
+              { label: 'UF RG', name: 'rg_uf' },
+              { label: 'Data expedição RG', name: 'rg_data' },
+            ],
+          },
+          {
+            title: 'Contato e endereço',
+            fields: [
+              { label: 'E-mail', name: 'email' },
+              { label: 'Telefone 1', name: 'tel1' },
+              { label: 'Telefone 2', name: 'tel2' },
+              { label: 'CEP', name: 'cep' },
+              { label: 'Logradouro', name: 'logradouro' },
+              { label: 'Número', name: 'numero' },
+              { label: 'Complemento', name: 'complemento' },
+              { label: 'Bairro', name: 'bairro' },
+              { label: 'Cidade', name: 'cidade' },
+              { label: 'UF', name: 'uf' },
+            ],
+          },
+          {
+            title: 'Perfil profissional',
+            fields: [
+              { label: 'Nível', name: 'nivel' },
+              { label: 'Instituição', name: 'ies' },
+              { label: 'Curso', name: 'curso' },
+              { label: 'Ano de conclusão', name: 'ano_conclusao' },
+              { label: 'Cargo pretendido', name: 'cargo' },
+              { label: 'Especialidade', name: 'especialidade' },
+              { label: 'Tempo de experiência', name: 'experiencia_tempo' },
+              { label: 'Título de eleitor', name: 'titulo' },
+              { label: 'Zona', name: 'zona' },
+              { label: 'Seção', name: 'secao' },
+              { label: 'Serviço militar', name: 'militar' },
+              { label: 'Certificado de reservista', name: 'alistamento_numero' },
+              { label: 'Órgão do certificado', name: 'alistamento_orgao' },
+              { label: 'Data do certificado', name: 'alistamento_data' },
+              { label: 'Parentesco com agentes políticos', name: 'politicos' },
+              { label: 'Atuação como jurado(a)', name: 'foi_jurado' },
+              { label: 'Informações do jurado', name: 'jurado_periodo' },
+              { label: 'Vínculo público', name: 'vinculo_publico' },
+              { label: 'Qual vínculo', name: 'qual_vinculo' },
+            ],
+          },
+          {
+            title: 'Inclusão e acessibilidade',
+            fields: [
+              { label: 'Concorrer PPNI', name: 'cotasPPNI' },
+              { label: 'É PCD', name: 'is_pcd' },
+              { label: 'Tipo de deficiência', name: 'tipo_pcd' },
+              { label: 'CID', name: 'pcd_cid' },
+              { label: 'Condição especial', name: 'condicao_especial' },
+              { label: 'Necessidade descrita', name: 'necessidade' },
+            ],
+          },
+          {
+            title: 'Documentos anexados',
+            fields: [
+              { label: 'Documento identificação (frente)', name: 'doc_id_frente' },
+              { label: 'Documento identificação (verso)', name: 'doc_id_verso' },
+              { label: 'CPF', name: 'doc_cpf' },
+              { label: 'Comprovante de residência', name: 'doc_residencia' },
+              { label: 'Quitação eleitoral', name: 'doc_quitacao_eleitoral' },
+              { label: 'Quitação militar', name: 'doc_militar' },
+              { label: 'Certidão jurado', name: 'doc_jurado' },
+              { label: 'Certidão jurado (art. 440)', name: 'doc_jurado_440' },
+              { label: 'Comprovação escolaridade', name: 'doc_escolaridade' },
+              { label: 'Experiência / títulos', name: 'doc_curriculo' },
+              { label: 'Declaração heteroidentificação', name: 'het_declaracao' },
+              { label: 'Documento heteroidentificação', name: 'het_id' },
+              { label: 'Foto frente', name: 'het_frente' },
+              { label: 'Foto perfil', name: 'het_perfil' },
+              { label: 'Vídeo', name: 'het_video' },
+              { label: 'Laudo médico', name: 'pcd_laudo' },
+              { label: 'Declaração PCD', name: 'pcd_declaracao' },
+              { label: 'Exames complementares', name: 'pcd_exames' },
+              { label: 'Tipo de recurso', name: 'recurso_tipo' },
+              { label: 'Justificativa', name: 'recurso_texto' },
+              { label: 'Anexo do recurso', name: 'recurso_anexo' },
+            ],
+          },
+        ];
+
+        sections.forEach((section) => {
+          const wrapper = document.createElement('section');
+          wrapper.className = 'summary-section';
+          const heading = document.createElement('h3');
+          heading.textContent = section.title;
+          wrapper.appendChild(heading);
+          const table = document.createElement('table');
+          table.className = 'summary-table';
+
+          section.fields.forEach((field) => {
+            const value = getValue(field.name);
+            if (value === null || value === undefined || value === '') return;
+            const row = document.createElement('tr');
+            const th = document.createElement('th');
+            th.textContent = field.label;
+            const td = document.createElement('td');
+            td.textContent = value;
+            row.appendChild(th);
+            row.appendChild(td);
+            table.appendChild(row);
+          });
+
+          if (!table.children.length) {
+            const empty = document.createElement('p');
+            empty.className = 'summary-placeholder mb-0';
+            empty.textContent = 'Nenhum dado informado nesta seção.';
+            wrapper.appendChild(empty);
+          } else {
+            wrapper.appendChild(table);
+          }
+
+          summary.appendChild(wrapper);
+        });
+      };
+
+      const saveDraft = () => {
+        const data = {};
+        Array.from(form.elements).forEach((field) => {
+          if (!field.name) return;
+          if (field.type === 'file') return;
+          if (field.type === 'radio') {
+            if (!field.checked) return;
+            data[field.name] = field.value;
+            return;
+          }
+          if (field.type === 'checkbox') {
+            data[field.name] = field.checked;
+            return;
+          }
+          data[field.name] = field.value;
+        });
+        localStorage.setItem(storageKey, JSON.stringify(data));
+        draftToast.classList.add('show');
+        setTimeout(() => draftToast.classList.remove('show'), 3200);
+      };
+
+      const loadDraft = () => {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return;
+        try {
+          const data = JSON.parse(raw);
+          Object.entries(data).forEach(([name, value]) => {
+            const field = form.elements[name];
+            if (!field) return;
+            if (field instanceof RadioNodeList) {
+              const radio = Array.from(field).find((input) => input.value === value);
+              if (radio) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change'));
+              }
+              return;
+            }
+            if (field.type === 'checkbox') {
+              field.checked = Boolean(value);
+              return;
+            }
+            field.value = value;
+            field.dispatchEvent(new Event('change'));
+          });
+        } catch (err) {
+          console.error('Erro ao carregar rascunho', err);
+        }
+      };
+
+      const clearEmailValidation = () => {
+        document.getElementById('email_confirm').setCustomValidity('');
+      };
+
+      document.querySelectorAll('[data-action="next"]').forEach((btn) => btn.addEventListener('click', goNext));
+      document.querySelectorAll('[data-action="prev"]').forEach((btn) => btn.addEventListener('click', goPrev));
+      document.querySelectorAll('[data-action="save-draft"]').forEach((btn) => btn.addEventListener('click', saveDraft));
+
+      wizardSteps.forEach((step) => {
+        step.addEventListener('click', () => {
+          const stepIndex = Number(step.dataset.step);
+          if (stepIndex <= currentStep && stepIndex >= 0) {
+            showStep(stepIndex);
+          }
+        });
+      });
+
+      form.addEventListener('submit', (event) => {
+        if (!form.checkValidity() || !validateCurrentStep()) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        clearEmailValidation();
+      });
+
+      document.getElementById('genero').addEventListener('change', updateGeneroOutro);
+      document.querySelectorAll('input[name="militar"]').forEach((input) => input.addEventListener('change', updateMilitar));
+      document.querySelectorAll('input[name="jurado_funcao"]').forEach((input) => input.addEventListener('change', updateJurado));
+      document.querySelectorAll('input[name="vinculo_publico_opcao"]').forEach((input) => input.addEventListener('change', updateVinculo));
+      document.getElementById('is_pcd').addEventListener('change', updatePCD);
+      document.querySelectorAll('input[name="condicao_especial"]').forEach((input) => input.addEventListener('change', updateNecessidade));
+      document.getElementById('cotasPPNI').addEventListener('change', updatePPNI);
+      document.getElementById('recurso_tipo').addEventListener('change', updateRecurso);
+      document.getElementById('email').addEventListener('input', clearEmailValidation);
+      document.getElementById('email_confirm').addEventListener('input', clearEmailValidation);
+
+      selectPrefills();
+      radioPrefills();
+      loadDraft();
+      updateGeneroOutro();
+      updateMilitar();
+      updateJurado();
+      updateVinculo();
+      updatePCD();
+      updateNecessidade();
+      updatePPNI();
+      updateRecurso();
+      showStep(0);
+    </script>
   </body>
 </html>
