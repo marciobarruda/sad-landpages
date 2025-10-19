@@ -2019,6 +2019,7 @@
       const storageKey = 'inscricao-hospvet-draft';
       let currentStep = 0;
       let cepController;
+      let isPcdActive = false;
       const visitedSteps = new Set();
       const authorizationField = document.getElementById('initialAuthorization');
 
@@ -2159,6 +2160,7 @@
         const option = Array.from(select.options).find((opt) => opt.value.toUpperCase() === value.toUpperCase());
         if (option) {
           select.value = option.value;
+          select.dataset.prefill = option.value;
           select.dispatchEvent(new Event('change', { bubbles: true }));
           if (select.id === 'is_pcd') {
             requestAnimationFrame(() => updatePCD());
@@ -2330,8 +2332,20 @@
 
       const updatePCD = () => {
         const select = document.getElementById('is_pcd');
-        const selectedValue = (select?.value || select?.dataset.prefill || '').toString().trim().toUpperCase();
+        if (!select) return;
+        if (!select.value && select.dataset.prefill) {
+          const prefillValue = select.dataset.prefill.trim();
+          const option = Array.from(select.options || []).find(
+            (opt) => opt.value.toUpperCase() === prefillValue.toUpperCase(),
+          );
+          if (option) {
+            select.value = option.value;
+          }
+        }
+        select.dataset.prefill = select.value || select.dataset.prefill || '';
+        const selectedValue = (select.value || select.dataset.prefill || '').toString().trim().toUpperCase();
         const isYes = selectedValue === 'SIM';
+        isPcdActive = isYes;
         const condicaoGroup = document.getElementById('condicaoEspecialGroup');
         const necessidadeGroup = document.getElementById('necessidadeGroup');
         const docsGroup = document.getElementById('pcdDocs');
@@ -2367,8 +2381,7 @@
 
       const updateNecessidade = () => {
         const sim = document.getElementById('condicao_especial_sim');
-        const isPcd = document.getElementById('is_pcd')?.value === 'Sim';
-        const shouldShow = Boolean(sim && sim.checked && isPcd);
+        const shouldShow = Boolean(sim && sim.checked && isPcdActive);
         toggleHiddenGroup(shouldShow, document.getElementById('necessidadeGroup'));
         if (!shouldShow) {
           const necessidade = document.getElementById('necessidade');
@@ -2953,6 +2966,7 @@
           document.getElementById('email_confirm').reportValidity();
           return;
         }
+        syncRegistrationNumber();
         const formData = buildFormData();
         let authValue = formData.get('authorization');
         authValue = typeof authValue === 'string' ? authValue.trim() : '';
