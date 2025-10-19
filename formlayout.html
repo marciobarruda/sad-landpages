@@ -149,7 +149,7 @@
         height: 2px;
         width: 50%;
         background: rgba(26, 115, 232, 0.2);
-        z-index: 0;
+        z-index: -1;
       }
 
       .wizard-step::before {
@@ -196,16 +196,20 @@
       }
 
       .wizard-step.completed .wizard-index {
-        background: rgba(26, 115, 232, 0.12);
-        color: var(--brand);
-        border-color: rgba(26, 115, 232, 0.35);
+        background: #198754;
+        color: #ffffff;
+        border-color: #198754;
+        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.15);
       }
 
       .wizard-step.active::before,
-      .wizard-step.active::after,
+      .wizard-step.active::after {
+        background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
+      }
+
       .wizard-step.completed::before,
       .wizard-step.completed::after {
-        background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
+        background: linear-gradient(90deg, #198754 0%, #0f5132 100%);
       }
 
       .step-card {
@@ -456,7 +460,7 @@
         class="needs-validation"
         novalidate
         method="post"
-        action="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/atualizarinstancia"
+        action="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/83d7be28-a3ca-4aca-80be-13155dd4d497"
         enctype="multipart/form-data"
       >
         <section class="card step-card" data-step-panel="0">
@@ -541,8 +545,8 @@
 
             <div class="section-block">
               <h3 class="section-title">Naturalidade e filiação</h3>
-              <div class="row g-3">
-                <div class="col-md-5">
+              <div class="row g-3 mb-1">
+                <div class="col-md-5 col-lg-6">
                   <label for="naturalidade_cidade" class="form-label required">Naturalidade</label>
                   <input
                     type="text"
@@ -553,7 +557,7 @@
                     required
                   />
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 col-lg-3 col-xl-2">
                   <label for="naturalidade_uf" class="form-label required">UF</label>
                   <input
                     type="text"
@@ -565,25 +569,29 @@
                     required
                   />
                 </div>
-                <div class="col-md-5">
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
                   <label for="mae" class="form-label required">Nome da mãe</label>
                   <input
                     type="text"
-                    class="form-control"
+                    class="form-control text-uppercase"
                     id="mae"
                     name="mae"
                     value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}"
+                    oninput="this.value = this.value.toUpperCase();"
                     required
                   />
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-6">
                   <label for="pai" class="form-label">Nome do pai</label>
                   <input
                     type="text"
-                    class="form-control"
+                    class="form-control text-uppercase"
                     id="pai"
                     name="pai"
                     value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}"
+                    oninput="this.value = this.value.toUpperCase();"
                   />
                 </div>
               </div>
@@ -747,7 +755,7 @@
                     class="form-control"
                     id="email_confirm"
                     name="email_confirm"
-                    value="{{ String($json.email ?? '').trim().toLowerCase() }}"
+                    value=""
                     required
                   />
                 </div>
@@ -986,10 +994,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4">
-                  <label for="experiencia_tempo" class="form-label">Tempo de experiência (meses/anos)</label>
-                  <input type="text" class="form-control" id="experiencia_tempo" name="experiencia_tempo" value="{{ String($json.experiencia_tempo ?? '').trim() }}" />
-                </div>
               </div>
             </div>
 
@@ -1004,6 +1008,7 @@
                     id="alistamento_numero"
                     name="alistamento_numero"
                     value="{{ String($json.alistamento_numero ?? '').trim().toUpperCase() }}"
+                    data-force-required="true"
                   />
                 </div>
                 <div class="col-md-4">
@@ -1014,6 +1019,7 @@
                     id="alistamento_orgao"
                     name="alistamento_orgao"
                     value="{{ String($json.alistamento_orgao ?? '').trim().toUpperCase() }}"
+                    data-force-required="true"
                   />
                 </div>
                 <div class="col-md-4">
@@ -1024,6 +1030,7 @@
                     id="alistamento_data"
                     name="alistamento_data"
                     value="{{ String($json.alistamento_data ?? '').split('/').reverse().join('-') }}"
+                    data-force-required="true"
                   />
                 </div>
               </div>
@@ -1099,7 +1106,7 @@
                   />
                 </div>
                 <div class="col-md-4">
-                  <span class="form-label">Possui vínculo com o serviço público?</span>
+                  <span class="form-label">Possui algum outro vínculo com o serviço público?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.vinculo_publico ?? '').trim() }}">
                     <div class="form-check">
                       <input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_sim" value="Sim" />
@@ -1111,9 +1118,48 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 hidden" id="qualVinculoGroup">
+                <div class="col-md-3 hidden" id="qualVinculoGroup">
                   <label for="qual_vinculo" class="form-label">Qual vínculo?</label>
-                  <input type="text" class="form-control" id="qual_vinculo" name="qual_vinculo" value="{{ String($json.qual_vinculo ?? '').trim() }}" />
+                  <input
+                    type="text"
+                    class="form-control text-uppercase"
+                    id="qual_vinculo"
+                    name="qual_vinculo"
+                    value="{{ String($json.qual_vinculo ?? '').trim().toUpperCase() }}"
+                    oninput="this.value = this.value.toUpperCase();"
+                  />
+                </div>
+                <div class="col-md-3 hidden" id="vinculoCargoGroup">
+                  <label for="vinculo_cargo" class="form-label">Cargo</label>
+                  <input
+                    type="text"
+                    class="form-control text-uppercase"
+                    id="vinculo_cargo"
+                    name="vinculo_cargo"
+                    value="{{ String($json.vinculo_cargo ?? '').trim().toUpperCase() }}"
+                    oninput="this.value = this.value.toUpperCase();"
+                  />
+                </div>
+                <div class="col-md-3 hidden" id="vinculoOrgaoGroup">
+                  <label for="vinculo_orgao" class="form-label">Órgão</label>
+                  <input
+                    type="text"
+                    class="form-control text-uppercase"
+                    id="vinculo_orgao"
+                    name="vinculo_orgao"
+                    value="{{ String($json.vinculo_orgao ?? '').trim().toUpperCase() }}"
+                    oninput="this.value = this.value.toUpperCase();"
+                  />
+                </div>
+                <div class="col-md-3 hidden" id="vinculoTempoGroup">
+                  <label for="vinculo_tempo_servico" class="form-label">Tempo de serviço</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="vinculo_tempo_servico"
+                    name="vinculo_tempo_servico"
+                    value="{{ String($json.vinculo_tempo_servico ?? '').trim() }}"
+                  />
                 </div>
               </div>
             </div>
@@ -1154,7 +1200,7 @@
                     <option value="Não">Não</option>
                   </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 hidden" id="condicaoEspecialGroup">
                   <span class="form-label">Necessita de condição especial?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
                     <div class="form-check">
@@ -1205,9 +1251,9 @@
                   <label for="doc_quitacao_eleitoral" class="form-label required">Quitação eleitoral</label>
                   <input type="file" class="form-control" id="doc_quitacao_eleitoral" name="doc_quitacao_eleitoral" accept=".pdf,image/*" required />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 hidden" id="docMilitarGroup">
                   <label for="doc_militar" class="form-label">Quitação do serviço militar</label>
-                  <input type="file" class="form-control" id="doc_militar" name="doc_militar" accept=".pdf,image/*" />
+                  <input type="file" class="form-control" id="doc_militar" name="doc_militar" accept=".pdf,image/*" data-force-required="true" />
                 </div>
               </div>
             </div>
@@ -1274,7 +1320,7 @@
                   <input type="file" class="form-control" id="pcd_laudo" name="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif" />
                 </div>
                 <div class="col-md-4">
-                  <label for="pcd_declaracao" class="form-label">Declaração de deficiência (modelo do edital)</label>
+                  <label for="pcd_declaracao" class="form-label">Declaração PCD (modelo do edital)</label>
                   <input type="file" class="form-control" id="pcd_declaracao" name="pcd_declaracao" accept=".pdf,image/*" />
                 </div>
                 <div class="col-md-4">
@@ -1284,28 +1330,6 @@
               </div>
             </div>
 
-            <div class="section-block">
-              <h3 class="section-title">Recursos</h3>
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="recurso_tipo" class="form-label">Tipo de recurso</label>
-                  <select id="recurso_tipo" name="recurso_tipo" class="form-select" data-prefill="{{ $json.recurso_tipo ?? '' }}">
-                    <option value="">Selecione...</option>
-                    <option value="analise_curricular">Resultado Preliminar da Análise Curricular</option>
-                    <option value="heteroidentificacao">Resultado Preliminar do Procedimento de Heteroidentificação</option>
-                    <option value="biopsicossocial">Resultado Preliminar da Avaliação Biopsicossocial</option>
-                  </select>
-                </div>
-                <div class="col-12 hidden" id="recursoTextoGroup">
-                  <label for="recurso_texto" class="form-label">Justificativa</label>
-                  <textarea class="form-control" id="recurso_texto" name="recurso_texto" rows="4" placeholder="Descreva o motivo do recurso">{{ String($json.recurso_texto ?? '').trim() }}</textarea>
-                </div>
-                <div class="col-md-6 hidden" id="recursoAnexoGroup">
-                  <label for="recurso_anexo" class="form-label">Anexo (opcional)</label>
-                  <input type="file" class="form-control" id="recurso_anexo" name="recurso_anexo" accept=".pdf,image/*" />
-                </div>
-              </div>
-            </div>
           </div>
           <div class="card-footer bg-transparent border-top-0 pt-0">
             <div class="wizard-controls">
@@ -1334,9 +1358,15 @@
 
             <div class="section-block">
               <h3 class="section-title">Declaração</h3>
+              <p>
+                Declaro, sob as penas da Lei, que concordo com os termos que constam do Edital n° XXXX/2025 de Abertura de Inscrições bem como declaro que aceito que os meus dados pessoais, sensíveis ou não, sejam tratados e processados, de forma a possibilitar a efetiva execução da seleção simplificada, com a aplicação dos critérios de avaliação e seleção, autorizando expressamente a divulgação dos meus nomes, números de inscrição, critérios de desempate e das minhas notas, em observância aos princípios da publicidade e da transparência que regem a Administração Pública e nos termos da Lei federal n° 13.709, de 14 de agosto de 2018; e que não serão fornecidas a terceiros informações e/ou dados pessoais, sensíveis ou não de candidatos.
+              </p>
+              <p>
+                Declaro, sob as penas da Lei, que os dados informados neste formulário são verdadeiros e que conheço e aceito todas as regras pertinentes ao concurso consignadas no Edital n° xx/2025 de Abertura de Inscrições.
+              </p>
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="termoResponsabilidade" name="termoResponsabilidade" required />
-                <label class="form-check-label" for="termoResponsabilidade">Li e estou de acordo com a declaração de responsabilidade.</label>
+                <label class="form-check-label" for="termoResponsabilidade">Li e estou de acordo com a declaração acima.</label>
               </div>
             </div>
           </div>
@@ -1364,6 +1394,7 @@
       const draftToast = document.getElementById('draftToast');
       const storageKey = 'inscricao-hospvet-draft';
       let currentStep = 0;
+      let cepController;
 
       const selectPrefills = () => {
         document.querySelectorAll('select[data-prefill]').forEach((select) => {
@@ -1398,6 +1429,10 @@
           step.classList.toggle('completed', i < currentStep);
           step.setAttribute('aria-selected', i === currentStep ? 'true' : 'false');
           step.setAttribute('tabindex', i === currentStep ? '0' : '-1');
+          const indexEl = step.querySelector('.wizard-index');
+          if (indexEl) {
+            indexEl.textContent = i < currentStep ? '✓' : String(i + 1);
+          }
         });
         if (currentStep === stepPanels.length - 1) {
           buildReview();
@@ -1451,14 +1486,22 @@
       };
 
       const updateMilitar = () => {
-        const militarSim = document.getElementById('militar_sim');
+        const sexo = document.getElementById('sexo');
+        const show = sexo && sexo.value === 'Masculino';
         const wrapper = document.getElementById('alistamentoWrapper');
-        const required = militarSim.checked;
-        toggleHiddenGroup(required, wrapper);
-        if (required) {
-          wrapper.querySelectorAll('input').forEach((input) => input.setAttribute('required', 'required'));
-        } else {
-          wrapper.querySelectorAll('input').forEach((input) => input.removeAttribute('required'));
+        const docGroup = document.getElementById('docMilitarGroup');
+        toggleHiddenGroup(show, wrapper);
+        toggleHiddenGroup(show, docGroup);
+        if (!show) {
+          if (wrapper) {
+            wrapper.querySelectorAll('input').forEach((input) => {
+              input.value = '';
+            });
+          }
+          const docMilitar = document.getElementById('doc_militar');
+          if (docMilitar) {
+            docMilitar.value = '';
+          }
         }
       };
 
@@ -1477,35 +1520,64 @@
         const radioSim = document.getElementById('vinculo_publico_sim');
         const radioNao = document.getElementById('vinculo_publico_nao');
         const group = document.getElementById('qualVinculoGroup');
+        const cargoGroup = document.getElementById('vinculoCargoGroup');
+        const orgaoGroup = document.getElementById('vinculoOrgaoGroup');
+        const tempoGroup = document.getElementById('vinculoTempoGroup');
         const hasSelection = radioSim.checked || radioNao.checked;
         document.getElementById('vinculo_publico').value = hasSelection ? (radioSim.checked ? 'Sim' : 'Não') : '';
         toggleHiddenGroup(radioSim.checked, group);
+        toggleHiddenGroup(radioSim.checked, cargoGroup);
+        toggleHiddenGroup(radioSim.checked, orgaoGroup);
+        toggleHiddenGroup(radioSim.checked, tempoGroup);
+        if (!radioSim.checked) {
+          ['qual_vinculo', 'vinculo_cargo', 'vinculo_orgao', 'vinculo_tempo_servico'].forEach((fieldId) => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+              field.value = '';
+            }
+          });
+        }
       };
 
       const updatePCD = () => {
         const select = document.getElementById('is_pcd');
-        const isYes = select.value === 'Sim';
+        const isYes = select && select.value === 'Sim';
+        const condicaoGroup = document.getElementById('condicaoEspecialGroup');
+        const necessidadeGroup = document.getElementById('necessidadeGroup');
+        toggleHiddenGroup(isYes, condicaoGroup);
         toggleHiddenGroup(isYes, document.getElementById('tipoPcdGroup'));
         toggleHiddenGroup(isYes, document.getElementById('pcdCidGroup'));
         toggleHiddenGroup(isYes, document.getElementById('pcdDocs'));
+        if (!isYes) {
+          document.querySelectorAll('input[name="condicao_especial"]').forEach((input) => {
+            input.checked = false;
+          });
+          const tipo = document.getElementById('tipo_pcd');
+          const cid = document.getElementById('pcd_cid');
+          const necessidade = document.getElementById('necessidade');
+          if (tipo) tipo.value = '';
+          if (cid) cid.value = '';
+          if (necessidade) necessidade.value = '';
+          toggleHiddenGroup(false, necessidadeGroup);
+        } else {
+          updateNecessidade();
+        }
       };
 
       const updateNecessidade = () => {
         const sim = document.getElementById('condicao_especial_sim');
-        toggleHiddenGroup(sim.checked, document.getElementById('necessidadeGroup'));
+        const isPcd = document.getElementById('is_pcd')?.value === 'Sim';
+        const shouldShow = Boolean(sim && sim.checked && isPcd);
+        toggleHiddenGroup(shouldShow, document.getElementById('necessidadeGroup'));
+        if (!shouldShow) {
+          const necessidade = document.getElementById('necessidade');
+          if (necessidade) necessidade.value = '';
+        }
       };
 
       const updatePPNI = () => {
         const select = document.getElementById('cotasPPNI');
         toggleHiddenGroup(select.value === 'Sim', document.getElementById('ppniDocs'));
-      };
-
-      const updateRecurso = () => {
-        const tipo = document.getElementById('recurso_tipo');
-        const hasValue = !!tipo.value;
-        toggleHiddenGroup(hasValue, document.getElementById('recursoTextoGroup'));
-        toggleHiddenGroup(hasValue, document.getElementById('recursoAnexoGroup'));
-        document.getElementById('recurso_texto').toggleAttribute('required', hasValue);
       };
 
       const buildReview = () => {
@@ -1573,7 +1645,6 @@
               { label: 'Ano de conclusão', name: 'ano_conclusao' },
               { label: 'Cargo pretendido', name: 'cargo' },
               { label: 'Especialidade', name: 'especialidade' },
-              { label: 'Tempo de experiência', name: 'experiencia_tempo' },
               { label: 'Título de eleitor', name: 'titulo' },
               { label: 'Zona', name: 'zona' },
               { label: 'Seção', name: 'secao' },
@@ -1586,6 +1657,9 @@
               { label: 'Informações do jurado', name: 'jurado_periodo' },
               { label: 'Vínculo público', name: 'vinculo_publico' },
               { label: 'Qual vínculo', name: 'qual_vinculo' },
+              { label: 'Cargo no vínculo', name: 'vinculo_cargo' },
+              { label: 'Órgão do vínculo', name: 'vinculo_orgao' },
+              { label: 'Tempo de serviço', name: 'vinculo_tempo_servico' },
             ],
           },
           {
@@ -1620,9 +1694,6 @@
               { label: 'Laudo médico', name: 'pcd_laudo' },
               { label: 'Declaração PCD', name: 'pcd_declaracao' },
               { label: 'Exames complementares', name: 'pcd_exames' },
-              { label: 'Tipo de recurso', name: 'recurso_tipo' },
-              { label: 'Justificativa', name: 'recurso_texto' },
-              { label: 'Anexo do recurso', name: 'recurso_anexo' },
             ],
           },
         ];
@@ -1711,6 +1782,75 @@
         }
       };
 
+      const cepInput = document.getElementById('cep');
+      const addressFields = {
+        logradouro: document.getElementById('logradouro'),
+        bairro: document.getElementById('bairro'),
+        cidade: document.getElementById('cidade'),
+        uf: document.getElementById('uf'),
+      };
+
+      const clearAddressFields = () => {
+        Object.values(addressFields).forEach((field) => {
+          if (field) {
+            field.value = '';
+          }
+        });
+      };
+
+      const fillAddressFields = (data) => {
+        if (!data) return;
+        if (addressFields.logradouro) {
+          addressFields.logradouro.value = (data.street || '').toUpperCase();
+        }
+        if (addressFields.bairro) {
+          addressFields.bairro.value = (data.neighborhood || '').toUpperCase();
+        }
+        if (addressFields.cidade) {
+          addressFields.cidade.value = (data.city || '').toUpperCase();
+        }
+        if (addressFields.uf) {
+          addressFields.uf.value = (data.state || '').toUpperCase();
+        }
+      };
+
+      const handleCepInput = async () => {
+        if (!cepInput) return;
+        const cepValue = cepInput.value.replace(/\D+/g, '');
+        if (cepValue.length !== 8) {
+          if (cepValue.length < 8) {
+            clearAddressFields();
+          }
+          if (cepController) {
+            cepController.abort();
+            cepController = null;
+          }
+          return;
+        }
+        if (cepController) {
+          cepController.abort();
+        }
+        cepController = new AbortController();
+        try {
+          const response = await fetch(`https://brasilapi.com.br/api/cep/v2/${cepValue}`, { signal: cepController.signal });
+          if (!response.ok) {
+            throw new Error('CEP não encontrado');
+          }
+          const data = await response.json();
+          if (cepInput.value.replace(/\D+/g, '') !== cepValue) {
+            return;
+          }
+          fillAddressFields(data);
+        } catch (error) {
+          if (error.name === 'AbortError') {
+            return;
+          }
+          clearAddressFields();
+        } finally {
+          cepController = null;
+        }
+      };
+
       const clearEmailValidation = () => {
         document.getElementById('email_confirm').setCustomValidity('');
       };
@@ -1738,15 +1878,17 @@
       });
 
       document.getElementById('genero').addEventListener('change', updateGeneroOutro);
-      document.querySelectorAll('input[name="militar"]').forEach((input) => input.addEventListener('change', updateMilitar));
+      document.getElementById('sexo').addEventListener('change', updateMilitar);
       document.querySelectorAll('input[name="jurado_funcao"]').forEach((input) => input.addEventListener('change', updateJurado));
       document.querySelectorAll('input[name="vinculo_publico_opcao"]').forEach((input) => input.addEventListener('change', updateVinculo));
       document.getElementById('is_pcd').addEventListener('change', updatePCD);
       document.querySelectorAll('input[name="condicao_especial"]').forEach((input) => input.addEventListener('change', updateNecessidade));
       document.getElementById('cotasPPNI').addEventListener('change', updatePPNI);
-      document.getElementById('recurso_tipo').addEventListener('change', updateRecurso);
       document.getElementById('email').addEventListener('input', clearEmailValidation);
       document.getElementById('email_confirm').addEventListener('input', clearEmailValidation);
+      if (cepInput) {
+        cepInput.addEventListener('input', handleCepInput);
+      }
 
       selectPrefills();
       radioPrefills();
@@ -1758,7 +1900,6 @@
       updatePCD();
       updateNecessidade();
       updatePPNI();
-      updateRecurso();
       showStep(0);
     </script>
   </body>
