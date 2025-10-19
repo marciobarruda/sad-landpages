@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Seleção Simplificada | Formulário de Inscrição</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <style>
+      :root {
+        --primary: #004bcc;
+        --primary-dark: #003ca1;
+        --primary-light: #e7f0ff;
+        --bg: #f5f7fb;
+        --text: #102042;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
+      }
+
+      header.hero {
+        background: linear-gradient(135deg, #0b66ff, #72a4ff);
+        color: #ffffff;
+        padding: 4rem 0 6rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      header.hero::before,
+      header.hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+        filter: blur(0px);
+      }
+
+      header.hero::before {
+        width: 520px;
+        height: 520px;
+        top: -260px;
+        right: -120px;
+      }
+
+      header.hero::after {
+        width: 360px;
+        height: 360px;
+        bottom: -220px;
+        left: -100px;
+      }
+
+      header.hero h1 {
+        font-weight: 700;
+        letter-spacing: 0.4px;
+      }
+
+      header.hero p {
+        max-width: 520px;
+        margin-bottom: 0;
+      }
+
+      main {
+        margin-top: -4rem;
+        margin-bottom: 4rem;
+      }
+
+      .card-form {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 32px 84px rgba(13, 58, 155, 0.12);
+        overflow: hidden;
+      }
+
+      .card-form .card-header {
+        background: #fff;
+        border-bottom: 1px solid #eef2fb;
+        padding: 2rem;
+      }
+
+      .card-form .card-body {
+        padding: 2.5rem;
+      }
+
+      .step-indicator {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        color: #6c7ba8;
+      }
+
+      .step .badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        background: #dbe6ff;
+        color: var(--primary);
+      }
+
+      .step.active .badge {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .step.active {
+        color: var(--primary);
+      }
+
+      .step.completed .badge {
+        background: rgba(0, 75, 204, 0.15);
+        color: var(--primary);
+      }
+
+      .step.completed {
+        color: #5a6c9e;
+      }
+
+      .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        margin-bottom: 1.5rem;
+      }
+
+      .required::after {
+        content: " *";
+        color: #e13245;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: rgba(0, 75, 204, 0.45);
+        box-shadow: 0 0 0 0.25rem rgba(11, 102, 255, 0.15);
+      }
+
+      .form-step {
+        display: none;
+      }
+
+      .form-step.active {
+        display: block;
+      }
+
+      .document-dropzone {
+        border: 2px dashed rgba(0, 75, 204, 0.3);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        background: #f8faff;
+      }
+
+      .document-dropzone .icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 1.5rem;
+      }
+
+      .summary-card {
+        background: var(--primary-light);
+        border-radius: 1rem;
+        padding: 1.5rem;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+      }
+
+      .summary-item span {
+        display: block;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7182ab;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+      }
+
+      .summary-item strong {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .review-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .review-list li + li {
+        border-top: 1px solid #dbe3ff;
+        margin-top: 1rem;
+        padding-top: 1rem;
+      }
+
+      .alert-info {
+        background: rgba(0, 75, 204, 0.08);
+        border: 1px solid rgba(0, 75, 204, 0.18);
+        color: #0b3d9a;
+      }
+
+      footer {
+        padding: 2rem 0 4rem;
+        color: #6c7ba8;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        header.hero {
+          padding: 3rem 0 5rem;
+        }
+
+        main {
+          margin-top: -3rem;
+        }
+
+        .card-form .card-body {
+          padding: 2rem 1.5rem;
+        }
+
+        .step-indicator {
+          gap: 1rem;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container position-relative">
+        <div class="row align-items-center">
+          <div class="col-lg-7">
+            <div class="text-uppercase small fw-semibold mb-2 opacity-75">
+              Secretaria de Administração — Prefeitura do Recife
+            </div>
+            <h1 class="display-5 mb-3">
+              Formulário de Inscrição — Seleção Simplificada HVR 2025
+            </h1>
+            <p class="lead">
+              Preencha os dados abaixo com atenção. Você poderá revisar todas as
+              informações antes de enviar a inscrição.
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="card card-form">
+          <div class="card-header">
+            <div class="step-indicator" id="stepIndicator">
+              <div class="step active" data-step="1">
+                <span class="badge">1</span>
+                Dados pessoais
+              </div>
+              <div class="step" data-step="2">
+                <span class="badge">2</span>
+                Endereço e contato
+              </div>
+              <div class="step" data-step="3">
+                <span class="badge">3</span>
+                Perfil profissional
+              </div>
+              <div class="step" data-step="4">
+                <span class="badge">4</span>
+                Documentos
+              </div>
+              <div class="step" data-step="5">
+                <span class="badge">5</span>
+                Revisão
+              </div>
+            </div>
+          </div>
+
+          <form class="card-body" id="formInscricao" novalidate>
+            <section class="form-step active" data-step="1">
+              <h2 class="section-title">Identificação do candidato</h2>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label required" for="nomeCompleto"
+                    >Nome completo</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nomeCompleto"
+                    name="nomeCompleto"
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Informe seu nome completo.
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label required" for="cpf">CPF</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cpf"
+                    name="cpf"
+                    inputmode="numeric"
+                    placeholder="000.000.000-00"
+                    maxlength="14"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe um CPF válido.</div>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label required" for="dataNascimento"
+                    >Data de nascimento</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="dataNascimento"
+                    name="dataNascimento"
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Informe sua data de nascimento.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="genero">Gênero</label>
+                  <select class="form-select" id="genero" name="genero" required>
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="nao-binario">Não-binário</option>
+                    <option value="prefiro-nao-informar">
+                      Prefiro não informar
+                    </option>
+                  </select>
+                  <div class="invalid-feedback">Informe o gênero.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="estadoCivil"
+                    >Estado civil</label
+                  >
+                  <select
+                    class="form-select"
+                    id="estadoCivil"
+                    name="estadoCivil"
+                    required
+                  >
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="solteiro">Solteiro(a)</option>
+                    <option value="casado">Casado(a)</option>
+                    <option value="divorciado">Divorciado(a)</option>
+                    <option value="viuvo">Viúvo(a)</option>
+                    <option value="uniao-estavel">União estável</option>
+                  </select>
+                  <div class="invalid-feedback">Informe seu estado civil.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="racaCor"
+                    >Raça/cor</label
+                  >
+                  <select class="form-select" id="racaCor" name="racaCor" required>
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="branca">Branca</option>
+                    <option value="preta">Preta</option>
+                    <option value="parda">Parda</option>
+                    <option value="amarela">Amarela</option>
+                    <option value="indigena">Indígena</option>
+                    <option value="nao-informar">Prefiro não informar</option>
+                  </select>
+                  <div class="invalid-feedback">Informe sua raça/cor.</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-step" data-step="2">
+              <h2 class="section-title">Endereço e contato</h2>
+              <div class="row g-4">
+                <div class="col-md-3">
+                  <label class="form-label required" for="cep">CEP</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cep"
+                    name="cep"
+                    placeholder="00000-000"
+                    maxlength="9"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe o CEP.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required" for="logradouro"
+                    >Logradouro</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="logradouro"
+                    name="logradouro"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe o logradouro.</div>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label required" for="numero">Número</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="numero"
+                    name="numero"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe o número.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="complemento">Complemento</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="complemento"
+                    name="complemento"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="bairro">Bairro</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="bairro"
+                    name="bairro"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe o bairro.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="cidade">Município</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cidade"
+                    name="cidade"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe o município.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="estado">UF</label>
+                  <select class="form-select" id="estado" name="estado" required>
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="AC">AC</option>
+                    <option value="AL">AL</option>
+                    <option value="AP">AP</option>
+                    <option value="AM">AM</option>
+                    <option value="BA">BA</option>
+                    <option value="CE">CE</option>
+                    <option value="DF">DF</option>
+                    <option value="ES">ES</option>
+                    <option value="GO">GO</option>
+                    <option value="MA">MA</option>
+                    <option value="MT">MT</option>
+                    <option value="MS">MS</option>
+                    <option value="MG">MG</option>
+                    <option value="PA">PA</option>
+                    <option value="PB">PB</option>
+                    <option value="PR">PR</option>
+                    <option value="PE">PE</option>
+                    <option value="PI">PI</option>
+                    <option value="RJ">RJ</option>
+                    <option value="RN">RN</option>
+                    <option value="RO">RO</option>
+                    <option value="RR">RR</option>
+                    <option value="RS">RS</option>
+                    <option value="SC">SC</option>
+                    <option value="SP">SP</option>
+                    <option value="SE">SE</option>
+                    <option value="TO">TO</option>
+                  </select>
+                  <div class="invalid-feedback">Informe a UF.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="telefone"
+                    >Telefone principal</label
+                  >
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="telefone"
+                    name="telefone"
+                    placeholder="(00) 00000-0000"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe um telefone válido.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="email"
+                    >E-mail</label
+                  >
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="nome@email.com"
+                    required
+                  />
+                  <div class="invalid-feedback">Informe um e-mail válido.</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-step" data-step="3">
+              <h2 class="section-title">Perfil profissional</h2>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label required" for="cargoPretendido"
+                    >Cargo pretendido</label
+                  >
+                  <select
+                    class="form-select"
+                    id="cargoPretendido"
+                    name="cargoPretendido"
+                    required
+                  >
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="medico">Médico Veterinário</option>
+                    <option value="enfermeiro">Enfermeiro</option>
+                    <option value="tecnico">Técnico de Enfermagem</option>
+                    <option value="assistente">Assistente Administrativo</option>
+                    <option value="outro">Outro (especificar)</option>
+                  </select>
+                  <div class="invalid-feedback">Informe o cargo pretendido.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required" for="vinculoAtual"
+                    >Vínculo profissional atual</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="vinculoAtual"
+                    name="vinculoAtual"
+                    placeholder="Ex.: Prefeitura do Recife"
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Informe seu vínculo profissional atual.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="tempoExperiencia"
+                    >Tempo de experiência</label
+                  >
+                  <select
+                    class="form-select"
+                    id="tempoExperiencia"
+                    name="tempoExperiencia"
+                    required
+                  >
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="0-1">Até 1 ano</option>
+                    <option value="1-3">De 1 a 3 anos</option>
+                    <option value="3-5">De 3 a 5 anos</option>
+                    <option value="mais-5">Mais de 5 anos</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Informe seu tempo de experiência.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="formacao"
+                    >Maior nível de formação</label
+                  >
+                  <select class="form-select" id="formacao" name="formacao" required>
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="medio">Ensino Médio</option>
+                    <option value="tecnico">Curso Técnico</option>
+                    <option value="graduacao">Graduação</option>
+                    <option value="especializacao">Especialização</option>
+                    <option value="mestrado">Mestrado</option>
+                    <option value="doutorado">Doutorado</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Informe sua formação.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label required" for="disponibilidade"
+                    >Disponibilidade de jornada</label
+                  >
+                  <select
+                    class="form-select"
+                    id="disponibilidade"
+                    name="disponibilidade"
+                    required
+                  >
+                    <option value="" selected disabled>Selecione</option>
+                    <option value="20h">20 horas semanais</option>
+                    <option value="30h">30 horas semanais</option>
+                    <option value="40h">40 horas semanais</option>
+                    <option value="plantao">Plantão</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Informe a disponibilidade.
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="experienciaResumo"
+                    >Resumo da experiência profissional</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="experienciaResumo"
+                    name="experienciaResumo"
+                    rows="4"
+                    placeholder="Descreva experiências relevantes para a função"
+                  ></textarea>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-step" data-step="4">
+              <h2 class="section-title">Documentos comprobatórios</h2>
+              <p class="text-muted mb-4">
+                Todos os arquivos devem estar em formato PDF com tamanho máximo de
+                10&nbsp;MB.
+              </p>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label required" for="rgDocumento"
+                    >Documento de identificação (RG ou CNH)</label
+                  >
+                  <div class="document-dropzone">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="icon">📄</div>
+                      <div>
+                        <p class="fw-semibold mb-1">RG ou CNH do candidato</p>
+                        <p class="text-muted small mb-2">
+                          Envie um arquivo PDF com frente e verso legíveis.
+                        </p>
+                        <input
+                          type="file"
+                          class="form-control"
+                          id="rgDocumento"
+                          name="rgDocumento"
+                          accept="application/pdf"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Anexe o documento de identificação.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required" for="comprovanteResidencia"
+                    >Comprovante de residência</label
+                  >
+                  <div class="document-dropzone">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="icon">🏠</div>
+                      <div>
+                        <p class="fw-semibold mb-1">Conta de serviço recente</p>
+                        <p class="text-muted small mb-2">
+                          Aceitamos contas de água, luz, gás ou internet emitidas
+                          nos últimos 3 meses.
+                        </p>
+                        <input
+                          type="file"
+                          class="form-control"
+                          id="comprovanteResidencia"
+                          name="comprovanteResidencia"
+                          accept="application/pdf"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Anexe o comprovante de residência.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required" for="diplomaDocumento"
+                    >Comprovante de formação</label
+                  >
+                  <div class="document-dropzone">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="icon">🎓</div>
+                      <div>
+                        <p class="fw-semibold mb-1">Diploma ou certificado</p>
+                        <p class="text-muted small mb-2">
+                          Junte em um único PDF a documentação comprobatória da
+                          formação informada.
+                        </p>
+                        <input
+                          type="file"
+                          class="form-control"
+                          id="diplomaDocumento"
+                          name="diplomaDocumento"
+                          accept="application/pdf"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Anexe o comprovante de formação.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="curriculo"
+                    >Currículo ou memorial descritivo</label
+                  >
+                  <div class="document-dropzone">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="icon">🗂️</div>
+                      <div>
+                        <p class="fw-semibold mb-1">Currículo atualizado</p>
+                        <p class="text-muted small mb-2">
+                          Opcional, mas recomendado para destacar experiências e
+                          cursos relevantes.
+                        </p>
+                        <input
+                          type="file"
+                          class="form-control"
+                          id="curriculo"
+                          name="curriculo"
+                          accept="application/pdf"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-step" data-step="5">
+              <h2 class="section-title">Revisão e confirmação</h2>
+              <div class="alert alert-info mb-4" role="alert">
+                Revise atentamente seus dados antes de enviar. Após o envio, não
+                será possível editar a inscrição.
+              </div>
+
+              <div class="summary-card mb-4">
+                <h3 class="h5 fw-semibold mb-3">Resumo dos dados informados</h3>
+                <div class="summary-grid" id="summaryGrid"></div>
+              </div>
+
+              <h3 class="h6 text-uppercase text-muted mb-3">Declarações</h3>
+              <ul class="review-list">
+                <li>
+                  Declaro que todas as informações prestadas são verdadeiras e
+                  estou ciente de que poderei ser eliminado(a) caso seja
+                  constatada qualquer irregularidade.
+                </li>
+                <li>
+                  Autorizo o tratamento dos meus dados pessoais para execução da
+                  seleção, de acordo com a Lei Geral de Proteção de Dados (Lei nº
+                  13.709/2018).
+                </li>
+                <li>
+                  Estou de acordo com as regras previstas no edital de abertura
+                  da seleção simplificada.
+                </li>
+              </ul>
+
+              <div class="form-check mt-4">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="1"
+                  id="declaracao"
+                  required
+                />
+                <label class="form-check-label" for="declaracao">
+                  Estou ciente e concordo com as declarações acima.
+                </label>
+                <div class="invalid-feedback">
+                  É necessário aceitar as declarações para finalizar a inscrição.
+                </div>
+              </div>
+            </section>
+
+            <div class="d-flex justify-content-between align-items-center mt-5">
+              <button type="button" class="btn btn-outline-secondary" id="btnPrev" disabled>
+                Voltar
+              </button>
+              <button type="button" class="btn btn-link text-muted" id="btnSalvarRascunho">
+                Salvar rascunho
+              </button>
+              <button type="button" class="btn btn-primary" id="btnNext">
+                Avançar
+              </button>
+              <button type="submit" class="btn btn-success d-none" id="btnSubmit">
+                Enviar inscrição
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container text-center text-md-start">
+        <div class="row g-4 align-items-center">
+          <div class="col-md">
+            © 2025 Secretaria de Administração do Recife. Todos os direitos
+            reservados.
+          </div>
+          <div class="col-md text-md-end">
+            Suporte: <a href="mailto:selecoes@sad.recife.pe.gov.br">selecoes@sad.recife.pe.gov.br</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div class="toast align-items-center text-bg-success border-0" id="toastSucesso" role="alert">
+        <div class="d-flex">
+          <div class="toast-body">Rascunho salvo com sucesso!</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('formInscricao');
+        const steps = Array.from(document.querySelectorAll('.form-step'));
+        const indicatorSteps = Array.from(document.querySelectorAll('.step-indicator .step'));
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnSalvar = document.getElementById('btnSalvarRascunho');
+        const summaryGrid = document.getElementById('summaryGrid');
+        const toastElement = document.getElementById('toastSucesso');
+        const toast = toastElement ? new bootstrap.Toast(toastElement) : null;
+        const STORAGE_KEY = 'inscricao_hvr_rascunho_v1';
+
+        let currentStep = 0;
+
+        function updateSteps() {
+          steps.forEach((step, index) => {
+            step.classList.toggle('active', index === currentStep);
+          });
+
+          indicatorSteps.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === currentStep);
+            indicator.classList.toggle('completed', index < currentStep);
+          });
+
+          btnPrev.disabled = currentStep === 0;
+          btnNext.classList.toggle('d-none', currentStep === steps.length - 1);
+          btnSubmit.classList.toggle('d-none', currentStep !== steps.length - 1);
+        }
+
+      function validateStep(stepIndex) {
+        const stepElement = steps[stepIndex];
+        const inputs = Array.from(stepElement.querySelectorAll('input, select, textarea'));
+        let valid = true;
+
+        inputs.forEach((input) => {
+          if (input.type === 'file') {
+            if (!input.files?.length && input.required) {
+              valid = false;
+              input.classList.add('is-invalid');
+            } else {
+              input.classList.remove('is-invalid');
+            }
+            return;
+          }
+
+          if (!input.checkValidity()) {
+            valid = false;
+            input.classList.add('is-invalid');
+          } else {
+            input.classList.remove('is-invalid');
+          }
+        });
+
+        return valid;
+      }
+
+      function goToStep(index) {
+        if (index < 0 || index >= steps.length) return;
+        currentStep = index;
+        updateSteps();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+        function saveDraft() {
+          const data = new FormData(form);
+          const entries = Object.fromEntries(data.entries());
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+          toast?.show();
+        }
+
+        function loadDraft() {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return;
+          const entries = JSON.parse(stored);
+          Object.entries(entries).forEach(([key, value]) => {
+            const field = form.elements.namedItem(key);
+            if (!field) return;
+            if (field.type === 'file') return;
+            if (field.type === 'checkbox') {
+              field.checked = value === 'on' || value === 'true';
+              return;
+            }
+            field.value = value;
+          });
+          updateSummary();
+        }
+
+      function buildSummaryItem(label, value) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'summary-item';
+        wrapper.innerHTML = `<span>${label}</span><strong>${value || '—'}</strong>`;
+        return wrapper;
+      }
+
+      function updateSummary() {
+        summaryGrid.innerHTML = '';
+        const fields = [
+          { name: 'nomeCompleto', label: 'Nome completo' },
+          { name: 'cpf', label: 'CPF' },
+          { name: 'dataNascimento', label: 'Nascimento' },
+          { name: 'genero', label: 'Gênero' },
+          { name: 'estadoCivil', label: 'Estado civil' },
+          { name: 'racaCor', label: 'Raça/cor' },
+          { name: 'telefone', label: 'Telefone' },
+          { name: 'email', label: 'E-mail' },
+          { name: 'cep', label: 'CEP' },
+          { name: 'logradouro', label: 'Logradouro' },
+          { name: 'numero', label: 'Número' },
+          { name: 'bairro', label: 'Bairro' },
+          { name: 'cidade', label: 'Município' },
+          { name: 'estado', label: 'UF' },
+          { name: 'cargoPretendido', label: 'Cargo pretendido' },
+          { name: 'vinculoAtual', label: 'Vínculo atual' },
+          { name: 'tempoExperiencia', label: 'Tempo de experiência' },
+          { name: 'formacao', label: 'Formação' },
+          { name: 'disponibilidade', label: 'Disponibilidade' }
+        ];
+
+        fields.forEach(({ name, label }) => {
+          const element = form.elements.namedItem(name);
+          if (!element) return;
+          let value = element.value;
+          if (!value) return;
+          if (element.tagName === 'SELECT') {
+            const option = element.selectedOptions[0];
+            value = option ? option.textContent : value;
+          }
+          if (name === 'dataNascimento') {
+            const [year, month, day] = value.split('-');
+            if (year && month && day) {
+              value = `${day}/${month}/${year}`;
+            }
+          }
+          summaryGrid.appendChild(buildSummaryItem(label, value));
+        });
+      }
+
+        btnNext.addEventListener('click', () => {
+          if (!validateStep(currentStep)) {
+            form.reportValidity();
+            return;
+          }
+          if (currentStep === steps.length - 2) {
+            updateSummary();
+          }
+          goToStep(currentStep + 1);
+        });
+
+        btnPrev.addEventListener('click', () => {
+          goToStep(currentStep - 1);
+        });
+
+        btnSalvar.addEventListener('click', (event) => {
+          event.preventDefault();
+          saveDraft();
+        });
+
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          if (!validateStep(currentStep)) {
+            form.reportValidity();
+            return;
+          }
+          btnSubmit.disabled = true;
+          btnSubmit.textContent = 'Enviando...';
+
+          setTimeout(() => {
+            localStorage.removeItem(STORAGE_KEY);
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = 'Enviar inscrição';
+            form.reset();
+            goToStep(0);
+            summaryGrid.innerHTML = '';
+            const modalElement = document.getElementById('modalSucesso');
+            if (modalElement) {
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
+            }
+          }, 800);
+        });
+
+        indicatorSteps.forEach((indicator, index) => {
+          indicator.addEventListener('click', () => {
+            if (index === currentStep) return;
+            if (index < currentStep || validateStep(currentStep)) {
+              goToStep(index);
+            }
+          });
+        });
+
+        Array.from(form.elements)
+          .filter((element) => ['INPUT', 'SELECT', 'TEXTAREA'].includes(element.tagName))
+          .forEach((element) => {
+            element.addEventListener('input', () => {
+              if (element.classList.contains('is-invalid') && element.checkValidity()) {
+                element.classList.remove('is-invalid');
+              }
+            });
+
+            element.addEventListener('change', () => {
+              if (element.type === 'file') {
+                if (element.files?.length) {
+                  element.classList.remove('is-invalid');
+                }
+              }
+              if (currentStep === steps.length - 1) {
+                updateSummary();
+              }
+            });
+          });
+
+        goToStep(0);
+        loadDraft();
+      });
+    </script>
+
+    <div class="modal fade" id="modalSucesso" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0">
+            <h5 class="modal-title">Inscrição enviada</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-0">
+              Sua inscrição foi registrada com sucesso. Um comprovante foi enviado
+              para o e-mail informado. Acompanhe as publicações oficiais para novas
+              atualizações.
+            </p>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+              Concluir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
