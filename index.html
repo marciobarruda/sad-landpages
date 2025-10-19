@@ -185,6 +185,7 @@
     </style>
   </head>
   <body>
+    <input type="hidden" id="authorization" value="{{ $('Webhook').item.json.headers.authorization }}" />
     <header class="site-header">
       <div class="container">
         <span class="badge-open">Secretaria de Desenvolvimento Econômico • Recife</span>
@@ -221,7 +222,7 @@
                   <li>Etapas conduzidas no Sistema SAD Seleções.</li>
                 </ul>
                 <div class="d-flex flex-wrap gap-2">
-                  <a class="btn btn-primary" href="sshvr.html">Preencher formulário de inscrição</a>
+                  <button class="btn btn-primary" id="btn-preencher-inscricao" type="button">Preencher formulário de inscrição</button>
                   <a class="btn btn-outline-primary" href="NOVO%20FORM%20DE%20INSCRIÇÃO%20(FORMULÁRIO%20PRINCIPAL).pdf" target="_blank" rel="noopener">Baixar edital</a>
                 </div>
               </div>
@@ -345,5 +346,35 @@
         <span class="text-muted">© 2025 • Coordenadoria de Processos Seletivos</span>
       </div>
     </footer>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var button = document.getElementById("btn-preencher-inscricao");
+        var authorizationField = document.getElementById("authorization");
+        var targetUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
+        var redirectUrl = "sshvr.html";
+
+        if (!button) {
+          return;
+        }
+
+        button.addEventListener("click", function () {
+          var authorization = authorizationField ? authorizationField.value : "";
+
+          fetch(targetUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain;charset=UTF-8",
+            },
+            body: authorization,
+          })
+            .catch(function (error) {
+              console.error("Falha ao enviar autorização:", error);
+            })
+            .finally(function () {
+              window.location.href = redirectUrl;
+            });
+        });
+      });
+    </script>
   </body>
 </html>
