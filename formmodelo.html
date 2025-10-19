@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Formulário Modelo — Seleção Simplificada</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      :root{
+        --brand:#0d6efd;
+        --brand-dark:#0b5ed7;
+        --bg:#f9fbff;
+        --text:#0b2447;
+        --muted:#6c757d;
+        --stage-w:1379px;
+        --pattern-w:1366px;
+      }
+      body{
+        background:
+          radial-gradient(1200px 600px at -10% -10%, #f0f8ff 0%, #ffffff 60%),
+          radial-gradient(800px 500px at 110% 0%, #f3f7ff 0%, #ffffff 60%),
+          linear-gradient(180deg,#ffffff 0%, #f9fbff 100%);
+        min-height:100vh;
+        color:var(--text);
+      }
+      .stage{ width:var(--stage-w); margin:0 auto; position:relative; left:-6px; }
+      header.hero{ width:var(--stage-w); height:240px; background:url('https://statics.recife.pe.gov.br/images/dynamics/zonaazul/banner.jpeg') center/cover no-repeat; }
+      .pattern-strip{ width:var(--pattern-w); margin:0 auto; position:relative; left:-6px; background:url('https://statics.recife.pe.gov.br/images/dynamics/zonaazul/background.jpeg') repeat center/900px auto; }
+      .pattern-top{ height:135px; opacity:.4; }
+      .pattern-bottom{ height:135px; opacity:.4; }
+      .card-form{ border:0; border-radius:1rem; box-shadow:0 12px 34px rgba(13,110,253,.12), 0 6px 16px rgba(13,110,253,.08); overflow:hidden; }
+      .card-form .card-header{ background:linear-gradient(180deg,#ffffff 0%, #f6f9ff 100%); border-bottom:1px solid #eef3ff; }
+      .required::after{ content:" *"; color:#dc3545; font-weight:600; }
+      .section-title{ font-weight:700; letter-spacing:.2px; color:#0b2447; }
+      .help{ font-size:.9rem; color:var(--muted); }
+      .dropzone{ border:2px dashed #cfe2ff; border-radius:.75rem; padding:1rem; background:#f8fbff; }
+      .frame-card{
+        max-width: 1100px;
+        background:#ffffff;
+        border-radius:1rem;
+        box-shadow:0 18px 40px rgba(13,110,253,.12), 0 8px 22px rgba(13,110,253,.08);
+        padding:2rem;
+        position:relative; z-index:2;
+        margin:-90px auto -90px !important;
+      }
+      .floating-save{ position:fixed; right:1rem; bottom:1rem; z-index:50; }
+      .tiny{ font-size:.85rem; }
+      .pill{ border-radius:999px; padding:.25rem .6rem; border:1px solid #dee2e6; }
+      .uploader-status{ min-height:1.75rem; }
+      .hidden{ display:none !important; }
+      @media (max-width: 992px){
+        :root{ --stage-w:100vw; --pattern-w:100vw; }
+        .stage, .pattern-strip{ left:0; }
+        header.hero{ background-position:center; background-size:cover; }
+        body{ overflow-x:hidden; }
+        .frame-card{ margin:-60px auto -60px; padding:1.25rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero stage"></header>
+    <div class="pattern-strip pattern-top"></div>
+
+    <main class="container my-4 frame-card" id="app">
+      <div class="text-center mb-4">
+        <h1 class="h4 mb-1">Seleção Simplificada — Formulário Modelo</h1>
+        <p class="text-muted">Preencha os campos abaixo com atenção. Os itens marcados com * são obrigatórios.</p>
+      </div>
+
+      <form id="inscricaoForm" action="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/atualizarinstancia" method="post" enctype="multipart/form-data">
+        <!-- Seção: Dados Pessoais -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Dados Pessoais</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label required" for="cpf">CPF</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" maxlength="11" inputmode="numeric" value="{{ String(($json.cpf ?? $json.preferred_username ?? '')).replace(/\D+/g, '').slice(0,11) }}" required />
+              </div>
+              <div class="col-md-5">
+                <label class="form-label required" for="nome">Nome completo</label>
+                <input type="text" class="form-control" id="nome" name="nome" value="{{ String($json.nome ?? $json.name ?? '').trim() || String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label required" for="nasc">Data de nascimento</label>
+                <input type="date" class="form-control" id="nasc" name="nasc" value="{{ (($json.nasc ?? $json.dob) || '').split('/').reverse().join('-') }}" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label required" for="nacionalidade">Nacionalidade</label>
+                <input type="text" class="form-control" id="nacionalidade" name="nacionalidade" value="{{ String($json.nacionalidade ?? $json.nationality ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label required" for="naturalidade_cidade">Naturalidade</label>
+                <input type="text" class="form-control" id="naturalidade_cidade" name="naturalidade_cidade" value="{{ String($json.naturalidade ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-1">
+                <label class="form-label required" for="naturalidade_uf">UF</label>
+                <input type="text" class="form-control" id="naturalidade_uf" name="naturalidade_uf" maxlength="2" value="{{ String($json.uf_naturalidade ?? '').trim().toUpperCase() }}" required />
+              </div>
+
+              <div class="col-12"><hr /></div>
+
+              <div class="col-md-3">
+                <label class="form-label required" for="rg_numero">RG</label>
+                <input type="text" class="form-control" id="rg_numero" name="rg_numero" maxlength="14" inputmode="numeric" value="{{ String($json.num_doc ?? '').replace(/\D+/g, '').slice(0,14) }}" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label required" for="rg_orgao">Órgão</label>
+                <input type="text" class="form-control" id="rg_orgao" name="rg_orgao" value="{{ String($json.orgao ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-1">
+                <label class="form-label required" for="rg_uf">UF</label>
+                <input type="text" class="form-control" id="rg_uf" name="rg_uf" maxlength="2" value="{{ String($json.uf_doc ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label required" for="rg_data">Expedição</label>
+                <input type="date" class="form-control" id="rg_data" name="rg_data" value="{{ String($json.exp_doc ?? '').split('/').reverse().join('-') }}" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="nis">NIS</label>
+                <input type="text" class="form-control" id="nis" name="nis" maxlength="11" inputmode="numeric" value="{{ String($json.nis ?? $json.pis ?? $json.pis_pasep ?? '').replace(/\D+/g, '').slice(0,11) }}" />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label required" for="sexo">Sexo</label>
+                <select class="form-select" id="sexo" name="sexo" data-prefill="{{ $json.sexo ?? $json.sex ?? $json.genero ?? $json.gender ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Prefiro não informar">Prefiro não informar</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label required" for="genero">Gênero</label>
+                <select class="form-select" id="genero" name="genero" data-prefill="{{ $json.genero ?? $json.genero_identidade ?? $json.genderIdentity ?? $json.gender ?? $json.sexo ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Mulher cisgênero">Mulher cisgênero</option>
+                  <option value="Mulher trans">Mulher trans</option>
+                  <option value="Homem cisgênero">Homem cisgênero</option>
+                  <option value="Homem trans">Homem trans</option>
+                  <option value="Pessoa não binária">Pessoa não binária</option>
+                  <option value="Travesti">Travesti</option>
+                  <option value="Outro">Outro</option>
+                  <option value="Prefiro não informar">Prefiro não informar</option>
+                </select>
+              </div>
+              <div class="col-md-3 hidden" id="generoOutroWrapper">
+                <label class="form-label" for="genero_outro">Informe o gênero</label>
+                <input type="text" class="form-control" id="genero_outro" name="genero_outro" maxlength="80" placeholder="Descreva o gênero" />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label required" for="estado_civil">Estado civil</label>
+                <select class="form-select" id="estado_civil" name="estado_civil" data-prefill="{{ $json.estado_civil ?? $json.maritalStatus ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Solteiro(a)">Solteiro(a)</option>
+                  <option value="Casado(a)">Casado(a)</option>
+                  <option value="União estável">União estável</option>
+                  <option value="Divorciado(a)">Divorciado(a)</option>
+                  <option value="Viúvo(a)">Viúvo(a)</option>
+                  <option value="Separado(a)">Separado(a)</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label required" for="mae">Nome da mãe</label>
+                <input type="text" class="form-control" id="mae" name="mae" value="{{ String($json.mae ?? $json.motherName ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="pai">Nome do pai</label>
+                <input type="text" class="form-control" id="pai" name="pai" value="{{ String($json.pai ?? $json.fatherName ?? '').trim().toUpperCase() }}" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="nome_social">Nome social</label>
+                <input type="text" class="form-control" id="nome_social" name="nome_social" value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Documentação Obrigatória -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Documentos Pessoais</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <span class="form-label d-block required">Cumpriu serviço militar?</span>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="militar" id="militar_sim" value="SIM" />
+                    <label class="form-check-label" for="militar_sim">Sim</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="militar" id="militar_nao" value="NAO" />
+                    <label class="form-check-label" for="militar_nao">Não</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <span class="form-label d-block required">Exerceu função de jurado(a)?</span>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_sim" value="SIM" />
+                    <label class="form-check-label" for="jurado_sim">Sim</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="jurado_funcao" id="jurado_nao" value="NAO" />
+                    <label class="form-check-label" for="jurado_nao">Não</label>
+                  </div>
+                </div>
+                <input type="hidden" id="foi_jurado" name="foi_jurado" value="{{ String($json.foi_jurado ?? $json.jurado ?? '').trim().toUpperCase() }}" />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" for="alistamento_numero">Número do Certificado de Reservista</label>
+                <input type="text" class="form-control" id="alistamento_numero" name="alistamento_numero" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="alistamento_orgao">Órgão Emissor</label>
+                <input type="text" class="form-control" id="alistamento_orgao" name="alistamento_orgao" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="alistamento_data">Data de emissão</label>
+                <input type="date" class="form-control" id="alistamento_data" name="alistamento_data" />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" for="titulo">Título de Eleitor</label>
+                <input type="text" class="form-control" id="titulo" name="titulo" maxlength="12" inputmode="numeric" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="zona">Zona</label>
+                <input type="text" class="form-control" id="zona" name="zona" maxlength="4" inputmode="numeric" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="secao">Seção</label>
+                <input type="text" class="form-control" id="secao" name="secao" maxlength="4" inputmode="numeric" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Contatos -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Contatos</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label required" for="email">E-mail</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="email_confirm">Confirme o e-mail</label>
+                <input type="email" class="form-control" id="email_confirm" name="email_confirm" value="{{ String($json.email ?? '').trim().toLowerCase() }}" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label required" for="tel1">Telefone 1</label>
+                <input type="text" class="form-control" id="tel1" name="tel1" maxlength="11" inputmode="numeric" placeholder="DDD + número" value="{{ String($json.telefone1 ?? $json.telefone ?? $json.phone ?? '').replace(/\D+/g, '') }}" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="tel2">Telefone 2</label>
+                <input type="text" class="form-control" id="tel2" name="tel2" maxlength="11" inputmode="numeric" placeholder="DDD + número" value="{{ String($json.telefone2 ?? $json.phone2 ?? '').replace(/\D+/g, '') }}" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Endereço -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Endereço</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label required" for="cep">CEP</label>
+                <input type="text" class="form-control" id="cep" name="cep" maxlength="8" inputmode="numeric" placeholder="00000-000" value="{{ String($json.postal_code ?? $json.cep ?? '').replace(/\D+/g, '') }}" required />
+              </div>
+              <div class="col-md-5">
+                <label class="form-label required" for="logradouro">Logradouro</label>
+                <input type="text" class="form-control" id="logradouro" name="logradouro" value="{{ String($json.addressStreet ?? $json.logradouro ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label required" for="numero">Número</label>
+                <input type="text" class="form-control" id="numero" name="numero" value="{{ String($json.numero ?? $json.addressNumber ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label" for="complemento">Complemento</label>
+                <input type="text" class="form-control" id="complemento" name="complemento" value="{{ String($json.complemento ?? $json.addressComplement ?? '').trim().toUpperCase() }}" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label required" for="bairro">Bairro</label>
+                <input type="text" class="form-control" id="bairro" name="bairro" value="{{ String($json.neighborhood ?? $json.bairro ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label required" for="cidade">Cidade</label>
+                <input type="text" class="form-control" id="cidade" name="cidade" value="{{ String($json.cidade ?? $json.locality ?? $json.city ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label required" for="uf">UF</label>
+                <input type="text" class="form-control" id="uf" name="uf" maxlength="2" value="{{ String(($json.state ?? $json.addressState ?? $json.uf ?? '')).trim().toUpperCase() }}" required />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Formação e Cargo -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Formação acadêmica e cargo</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label required" for="nivel">Nível</label>
+                <select class="form-select" id="nivel" name="nivel" data-prefill="{{ $json.nivel ?? $json.nivel_escolaridade ?? $json.escolaridade ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Fundamental">Fundamental</option>
+                  <option value="Médio">Médio</option>
+                  <option value="Técnico">Técnico</option>
+                  <option value="Graduação">Graduação</option>
+                  <option value="Pós-graduação">Pós-graduação</option>
+                  <option value="Mestrado">Mestrado</option>
+                  <option value="Doutorado">Doutorado</option>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <label class="form-label required" for="ies">Instituição</label>
+                <input type="text" class="form-control" id="ies" name="ies" value="{{ String($json.instituicao ?? $json.ies ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label required" for="curso">Curso</label>
+                <input type="text" class="form-control" id="curso" name="curso" value="{{ String($json.curso ?? '').trim().toUpperCase() }}" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label required" for="ano_conclusao">Ano de conclusão</label>
+                <input type="text" class="form-control" id="ano_conclusao" name="ano_conclusao" maxlength="4" inputmode="numeric" value="{{ String($json.ano ?? $json.ano_conclusao ?? '').replace(/\D+/g, '').slice(0,4) }}" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="cargo">Cargo pretendido</label>
+                <select class="form-select" id="cargo" name="cargo" data-prefill="{{ $json.cargo ?? $json.cargo_pretendido ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Analista em Saúde Animal – Veterinário 40h">Analista em Saúde Animal – Veterinário 40h</option>
+                  <option value="Analista em Saúde Animal – Veterinário 20h">Analista em Saúde Animal – Veterinário 20h</option>
+                  <option value="Analista em Saúde Animal – Veterinário 40h Plantonista">Analista em Saúde Animal – Veterinário 40h Plantonista</option>
+                  <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h</option>
+                  <option value="Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista">Auxiliar em Saúde Animal - Auxiliar Veterinário 40h Plantonista</option>
+                  <option value="Técnico em Saúde Animal - Radiologia e Imagenologia 24h">Técnico em Saúde Animal - Radiologia e Imagenologia 24h</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="especialidade">Especialidade (quando houver)</label>
+                <input type="text" class="form-control" id="especialidade" name="especialidade" value="{{ String($json.especialidade ?? '').trim().toUpperCase() }}" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Experiências e Vínculos -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Experiências e vínculos</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <span class="form-label d-block">Possui vínculo com o serviço público?</span>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_sim" value="SIM" />
+                    <label class="form-check-label" for="vinculo_publico_sim">Sim</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="vinculo_publico_opcao" id="vinculo_publico_nao" value="NAO" />
+                    <label class="form-check-label" for="vinculo_publico_nao">Não</label>
+                  </div>
+                </div>
+                <input type="hidden" id="vinculo_publico" name="vinculo_publico" value="{{ String($json.vinculo_publico ?? '').trim().toUpperCase() }}" />
+              </div>
+              <div class="col-md-6">
+                <span class="form-label d-block">Exerceu cargos ou funções políticas?</span>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="politicos" id="politicos_sim" value="SIM" />
+                    <label class="form-check-label" for="politicos_sim">Sim</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO" />
+                    <label class="form-check-label" for="politicos_nao">Não</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="qual_vinculo">Qual vínculo</label>
+                <input type="text" class="form-control" id="qual_vinculo" name="qual_vinculo" value="{{ String($json.qual_vinculo ?? '').trim() }}" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="experiencia_tempo">Tempo (meses/anos)</label>
+                <input type="text" class="form-control" id="experiencia_tempo" name="experiencia_tempo" value="{{ String($json.experiencia_tempo ?? '').trim() }}" />
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="jurado_periodo">Informações sobre a atuação como jurado(a)</label>
+                <input type="text" class="form-control" id="jurado_periodo" name="jurado_periodo" placeholder="Tribunal, período ou outros detalhes" value="{{ String($json.jurado_periodo ?? '').trim() }}" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Diversidade e Inclusão -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Diversidade e inclusão</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label required" for="raca">Cor/Raça (IBGE)</label>
+                <select class="form-select" id="raca" name="raca" data-prefill="{{ $json.raca ?? $json.race ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Branca">Branca</option>
+                  <option value="Preta">Preta</option>
+                  <option value="Parda">Parda</option>
+                  <option value="Amarela">Amarela</option>
+                  <option value="Indígena">Indígena</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label required" for="cotasPPNI">Concorrer às vagas PPNI?</label>
+                <select class="form-select" id="cotasPPNI" name="cotasPPNI" data-prefill="{{ $json.cotasPPNI ?? $json.concorrer_ppni ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label required" for="is_pcd">É PCD?</label>
+                <select class="form-select" id="is_pcd" name="is_pcd" data-prefill="{{ $json.is_pcd ?? $json.withDisability ?? '' }}" required>
+                  <option value="">Selecione...</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="tipo_pcd">Tipo de deficiência</label>
+                <input type="text" class="form-control" id="tipo_pcd" name="tipo_pcd" value="{{ String($json.tipo_pcd ?? '').trim() }}" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="pcd_cid">CID (se houver)</label>
+                <input type="text" class="form-control" id="pcd_cid" name="pcd_cid" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}" />
+              </div>
+              <div class="col-md-12">
+                <span class="form-label d-block">Necessita de condição especial para participação?</span>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_sim" value="Sim" />
+                    <label class="form-check-label" for="condicao_especial_sim">Sim</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="condicao_especial" id="condicao_especial_nao" value="Não" />
+                    <label class="form-check-label" for="condicao_especial_nao">Não</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="necessidade">Descreva a necessidade</label>
+                <textarea class="form-control" id="necessidade" name="necessidade" rows="2" placeholder="Informe recursos ou adaptações necessários">{{ String($json.necessidade ?? $json.specialNeedDescription ?? '').trim() }}</textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Documentos para upload -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Envio de documentos</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label required" for="doc_id_frente">Documento de identificação oficial com foto (frente)</label>
+                <input class="form-control" type="file" id="doc_id_frente" name="doc_id_frente" accept=".pdf,image/*" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="doc_id_verso">Documento de identificação oficial com foto (verso)</label>
+                <input class="form-control" type="file" id="doc_id_verso" name="doc_id_verso" accept=".pdf,image/*" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="doc_cpf">CPF</label>
+                <input class="form-control" type="file" id="doc_cpf" name="doc_cpf" accept=".pdf,image/*" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="doc_residencia">Comprovante de residência</label>
+                <input class="form-control" type="file" id="doc_residencia" name="doc_residencia" accept=".pdf,image/*" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="doc_quitacao_eleitoral">Quitação eleitoral</label>
+                <input class="form-control" type="file" id="doc_quitacao_eleitoral" name="doc_quitacao_eleitoral" accept=".pdf,image/*" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="doc_militar">Quitação do serviço militar</label>
+                <input class="form-control" type="file" id="doc_militar" name="doc_militar" accept=".pdf,image/*" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="doc_jurado">Certidão de atuação na função de jurado</label>
+                <input class="form-control" type="file" id="doc_jurado" name="doc_jurado" accept=".pdf,image/*" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="doc_jurado_440">Certidão de atuação na função de jurado (art. 440 do CPP)</label>
+                <input class="form-control" type="file" id="doc_jurado_440" name="doc_jurado_440" accept=".pdf,image/*" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label required" for="doc_escolaridade">Comprovação da escolaridade</label>
+                <input class="form-control" type="file" id="doc_escolaridade" name="doc_escolaridade" accept=".pdf,image/*" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="doc_curriculo">Experiência / títulos / certificados</label>
+                <input class="form-control" type="file" id="doc_curriculo" name="doc_curriculo" accept=".pdf,image/*" multiple />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="het_declaracao">Declaração de heteroidentificação</label>
+                <input class="form-control" type="file" id="het_declaracao" name="het_declaracao" accept=".pdf,image/*" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="het_id">Documento de identidade (frente/verso)</label>
+                <input class="form-control" type="file" id="het_id" name="het_id" accept=".pdf,image/*" multiple />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="het_frente">Foto de frente</label>
+                <input class="form-control" type="file" id="het_frente" name="het_frente" accept="image/*" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="het_perfil">Foto de perfil</label>
+                <input class="form-control" type="file" id="het_perfil" name="het_perfil" accept="image/*" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="het_video">Vídeo (até 20s)</label>
+                <input class="form-control" type="file" id="het_video" name="het_video" accept="video/mp4,video/quicktime" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pcd_laudo">Laudo médico</label>
+                <input class="form-control" type="file" id="pcd_laudo" name="pcd_laudo" accept=".pdf,.png,.jpeg,.jpg,.gif" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pcd_declaracao">Declaração de deficiência (modelo do edital)</label>
+                <input class="form-control" type="file" id="pcd_declaracao" name="pcd_declaracao" accept=".pdf,image/*" />
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="pcd_exames">Exames complementares (opcional)</label>
+                <input class="form-control" type="file" id="pcd_exames" name="pcd_exames" accept=".pdf,image/*" multiple />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Recursos -->
+        <section class="card card-form mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Interposição de recurso</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label" for="recurso_tipo">Tipo de recurso</label>
+                <select class="form-select" id="recurso_tipo" name="recurso_tipo">
+                  <option value="">Selecione...</option>
+                  <option value="analise_curricular">Resultado Preliminar da Análise Curricular</option>
+                  <option value="heteroidentificacao">Resultado Preliminar do Procedimento de Heteroidentificação</option>
+                  <option value="biopsicossocial">Resultado Preliminar da Avaliação Biopsicossocial</option>
+                </select>
+              </div>
+              <div class="col-md-8">
+                <label class="form-label" for="recurso_anexo">Anexo (opcional)</label>
+                <input class="form-control" type="file" id="recurso_anexo" name="recurso_anexo" accept=".pdf,image/*" />
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="recurso_texto">Justificativa</label>
+                <textarea class="form-control" id="recurso_texto" name="recurso_texto" rows="4" placeholder="Descreva o motivo do recurso"></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Seção: Declaração -->
+        <section class="card card-form mb-4">
+          <div class="card-body">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="termoResponsabilidade" name="termoResponsabilidade" required />
+              <label class="form-check-label required" for="termoResponsabilidade">Li e estou de acordo com a declaração de responsabilidade.</label>
+            </div>
+          </div>
+        </section>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg">Enviar inscrição</button>
+        </div>
+        <div id="formStatus" class="mt-3 tiny text-muted"></div>
+      </form>
+    </main>
+
+    <div class="pattern-strip pattern-bottom"></div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const generoSelect = document.getElementById('genero');
+        const generoOutroWrapper = document.getElementById('generoOutroWrapper');
+        const generoOutroInput = document.getElementById('genero_outro');
+        const selects = document.querySelectorAll('select[data-prefill]');
+        const radioBindings = [
+          { name: 'jurado_funcao', hiddenId: 'foi_jurado' },
+          { name: 'vinculo_publico_opcao', hiddenId: 'vinculo_publico' }
+        ];
+        const normalize = value => value
+          ? value.toString().normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
+          : '';
+
+        // Prefill selects
+        selects.forEach(select => {
+          const value = select.getAttribute('data-prefill');
+          if (value && [...select.options].some(option => normalize(option.value) === normalize(value))) {
+            [...select.options].forEach(option => {
+              if (normalize(option.value) === normalize(value)) {
+                option.selected = true;
+              }
+            });
+          }
+        });
+
+        // Handle genero outro visibility
+        const toggleGeneroOutro = () => {
+          const needsOutro = generoSelect.value === 'Outro';
+          generoOutroWrapper.classList.toggle('hidden', !needsOutro);
+          generoOutroInput.required = needsOutro;
+          if (!needsOutro) {
+            generoOutroInput.value = '';
+          }
+        };
+        toggleGeneroOutro();
+        generoSelect.addEventListener('change', toggleGeneroOutro);
+
+        // Sync radio groups with hidden fields when applicable
+        radioBindings.forEach(binding => {
+          const hidden = document.getElementById(binding.hiddenId);
+          if (!hidden) return;
+          const radios = document.querySelectorAll(`input[name="${binding.name}"]`);
+          const current = hidden.value;
+          radios.forEach(radio => {
+            if (current && normalize(radio.value) === normalize(current)) {
+              radio.checked = true;
+            }
+            radio.addEventListener('change', () => {
+              if (radio.checked) {
+                hidden.value = radio.value;
+              }
+            });
+          });
+        });
+
+        const form = document.getElementById('inscricaoForm');
+        const status = document.getElementById('formStatus');
+
+        form.addEventListener('submit', async event => {
+          event.preventDefault();
+          status.textContent = 'Enviando...';
+          status.classList.remove('text-success', 'text-danger');
+
+          const formData = new FormData(form);
+          try {
+            const response = await fetch(form.action, {
+              method: 'POST',
+              body: formData
+            });
+
+            if (!response.ok) {
+              throw new Error(`Erro ao enviar: ${response.status}`);
+            }
+
+            status.textContent = 'Inscrição enviada com sucesso!';
+            status.classList.remove('text-danger');
+            status.classList.add('text-success');
+          } catch (error) {
+            console.error(error);
+            status.textContent = 'Não foi possível enviar a inscrição. Tente novamente.';
+            status.classList.remove('text-success');
+            status.classList.add('text-danger');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
