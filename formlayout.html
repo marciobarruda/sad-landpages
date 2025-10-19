@@ -281,6 +281,12 @@
         font-size: 0.85rem;
       }
 
+      .form-control.is-invalid,
+      .form-select.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+      }
+
       .wizard-controls {
         display: flex;
         justify-content: space-between;
@@ -1478,7 +1484,7 @@
                   <div class="upload-card" data-upload-card>
                     <div class="upload-emoji" aria-hidden="true">🎖️</div>
                     <p class="upload-title">Quitação do serviço militar</p>
-                    <p class="upload-instruction">Obrigatório apenas para candidatos do sexo masculino.</p>
+                    <p class="upload-instruction">Obrigatório para candidatos do sexo masculino.</p>
                     <input
                       type="file"
                       class="upload-input"
@@ -1832,23 +1838,33 @@
         const names = Array.from(input.files).map((file) => file.name);
         output.textContent = input.multiple ? names.join(', ') : names[0];
         card.classList.add('has-file');
+        input.classList.remove('is-invalid');
       };
 
       const resetUploadIndicator = (input) => {
         if (!input) return;
         input.value = '';
         updateUploadIndicator(input);
+        input.classList.remove('is-invalid');
       };
+
+      const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
 
       const validateEmailsMatch = () => {
         const email = document.getElementById('email');
         const confirm = document.getElementById('email_confirm');
         if (!email || !confirm) return true;
-        if (confirm.value && email.value && email.value !== confirm.value) {
+        const normalizedEmail = normalizeEmail(email.value);
+        const normalizedConfirm = normalizeEmail(confirm.value);
+        if (confirm.value && email.value && normalizedEmail !== normalizedConfirm) {
           confirm.setCustomValidity('Os e-mails precisam ser iguais.');
+          confirm.classList.add('is-invalid');
           return false;
         }
         confirm.setCustomValidity('');
+        if (confirm.classList.contains('is-invalid') && confirm.checkValidity()) {
+          confirm.classList.remove('is-invalid');
+        }
         return true;
       };
 
@@ -1894,6 +1910,33 @@
         visitedSteps.add(index);
       };
 
+      const buildFormData = () => {
+        const raw = new FormData(form);
+        const sanitized = new FormData();
+        for (const [key, value] of raw.entries()) {
+          if (value instanceof File) {
+            if (!value.name && value.size === 0) {
+              continue;
+            }
+            sanitized.append(key, value);
+            continue;
+          }
+          sanitized.append(key, value);
+        }
+        return sanitized;
+      };
+
+      const isValidatableElement = (field) =>
+        field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement;
+
+      const handleValidityState = (field) => {
+        if (!isValidatableElement(field)) return;
+        if (field.type === 'hidden') return;
+        if (field.checkValidity()) {
+          field.classList.remove('is-invalid');
+        }
+      };
+
       const selectPrefills = () => {
         document.querySelectorAll('select[data-prefill]').forEach((select) => {
           const value = select.dataset.prefill?.trim();
@@ -1925,7 +1968,7 @@
         });
         wizardSteps.forEach((step, i) => {
           const isActive = i === currentStep;
-          const isCompleted = visitedSteps.has(i) && !isActive;
+          const isCompleted = visitedSteps.has(i) && i < currentStep;
           step.classList.toggle('active', isActive);
           step.classList.toggle('completed', isCompleted);
           step.setAttribute('aria-selected', isActive ? 'true' : 'false');
@@ -1975,6 +2018,9 @@
         element.setAttribute('aria-hidden', (!condition).toString());
         element.querySelectorAll('input, select, textarea').forEach((field) => {
           field.toggleAttribute('required', condition && field.dataset.forceRequired === 'true');
+          if (!condition) {
+            field.classList.remove('is-invalid');
+          }
         });
       };
 
@@ -1993,6 +2039,12 @@
         toggleHiddenGroup(show, militarGroup);
         toggleHiddenGroup(show, wrapper);
         toggleHiddenGroup(show, docGroup);
+        if (docGroup) {
+          const docCard = docGroup.querySelector('.upload-card');
+          if (docCard) {
+            docCard.classList.toggle('required', show);
+          }
+        }
         if (!show) {
           document.querySelectorAll('input[name="militar"]').forEach((input) => {
             input.checked = false;
@@ -2368,6 +2420,39 @@
           cepController = null;
         }
       };
+
+      form.addEventListener(
+        'invalid',
+        (event) => {
+          const target = event.target;
+          if (!isValidatableElement(target)) return;
+          if (target.type === 'hidden') return;
+          target.classList.add('is-invalid');
+        },
+        true,
+      );
+
+      const onFieldInteraction = (event) => {
+        const target = event.target;
+        if (!isValidatableElement(target)) return;
+        if (target.type === 'hidden') return;
+        if (target instanceof HTMLInputElement && (target.type === 'radio' || target.type === 'checkbox')) {
+          const controls = target.form && target.name ? target.form.elements[target.name] : null;
+          if (controls instanceof RadioNodeList) {
+            Array.from(controls).forEach((control) => control.classList.remove('is-invalid'));
+          } else {
+            target.classList.remove('is-invalid');
+          }
+        } else {
+          handleValidityState(target);
+        }
+        if (target.id === 'email' || target.id === 'email_confirm') {
+          validateEmailsMatch();
+        }
+      };
+
+      form.addEventListener('input', onFieldInteraction);
+      form.addEventListener('change', onFieldInteraction);
       document.querySelectorAll('[data-action="next"]').forEach((btn) => btn.addEventListener('click', goNext));
       document.querySelectorAll('[data-action="prev"]').forEach((btn) => btn.addEventListener('click', goPrev));
       document.querySelectorAll('[data-action="save-draft"]').forEach((btn) => btn.addEventListener('click', saveDraft));
@@ -2391,6 +2476,7 @@
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
+        validateEmailsMatch();
         if (!form.checkValidity() || !validateCurrentStep()) {
           event.stopPropagation();
           return;
@@ -2399,7 +2485,7 @@
           document.getElementById('email_confirm').reportValidity();
           return;
         }
-        const formData = new FormData(form);
+        const formData = buildFormData();
         let authValue = formData.get('authorization');
         authValue = typeof authValue === 'string' ? authValue.trim() : '';
         if (!authValue) {
@@ -2411,11 +2497,10 @@
         }
         cachedAuthorization = authValue;
         try {
-          const request = fetch(form.action, {
+          void fetch(form.action, {
             method: 'POST',
             body: formData,
-          });
-          request.catch((error) => console.error('Erro ao enviar inscrição', error));
+          }).catch((error) => console.error('Erro ao enviar inscrição', error));
         } catch (error) {
           console.error('Erro ao enviar inscrição', error);
         }
