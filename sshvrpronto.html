@@ -277,6 +277,13 @@
         box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.15);
       }
 
+      .wizard-step.warning .wizard-index {
+        background: #facc15;
+        color: #7c2d12;
+        border-color: #fbbf24;
+        box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.25);
+      }
+
       .wizard-step.active::before,
       .wizard-step.active::after {
         background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
@@ -285,6 +292,11 @@
       .wizard-step.completed::before,
       .wizard-step.completed::after {
         background: linear-gradient(90deg, #198754 0%, #0f5132 100%);
+      }
+
+      .wizard-step.warning::before,
+      .wizard-step.warning::after {
+        background: linear-gradient(90deg, #facc15 0%, #f59e0b 100%);
       }
 
       .step-card {
@@ -698,10 +710,16 @@
           value="{{ String($json.authorization ?? $json.Authorization ?? '') }}"
         />
 
-        <input 
+        <input
           type="hidden"
           name="inscricao"
           value="{{ String($json.inscricao ?? '').trim() }}"
+        />
+
+        <input
+          type="hidden"
+          id="cargosInscritos"
+          value='{{ JSON.stringify($json.cargos_inscritos ?? []) }}'
         />
 
         <section class="card step-card" data-step-panel="0">
@@ -1969,11 +1987,29 @@
       <span>Rascunho salvo com sucesso!</span>
     </div>
 
+    <div class="modal fade" id="friendlyAlert" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Aviso!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body" id="friendlyAlertMessage"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       const form = document.getElementById('inscricaoForm');
       const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
       const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
       const draftToast = document.getElementById('draftToast');
+      const friendlyAlertElement = document.getElementById('friendlyAlert');
+      const friendlyAlertMessage = document.getElementById('friendlyAlertMessage');
+      let friendlyAlertInstance;
       const registrationNumberElement = document.getElementById('registrationNumber');
       const registrationValueElement = registrationNumberElement?.querySelector('.registration-value');
       const successScreen = document.getElementById('submissionSuccess');
@@ -1984,6 +2020,8 @@
       const naturalidadeUfLabel = document.querySelector('label[for="naturalidade_uf"]');
       const ufSelects = Array.from(document.querySelectorAll('[data-uf-select]'));
       const generoSelect = document.getElementById('genero');
+      const cargoSelect = document.getElementById('cargo');
+      const cargosInscritosInput = document.getElementById('cargosInscritos');
       const generoBaseOptions = generoSelect
         ? Array.from(generoSelect.options).map((option) => ({ value: option.value, label: option.textContent }))
         : [];
@@ -2021,6 +2059,226 @@
       let cepController;
       const visitedSteps = new Set();
       const authorizationField = document.getElementById('initialAuthorization');
+      const showFriendlyAlert = (content) => {
+        if (!friendlyAlertElement || !friendlyAlertMessage) {
+          window.alert(typeof content === 'string' ? content : String(content ?? ''));
+          return;
+        }
+        friendlyAlertMessage.innerHTML = '';
+        if (typeof content === 'string') {
+          const paragraph = document.createElement('p');
+          paragraph.className = 'mb-0';
+          paragraph.textContent = content;
+          friendlyAlertMessage.appendChild(paragraph);
+        } else if (content instanceof Node) {
+          friendlyAlertMessage.appendChild(content);
+        } else {
+          const paragraph = document.createElement('p');
+          paragraph.className = 'mb-0';
+          paragraph.textContent = String(content ?? '');
+          friendlyAlertMessage.appendChild(paragraph);
+        }
+        if (typeof bootstrap !== 'undefined' && bootstrap?.Modal) {
+          friendlyAlertInstance = bootstrap.Modal.getOrCreateInstance(friendlyAlertElement);
+          friendlyAlertInstance.show();
+        } else {
+          window.alert(friendlyAlertMessage.textContent || '');
+        }
+      };
+
+      const escapeSelector = (value) => {
+        const stringValue = String(value ?? '');
+        if (typeof CSS !== 'undefined' && CSS.escape) {
+          return CSS.escape(stringValue);
+        }
+        return stringValue.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+      };
+
+      const isElementVisible = (element) => {
+        if (!element) return false;
+        if (element.offsetParent !== null) return true;
+        return element.getClientRects().length > 0;
+      };
+
+      const getFieldLabel = (field) => {
+        if (!field) return '';
+        if (field.labels && field.labels.length > 0) {
+          const labelText = Array.from(field.labels)
+            .map((label) => label.textContent?.trim())
+            .find((text) => text);
+          if (labelText) {
+            return labelText;
+          }
+        }
+        let container = field.parentElement;
+        while (container && container !== form) {
+          const label = container.querySelector('.form-label, label');
+          if (label && !label.classList.contains('form-check-label')) {
+            const text = label.textContent?.trim();
+            if (text) {
+              return text.replace(/\s*\*+$/, '').trim();
+            }
+          }
+          container = container.parentElement;
+        }
+        return field.getAttribute('placeholder')?.trim() || field.name || 'Campo obrigatório';
+      };
+
+      const getSectionName = (field) => {
+        if (!field) return 'Formulário';
+        const sectionBlock = field.closest('.section-block');
+        const sectionTitle = sectionBlock?.querySelector('.section-title')?.textContent?.trim();
+        if (sectionTitle) return sectionTitle;
+        const stepCard = field.closest('.step-card');
+        const cardHeading = stepCard?.querySelector('.card-header h2')?.textContent?.trim();
+        if (cardHeading) return cardHeading;
+        return 'Formulário';
+      };
+
+      const collectInvalidFields = (root, { ignoreVisibility = false } = {}) => {
+        if (!root) return [];
+        const items = [];
+        const radioNames = new Set();
+        const fields = Array.from(root.querySelectorAll('input, select, textarea'));
+        fields.forEach((field) => {
+          if (!field) return;
+          if (field.disabled) return;
+          if (field.type === 'hidden') return;
+          if (field.type === 'radio') {
+            if (!field.name || radioNames.has(field.name)) return;
+            radioNames.add(field.name);
+            const selector = `input[type="radio"][name="${escapeSelector(field.name)}"]`;
+            const group = Array.from(root.querySelectorAll(selector));
+            if (!group.length) return;
+            const hasVisibleOption = group.some((radio) => ignoreVisibility || isElementVisible(radio));
+            if (!hasVisibleOption) return;
+            const hasSelection = group.some((radio) => radio.checked);
+            if (!hasSelection) {
+              const representative = group.find((radio) => ignoreVisibility || isElementVisible(radio)) || field;
+              items.push({
+                field: representative,
+                label: getFieldLabel(representative),
+                section: getSectionName(representative),
+              });
+            }
+            return;
+          }
+          if (!ignoreVisibility && !isElementVisible(field)) return;
+          if (!field.checkValidity()) {
+            items.push({ field, label: getFieldLabel(field), section: getSectionName(field) });
+          }
+        });
+        return items;
+      };
+
+      const buildMissingFieldsAlertContent = (items) => {
+        const container = document.createElement('div');
+        const intro = document.createElement('p');
+        intro.textContent = 'Os seguintes campos obrigatórios ainda precisam ser preenchidos:';
+        container.appendChild(intro);
+        const list = document.createElement('ul');
+        list.className = 'mb-0';
+        const grouped = new Map();
+        items.forEach(({ label, section }) => {
+          const sectionName = section || 'Formulário';
+          if (!grouped.has(sectionName)) {
+            grouped.set(sectionName, new Set());
+          }
+          if (label) {
+            grouped.get(sectionName).add(label);
+          }
+        });
+        if (!grouped.size) {
+          const fallback = document.createElement('li');
+          fallback.textContent = 'Preencha os campos obrigatórios.';
+          list.appendChild(fallback);
+        } else {
+          grouped.forEach((labels, section) => {
+            const sectionItem = document.createElement('li');
+            const strong = document.createElement('strong');
+            strong.textContent = section;
+            sectionItem.appendChild(strong);
+            const innerList = document.createElement('ul');
+            labels.forEach((label) => {
+              const item = document.createElement('li');
+              item.textContent = label;
+              innerList.appendChild(item);
+            });
+            sectionItem.appendChild(innerList);
+            list.appendChild(sectionItem);
+          });
+        }
+        container.appendChild(list);
+        return container;
+      };
+
+      const stepHasPendingRequired = (index) => {
+        const panel = stepPanels[index];
+        if (!panel) return false;
+        return collectInvalidFields(panel, { ignoreVisibility: true }).length > 0;
+      };
+
+      const updateWizardStepStates = () => {
+        wizardSteps.forEach((step, i) => {
+          const isActive = i === currentStep;
+          const wasVisited = visitedSteps.has(i);
+          const hasPending = stepHasPendingRequired(i);
+          const shouldShowStatus = (wasVisited || i < currentStep) && !isActive;
+          const isCompleted = shouldShowStatus && !hasPending && i < currentStep;
+          const isWarning = shouldShowStatus && hasPending;
+          step.classList.toggle('active', isActive);
+          step.classList.toggle('completed', isCompleted);
+          step.classList.toggle('warning', isWarning);
+          step.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          step.setAttribute('tabindex', isActive ? '0' : '-1');
+          const indexLabel = step.querySelector('.wizard-index-label');
+          if (indexLabel) {
+            const original = indexLabel.dataset.stepIndex || String(i + 1);
+            if (isCompleted) {
+              indexLabel.textContent = '✓';
+            } else if (isWarning) {
+              indexLabel.textContent = '!';
+            } else {
+              indexLabel.textContent = original;
+            }
+          }
+        });
+      };
+
+      const parseCargosInscritos = () => {
+        if (!cargosInscritosInput) return [];
+        const raw = cargosInscritosInput.value?.trim();
+        if (!raw) return [];
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            return parsed.map((value) => String(value ?? '').trim()).filter(Boolean);
+          }
+        } catch (error) {
+          // Ignored — fallback to string parsing below.
+        }
+        return raw
+          .split(/[;,\n]+/)
+          .map((value) => value.trim())
+          .filter(Boolean);
+      };
+
+      const filterCargoOptions = () => {
+        if (!cargoSelect) return;
+        const inscritos = parseCargosInscritos();
+        if (!inscritos.length) return;
+        const allowedValue = cargoSelect.dataset.prefill?.trim().toUpperCase() || '';
+        const bloqueados = new Set(inscritos.map((value) => value.toUpperCase()));
+        Array.from(cargoSelect.options).forEach((option) => {
+          const optionValue = option.value?.trim();
+          if (!optionValue) return;
+          const normalized = optionValue.toUpperCase();
+          if (bloqueados.has(normalized) && normalized !== allowedValue) {
+            option.remove();
+          }
+        });
+      };
+
       const resolveInitialAuthorization = () => {
         const bodyAuth = document.body?.dataset?.authorization?.trim();
         const hiddenAuth = authorizationField?.value?.trim();
@@ -2082,7 +2340,7 @@
           confirm.classList.add('is-invalid');
           if ((shouldAlert || document.activeElement !== confirm) && !emailMismatchAlertShown) {
             emailMismatchAlertShown = true;
-            alert('Os e-mails informados não coincidem.');
+            showFriendlyAlert('Os e-mails informados não coincidem.');
           }
           return false;
         }
@@ -2111,7 +2369,7 @@
           successScreen.classList.add('show');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-          alert('Inscrição enviada com sucesso!');
+          showFriendlyAlert('Inscrição enviada com sucesso!');
         }
       };
 
@@ -2185,19 +2443,7 @@
         stepPanels.forEach((panel, i) => {
           panel.classList.toggle('d-none', i !== currentStep);
         });
-        wizardSteps.forEach((step, i) => {
-          const isActive = i === currentStep;
-          const isCompleted = visitedSteps.has(i) && i < currentStep;
-          step.classList.toggle('active', isActive);
-          step.classList.toggle('completed', isCompleted);
-          step.setAttribute('aria-selected', isActive ? 'true' : 'false');
-          step.setAttribute('tabindex', '0');
-          const indexLabel = step.querySelector('.wizard-index-label');
-          if (indexLabel) {
-            const original = indexLabel.dataset.stepIndex || String(i + 1);
-            indexLabel.textContent = isCompleted ? '✓' : original;
-          }
-        });
+        updateWizardStepStates();
         if (currentStep === stepPanels.length - 1) {
           buildReview();
         }
@@ -2763,11 +3009,11 @@
             draftToast.classList.add('show');
             setTimeout(() => draftToast.classList.remove('show'), 3200);
           } else {
-            alert('Rascunho salvo com sucesso!');
+            showFriendlyAlert('Rascunho salvo com sucesso!');
           }
         } catch (error) {
           console.error('Erro ao salvar rascunho', error);
-          alert('Não foi possível salvar o rascunho neste navegador.');
+          showFriendlyAlert('Não foi possível salvar o rascunho neste navegador.');
         }
       };
 
@@ -2940,8 +3186,29 @@
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        validateEmailsMatch(true);
-        if (!form.checkValidity() || !validateCurrentStep()) {
+        validateEmailsMatch(false);
+        const pendingFields = collectInvalidFields(form, { ignoreVisibility: true });
+        if (pendingFields.length > 0) {
+          event.stopPropagation();
+          const firstInvalid = pendingFields[0]?.field || null;
+          if (firstInvalid) {
+            const targetStepIndex = stepPanels.findIndex((panel) => panel.contains(firstInvalid));
+            if (targetStepIndex >= 0 && targetStepIndex !== currentStep) {
+              showStep(targetStepIndex);
+            }
+          }
+          updateWizardStepStates();
+          const alertContent = buildMissingFieldsAlertContent(pendingFields);
+          showFriendlyAlert(alertContent);
+          if (firstInvalid && typeof firstInvalid.reportValidity === 'function') {
+            firstInvalid.reportValidity();
+          }
+          if (firstInvalid && typeof firstInvalid.focus === 'function') {
+            setTimeout(() => firstInvalid.focus({ preventScroll: false }), 0);
+          }
+          return;
+        }
+        if (!validateCurrentStep()) {
           event.stopPropagation();
           return;
         }
@@ -3008,6 +3275,7 @@
       applyUppercaseTransform();
       enforceNumericOnly();
       populateUfSelects();
+      filterCargoOptions();
       selectPrefills();
       void populateNacionalidades();
       radioPrefills();
