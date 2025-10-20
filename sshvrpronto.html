@@ -1991,7 +1991,7 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Aviso!</h5>
+            <h5 class="modal-title" id="friendlyAlertTitle">Aviso!</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
           <div class="modal-body" id="friendlyAlertMessage"></div>
@@ -2009,6 +2009,8 @@
       const draftToast = document.getElementById('draftToast');
       const friendlyAlertElement = document.getElementById('friendlyAlert');
       const friendlyAlertMessage = document.getElementById('friendlyAlertMessage');
+      const friendlyAlertTitle = document.getElementById('friendlyAlertTitle');
+      const friendlyAlertTitleBaseClass = friendlyAlertTitle?.className || '';
       let friendlyAlertInstance;
       const registrationNumberElement = document.getElementById('registrationNumber');
       const registrationValueElement = registrationNumberElement?.querySelector('.registration-value');
@@ -2059,10 +2061,24 @@
       let cepController;
       const visitedSteps = new Set();
       const authorizationField = document.getElementById('initialAuthorization');
-      const showFriendlyAlert = (content) => {
+      const showFriendlyAlert = (content, options = {}) => {
         if (!friendlyAlertElement || !friendlyAlertMessage) {
           window.alert(typeof content === 'string' ? content : String(content ?? ''));
           return;
+        }
+        const { title, titleClass } = options ?? {};
+        if (friendlyAlertTitle) {
+          friendlyAlertTitle.className = friendlyAlertTitleBaseClass;
+          const titleText = typeof title === 'string' && title.trim() ? title : 'Aviso!';
+          friendlyAlertTitle.textContent = titleText;
+          if (titleClass) {
+            const classes = Array.isArray(titleClass)
+              ? titleClass
+              : String(titleClass)
+                  .split(/\s+/)
+                  .filter(Boolean);
+            classes.forEach((className) => friendlyAlertTitle.classList.add(className));
+          }
         }
         friendlyAlertMessage.innerHTML = '';
         if (typeof content === 'string') {
@@ -3199,7 +3215,7 @@
           }
           updateWizardStepStates();
           const alertContent = buildMissingFieldsAlertContent(pendingFields);
-          showFriendlyAlert(alertContent);
+          showFriendlyAlert(alertContent, { title: '❌ Aviso!', titleClass: 'text-danger' });
           if (firstInvalid && typeof firstInvalid.reportValidity === 'function') {
             firstInvalid.reportValidity();
           }
