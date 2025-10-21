@@ -39,9 +39,10 @@
 
       header .lead {
         color: rgba(255, 255, 255, 0.82);
-        max-width: 720px;
+        max-width: 100%;
         font-size: 1rem;
         line-height: 1.65;
+        text-align: justify;
       }
 
       .badge-open {
@@ -369,60 +370,60 @@
               <div class="card-body">
                 <ul class="mb-0">
                   <li>Revise e confirme os dados antes de enviar a atualização.</li>
-                  <li>As informações seguem diretamente para a equipe responsável pelo cadastro reserva.</li>
+                  <li>As informações serão atualizadas em seu cadastro.</li>
                 </ul>
                 <details class="collapsible-form mt-3">
                   <summary>Atualizar dados de contato</summary>
                   <div class="mt-3">
                     <label class="form-label" for="email-input">E-mail</label>
-                    <input class="form-control" type="email" id="email-input" name="email" value="{{ $json.email }}" placeholder="nome@exemplo.com" autocomplete="email" />
+                    <input class="form-control" type="email" id="email-input" name="email" value="{{ $json.email }}" placeholder="nome@exemplo.com" autocomplete="email" required />
                     <div class="form-text">Informe o endereço eletrônico que receberá os comunicados oficiais.</div>
                   </div>
                   <div class="mt-3">
                     <label class="form-label" for="email-confirm-input">Confirmar e-mail</label>
-                    <input class="form-control" type="email" id="email-confirm-input" name="emailConfirm" value="{{ $json.email }}" placeholder="Confirme seu e-mail" autocomplete="email" />
+                    <input class="form-control" type="email" id="email-confirm-input" name="emailConfirm" value="{{ $json.email }}" placeholder="Confirme seu e-mail" autocomplete="email" required />
                     <div class="form-text">Digite novamente para validar o endereço informado.</div>
                   </div>
                   <div class="mt-3">
                     <label class="form-label" for="telefone-input">Telefone</label>
-                    <input class="form-control" type="tel" id="telefone-input" name="telefone" value="{{ $json.telefone }}" placeholder="DDD + número" inputmode="numeric" maxlength="11" />
+                    <input class="form-control" type="tel" id="telefone-input" name="telefone" value="{{ $json.telefone }}" placeholder="DDD + número" inputmode="numeric" maxlength="11" required />
                     <div class="form-text">Informe 11 dígitos numéricos (ex.: 81999999999) para contato preferencial.</div>
                   </div>
                   <div class="mt-3">
                     <label class="form-label" for="cep-input">CEP</label>
-                    <input class="form-control" type="text" id="cep-input" name="cep" value="{{ $json.cep }}" placeholder="00000000" inputmode="numeric" maxlength="8" />
-                    <div class="form-text">Após preencher os 8 dígitos, o endereço será buscado automaticamente na Brasil API.</div>
+                    <input class="form-control" type="text" id="cep-input" name="cep" value="{{ $json.cep }}" placeholder="00000000" inputmode="numeric" maxlength="8" required />
+                    <div class="form-text">Informe o CEP com 8 dígitos.</div>
                   </div>
                   <div class="row g-3 mt-3">
                     <div class="col-md-8">
                       <label class="form-label" for="logradouro-input">Logradouro</label>
-                      <input class="form-control" type="text" id="logradouro-input" name="logradouro" value="{{ $json.logradouro }}" placeholder="Rua, avenida, travessa..." />
+                      <input class="form-control" type="text" id="logradouro-input" name="logradouro" value="{{ $json.logradouro }}" placeholder="Rua, avenida, travessa..." required />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="numero-input">Número</label>
-                      <input class="form-control" type="text" id="numero-input" name="numero" value="{{ $json.numero }}" placeholder="000" />
+                      <input class="form-control" type="text" id="numero-input" name="numero" value="{{ $json.numero }}" placeholder="000" required />
                     </div>
                   </div>
                   <div class="mt-3">
                     <label class="form-label" for="complemento-input">Complemento</label>
-                    <input class="form-control" type="text" id="complemento-input" name="complemento" value="{{ $json.complemento }}" placeholder="Apartamento, bloco, referência" />
+                    <input class="form-control" type="text" id="complemento-input" name="complemento" value="{{ $json.complemento }}" placeholder="Apartamento, bloco, referência" required />
                   </div>
                   <div class="row g-3 mt-3">
                     <div class="col-md-6">
                       <label class="form-label" for="bairro-input">Bairro</label>
-                      <input class="form-control" type="text" id="bairro-input" name="bairro" value="{{ $json.bairro }}" placeholder="Nome do bairro" />
+                      <input class="form-control" type="text" id="bairro-input" name="bairro" value="{{ $json.bairro }}" placeholder="Nome do bairro" required />
                     </div>
                     <div class="col-md-4">
                       <label class="form-label" for="cidade-input">Cidade</label>
-                      <input class="form-control" type="text" id="cidade-input" name="cidade" value="{{ $json.cidade }}" placeholder="Município" />
+                      <input class="form-control" type="text" id="cidade-input" name="cidade" value="{{ $json.cidade }}" placeholder="Município" required />
                     </div>
                     <div class="col-md-2">
                       <label class="form-label" for="uf-input">UF</label>
-                      <input class="form-control text-uppercase" type="text" id="uf-input" name="uf" value="{{ $json.uf }}" placeholder="UF" maxlength="2" />
+                      <input class="form-control text-uppercase" type="text" id="uf-input" name="uf" value="{{ $json.uf }}" placeholder="UF" maxlength="2" required />
                     </div>
                   </div>
                 </details>
-                <button class="btn btn-outline-primary mt-3" id="btn-atualizar-cadastro" type="button">Enviar atualização de contato</button>
+                <button class="btn btn-outline-primary mt-3" id="btn-atualizar-cadastro" type="button" disabled>Enviar atualização de contato</button>
               </div>
             </article>
           </div>
@@ -667,31 +668,61 @@
 
         function collectUpdateValues() {
           var cpfField = document.getElementById("cpf");
-          var values = {
+          var emailValue = emailInput ? emailInput.value.trim().toLowerCase() : "";
+          var emailConfirmValue = emailConfirmInput ? emailConfirmInput.value.trim().toLowerCase() : "";
+          var telefoneValue = telefoneInput ? sanitizeDigits(telefoneInput.value) : "";
+          var cepValue = cepInput ? sanitizeDigits(cepInput.value) : "";
+          var logradouroValue = logradouroInput ? logradouroInput.value.trim().toUpperCase() : "";
+          var numeroValue = numeroInput ? numeroInput.value.trim().toUpperCase() : "";
+          var complementoValue = complementoInput ? complementoInput.value.trim().toUpperCase() : "";
+          var bairroValue = bairroInput ? bairroInput.value.trim().toUpperCase() : "";
+          var cidadeValue = cidadeInput ? cidadeInput.value.trim().toUpperCase() : "";
+          var ufValue = ufInput ? String(ufInput.value || "").replace(/[^a-zA-Z]/g, "").slice(0, 2).toUpperCase() : "";
+
+          if (emailInput && emailInput.value !== emailValue) {
+            emailInput.value = emailValue;
+          }
+          if (emailConfirmInput && emailConfirmInput.value !== emailConfirmValue) {
+            emailConfirmInput.value = emailConfirmValue;
+          }
+          if (telefoneInput && telefoneInput.value !== telefoneValue) {
+            telefoneInput.value = telefoneValue;
+          }
+          if (cepInput && cepInput.value !== cepValue) {
+            cepInput.value = cepValue;
+          }
+          if (logradouroInput && logradouroInput.value !== logradouroValue) {
+            logradouroInput.value = logradouroValue;
+          }
+          if (numeroInput && numeroInput.value !== numeroValue) {
+            numeroInput.value = numeroValue;
+          }
+          if (complementoInput && complementoInput.value !== complementoValue) {
+            complementoInput.value = complementoValue;
+          }
+          if (bairroInput && bairroInput.value !== bairroValue) {
+            bairroInput.value = bairroValue;
+          }
+          if (cidadeInput && cidadeInput.value !== cidadeValue) {
+            cidadeInput.value = cidadeValue;
+          }
+          if (ufInput && ufInput.value !== ufValue) {
+            ufInput.value = ufValue;
+          }
+
+          return {
             cpf: cpfField ? cpfField.value : "",
-            email: emailInput ? emailInput.value.trim() : "",
-            emailConfirm: emailConfirmInput ? emailConfirmInput.value.trim() : "",
-            telefone: telefoneInput ? sanitizeDigits(telefoneInput.value) : "",
-            cep: cepInput ? sanitizeDigits(cepInput.value) : "",
-            logradouro: logradouroInput ? logradouroInput.value.trim() : "",
-            numero: numeroInput ? numeroInput.value.trim() : "",
-            complemento: complementoInput ? complementoInput.value.trim() : "",
-            bairro: bairroInput ? bairroInput.value.trim() : "",
-            cidade: cidadeInput ? cidadeInput.value.trim() : "",
-            uf: ufInput ? ufInput.value.trim().toUpperCase() : "",
+            email: emailValue,
+            emailConfirm: emailConfirmValue,
+            telefone: telefoneValue,
+            cep: cepValue,
+            logradouro: logradouroValue,
+            numero: numeroValue,
+            complemento: complementoValue,
+            bairro: bairroValue,
+            cidade: cidadeValue,
+            uf: ufValue,
           };
-
-          if (telefoneInput && telefoneInput.value !== values.telefone) {
-            telefoneInput.value = values.telefone;
-          }
-          if (cepInput && cepInput.value !== values.cep) {
-            cepInput.value = values.cep;
-          }
-          if (ufInput && ufInput.value !== values.uf) {
-            ufInput.value = values.uf;
-          }
-
-          return values;
         }
 
         function syncHiddenValues(values) {
@@ -727,41 +758,129 @@
           }
         }
 
-        function validateUpdateData(values) {
-          var messages = [];
+        function computeValidationState(values) {
           var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          var state = {
+            emailValid: emailPattern.test(values.email),
+            emailConfirmValid: emailPattern.test(values.emailConfirm),
+            emailsMatch: !!values.email && values.email === values.emailConfirm,
+            telefoneValid: /^\d{11}$/.test(values.telefone),
+            cepValid: /^\d{8}$/.test(values.cep),
+            logradouroValid: !!values.logradouro,
+            numeroValid: !!values.numero,
+            complementoValid: !!values.complemento,
+            bairroValid: !!values.bairro,
+            cidadeValid: !!values.cidade,
+            ufValid: /^[A-Z]{2}$/.test(values.uf),
+          };
 
-          if (!emailPattern.test(values.email)) {
+          state.allFieldsFilled =
+            !!values.email &&
+            !!values.emailConfirm &&
+            !!values.telefone &&
+            !!values.cep &&
+            !!values.logradouro &&
+            !!values.numero &&
+            !!values.complemento &&
+            !!values.bairro &&
+            !!values.cidade &&
+            !!values.uf;
+
+          state.isValid =
+            state.emailValid &&
+            state.emailConfirmValid &&
+            state.emailsMatch &&
+            state.telefoneValid &&
+            state.cepValid &&
+            state.logradouroValid &&
+            state.numeroValid &&
+            state.complementoValid &&
+            state.bairroValid &&
+            state.cidadeValid &&
+            state.ufValid;
+
+          return state;
+        }
+
+        function updateValidationFeedback(state, forceHighlight) {
+          if (!state) {
+            return;
+          }
+
+          if (emailInput) {
+            emailInput.classList.toggle("is-invalid", !state.emailValid || !state.emailsMatch);
+          }
+          if (emailConfirmInput) {
+            emailConfirmInput.classList.toggle("is-invalid", !state.emailConfirmValid || !state.emailsMatch);
+          }
+
+          var validityMap = [
+            [telefoneInput, state.telefoneValid],
+            [cepInput, state.cepValid],
+            [logradouroInput, state.logradouroValid],
+            [numeroInput, state.numeroValid],
+            [complementoInput, state.complementoValid],
+            [bairroInput, state.bairroValid],
+            [cidadeInput, state.cidadeValid],
+            [ufInput, state.ufValid],
+          ];
+
+          var shouldHighlight = forceHighlight || state.allFieldsFilled;
+
+          validityMap.forEach(function (entry) {
+            var field = entry[0];
+            var valid = entry[1];
+            if (field) {
+              field.classList.toggle("is-invalid", !valid && shouldHighlight);
+            }
+          });
+        }
+
+        function updateSubmitButton(state) {
+          if (updateButton) {
+            updateButton.disabled = !state || !state.isValid;
+          }
+        }
+
+        function validateUpdateData(values) {
+          var state = computeValidationState(values);
+          var messages = [];
+
+          if (!state.emailValid) {
             messages.push("Informe um e-mail válido.");
           }
-          if (!emailPattern.test(values.emailConfirm)) {
+          if (!state.emailConfirmValid) {
             messages.push("Confirme o e-mail com um endereço válido.");
           }
-          if (values.email && values.emailConfirm && values.email !== values.emailConfirm) {
+          if (state.emailValid && state.emailConfirmValid && !state.emailsMatch) {
             messages.push("Os campos de e-mail devem ser idênticos.");
           }
-          if (!/^\d{11}$/.test(values.telefone)) {
+          if (!state.telefoneValid) {
             messages.push("O telefone deve conter exatamente 11 dígitos numéricos.");
           }
-          if (values.cep.length !== 8) {
+          if (!state.cepValid) {
             messages.push("Informe um CEP com 8 dígitos.");
           }
-          if (!values.logradouro) {
+          if (!state.logradouroValid) {
             messages.push("Preencha o logradouro.");
           }
-          if (!values.numero) {
+          if (!state.numeroValid) {
             messages.push("Informe o número do endereço.");
           }
-          if (!values.bairro) {
+          if (!state.complementoValid) {
+            messages.push("Informe o complemento do endereço.");
+          }
+          if (!state.bairroValid) {
             messages.push("Preencha o bairro.");
           }
-          if (!values.cidade) {
+          if (!state.cidadeValid) {
             messages.push("Informe a cidade.");
           }
-          if (!values.uf || values.uf.length !== 2) {
+          if (!state.ufValid) {
             messages.push("Informe a UF com duas letras.");
           }
 
+          messages.state = state;
           return messages;
         }
 
@@ -792,19 +911,19 @@
             .then(function (data) {
               if (data) {
                 if (logradouroInput && data.street) {
-                  logradouroInput.value = data.street;
+                  logradouroInput.value = String(data.street).toUpperCase();
                 }
                 if (bairroInput && data.neighborhood) {
-                  bairroInput.value = data.neighborhood;
+                  bairroInput.value = String(data.neighborhood).toUpperCase();
                 }
                 if (cidadeInput && data.city) {
-                  cidadeInput.value = data.city;
+                  cidadeInput.value = String(data.city).toUpperCase();
                 }
                 if (ufInput && data.state) {
                   ufInput.value = String(data.state).toUpperCase();
                 }
               }
-              syncHiddenValues(collectUpdateValues());
+              handleInputChange();
             })
             .catch(function (error) {
               lastCepConsulted = "";
@@ -813,12 +932,21 @@
             });
         }
 
+        function handleInputChange() {
+          var values = collectUpdateValues();
+          syncHiddenValues(values);
+          var state = computeValidationState(values);
+          updateValidationFeedback(state, false);
+          updateSubmitButton(state);
+        }
+
         if (telefoneInput) {
           telefoneInput.addEventListener("input", function () {
             var sanitized = sanitizeDigits(telefoneInput.value).slice(0, 11);
             if (telefoneInput.value !== sanitized) {
               telefoneInput.value = sanitized;
             }
+            handleInputChange();
           });
           telefoneInput.value = sanitizeDigits(telefoneInput.value).slice(0, 11);
         }
@@ -829,6 +957,7 @@
             if (cepInput.value !== sanitized) {
               cepInput.value = sanitized;
             }
+            handleInputChange();
           });
           cepInput.addEventListener("keyup", handleCepLookup);
           cepInput.addEventListener("change", handleCepLookup);
@@ -842,6 +971,7 @@
             if (ufInput.value !== sanitized) {
               ufInput.value = sanitized;
             }
+            handleInputChange();
           });
           ufInput.value = String(ufInput.value || "").replace(/[^a-zA-Z]/g, "").slice(0, 2).toUpperCase();
         }
@@ -851,12 +981,11 @@
             return !!input;
           })
           .forEach(function (input) {
-            input.addEventListener("blur", function () {
-              syncHiddenValues(collectUpdateValues());
-            });
+            input.addEventListener("input", handleInputChange);
+            input.addEventListener("blur", handleInputChange);
           });
 
-        syncHiddenValues(collectUpdateValues());
+        handleInputChange();
 
         function getEmojiForUrl(url) {
           var extension = (url.split(".").pop() || "").toLowerCase();
@@ -1014,8 +1143,12 @@
             syncHiddenValues(values);
 
             var validationErrors = validateUpdateData(values);
+            var state = validationErrors.state || computeValidationState(values);
+            updateValidationFeedback(state, true);
+            updateSubmitButton(state);
+
             if (validationErrors.length) {
-              showPopup(validationErrors.join("\n"), { tone: "warning" });
+              showPopup(validationErrors.join("\n"), { tone: "warning", data: { status: "warning" } });
               return;
             }
 
