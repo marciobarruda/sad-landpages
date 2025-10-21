@@ -1526,6 +1526,10 @@
                     data-force-required="true"
                   />
                 </div>
+                <div class="col-md-6 hidden" id="pcdCidGroup">
+                  <label for="pcd_cid" class="form-label">CID (se houver)</label>
+                  <input type="text" class="form-control" id="pcd_cid" name="pcd_cid" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}" />
+                </div>
                 <div class="col-12" id="condicaoEspecialGroup">
                   <span class="form-label">Necessita de condição especial?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
@@ -1552,10 +1556,6 @@
                       <label class="form-check-label" for="condicao_especial_nao">Não</label>
                     </div>
                   </div>
-                </div>
-                <div class="col-md-6 hidden" id="pcdCidGroup">
-                  <label for="pcd_cid" class="form-label">CID (se houver)</label>
-                  <input type="text" class="form-control" id="pcd_cid" name="pcd_cid" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}" />
                 </div>
                 <div class="col-12 hidden" id="necessidadeGroup">
                   <label for="necessidade" class="form-label">Descreva a necessidade</label>
