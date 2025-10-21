@@ -75,6 +75,55 @@
         font-size: 1.4rem;
       }
 
+      .minhas-inscricoes-grid {
+        margin-top: 1rem;
+      }
+
+      .minhas-inscricao-card {
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        border: 1px solid rgba(0, 83, 164, 0.12);
+      }
+
+      .minhas-inscricao-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 45, 98, 0.12);
+      }
+
+      .minhas-inscricao-card.is-loading {
+        pointer-events: none;
+        opacity: 0.7;
+      }
+
+      .minhas-inscricoes-placeholder {
+        padding: 1.25rem;
+        border-radius: 0.9rem;
+        background: rgba(0, 83, 164, 0.05);
+        border: 1px dashed rgba(0, 83, 164, 0.2);
+        color: var(--text-muted);
+      }
+
+      .resumo-inscricao-list dt {
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .resumo-inscricao-list dd {
+        font-weight: 600;
+        color: var(--text-strong);
+      }
+
+      .resumo-inscricao-pre {
+        background: rgba(0, 83, 164, 0.06);
+        border-radius: 0.75rem;
+        padding: 0.75rem;
+        white-space: pre-wrap;
+        font-size: 0.85rem;
+        margin-bottom: 0;
+      }
+
       .collapsible-form {
         border: 1px solid rgba(0, 83, 164, 0.15);
         border-radius: 0.9rem;
@@ -461,6 +510,23 @@
         </div>
       </section>
 
+      <section class="mb-5" id="minhas-inscricoes-section">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+          <h2 class="section-title mb-0">Minhas inscrições</h2>
+          <p class="text-muted small mb-0">Selecione uma inscrição para visualizar o resumo cadastral.</p>
+        </div>
+        <div id="minhas-inscricoes-loading" class="minhas-inscricoes-placeholder">
+          Carregando inscrições vinculadas ao CPF informado...
+        </div>
+        <div id="minhas-inscricoes-empty" class="minhas-inscricoes-placeholder d-none">
+          Nenhuma inscrição encontrada para o CPF informado.
+        </div>
+        <div
+          id="minhas-inscricoes-cards"
+          class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 minhas-inscricoes-grid d-none"
+        ></div>
+      </section>
+
       <section class="mb-5">
         <h2 class="section-title mb-3">Documentos obrigatórios e modelos</h2>
         <p class="text-muted mb-4">
@@ -587,6 +653,14 @@
         var modalClose = document.getElementById("feedback-modal-close");
         var popupCloseHandler = null;
         var lastCepConsulted = "";
+        var minhasInscricoesSection = document.getElementById("minhas-inscricoes-section");
+        var minhasInscricoesList = document.getElementById("minhas-inscricoes-cards");
+        var minhasInscricoesLoading = document.getElementById("minhas-inscricoes-loading");
+        var minhasInscricoesEmpty = document.getElementById("minhas-inscricoes-empty");
+        var inscricoesListEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d9a52f68-88ee-44af-b8e5-335131a9ba31";
+        var inscricoesResumoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/consultar-sesuite";
+        var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
+        var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
 
         function sanitizeDigits(value) {
           return (value || "").replace(/\D/g, "");
@@ -677,8 +751,19 @@
           if (modalMessage) {
             var trimmedMessage = msg.trim();
             var complementoAviso = "Atualize também as suas informações cadastrais no ConectaRecife.";
-            var finalMessage = trimmedMessage ? trimmedMessage + " " + complementoAviso : complementoAviso;
-            modalMessage.textContent = finalMessage;
+            var appendReminder = options && Object.prototype.hasOwnProperty.call(options, "appendReminder")
+              ? options.appendReminder !== false
+              : true;
+
+            if (options && options.htmlContent) {
+              var htmlContent = String(options.htmlContent || "");
+              modalMessage.innerHTML = appendReminder
+                ? htmlContent + '<p class="mt-3 small text-muted">' + complementoAviso + "</p>"
+                : htmlContent;
+            } else {
+              var finalMessage = trimmedMessage ? trimmedMessage + " " + complementoAviso : complementoAviso;
+              modalMessage.textContent = finalMessage;
+            }
           }
           if (modalBackdrop) {
             modalBackdrop.classList.add("active");
@@ -720,6 +805,370 @@
             hidePopup();
           }
         });
+
+        function escapeHtml(value) {
+          return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function formatResumoLabel(label) {
+          return String(label || "")
+            .replace(/([a-z])([A-Z])/g, "$1 $2")
+            .replace(/[_-]+/g, " ")
+            .trim()
+            .split(/\s+/)
+            .map(function (word) {
+              return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            })
+            .join(" ");
+        }
+
+        function isPlainObject(value) {
+          return Object.prototype.toString.call(value) === "[object Object]";
+        }
+
+        function buildDefinitionListFromObject(obj) {
+          if (!isPlainObject(obj)) {
+            return "";
+          }
+
+          var keys = Object.keys(obj);
+          if (!keys.length) {
+            return '<p class="mb-0 text-muted">Nenhum dado retornado.</p>';
+          }
+
+          var rows = keys
+            .map(function (key) {
+              var value = obj[key];
+              if (value === undefined || value === null || value === "") {
+                return "";
+              }
+
+              var label = formatResumoLabel(key);
+              var valueHtml;
+
+              if (Array.isArray(value) || isPlainObject(value)) {
+                valueHtml = '<pre class="resumo-inscricao-pre">' + escapeHtml(JSON.stringify(value, null, 2)) + "</pre>";
+              } else {
+                valueHtml = '<span>' + escapeHtml(value) + "</span>";
+              }
+
+              return (
+                '<dt class="col-sm-4">' +
+                escapeHtml(label) +
+                '</dt><dd class="col-sm-8">' +
+                valueHtml +
+                "</dd>"
+              );
+            })
+            .filter(function (row) {
+              return !!row;
+            })
+            .join("");
+
+          if (!rows) {
+            return '<p class="mb-0 text-muted">Nenhum dado retornado.</p>';
+          }
+
+          return '<dl class="row g-2 resumo-inscricao-list mb-0">' + rows + "</dl>";
+        }
+
+        function buildResumoHtml(data, numero) {
+          var header = numero ? '<h5 class="fw-semibold mb-3">Inscrição ' + escapeHtml(numero) + "</h5>" : "";
+
+          if (data === undefined || data === null) {
+            return header + '<p class="mb-0 text-muted">Nenhuma informação retornada pelo serviço.</p>';
+          }
+
+          if (Array.isArray(data)) {
+            if (!data.length) {
+              return header + '<p class="mb-0 text-muted">Nenhum registro retornado para esta inscrição.</p>';
+            }
+
+            var blocks = data
+              .map(function (item, index) {
+                var titulo = data.length > 1 ? '<h6 class="fw-semibold mt-3 mb-2">Registro ' + (index + 1) + "</h6>" : "";
+                if (isPlainObject(item)) {
+                  return titulo + buildDefinitionListFromObject(item);
+                }
+                return titulo + '<pre class="resumo-inscricao-pre">' + escapeHtml(JSON.stringify(item, null, 2)) + "</pre>";
+              })
+              .join("");
+
+            return header + blocks;
+          }
+
+          if (isPlainObject(data)) {
+            return header + buildDefinitionListFromObject(data);
+          }
+
+          return header + '<p class="mb-0">' + escapeHtml(String(data)) + "</p>";
+        }
+
+        function setMinhasInscricoesState(state) {
+          if (minhasInscricoesLoading) {
+            if (!minhasInscricoesLoadingDefault) {
+              minhasInscricoesLoadingDefault = "Carregando inscrições vinculadas ao CPF informado...";
+            }
+            minhasInscricoesLoading.classList.toggle("d-none", state !== "loading");
+          }
+          if (minhasInscricoesEmpty) {
+            if (!minhasInscricoesEmptyDefault) {
+              minhasInscricoesEmptyDefault = "Nenhuma inscrição encontrada para o CPF informado.";
+            }
+            minhasInscricoesEmpty.classList.toggle("d-none", state !== "empty");
+          }
+          if (minhasInscricoesList) {
+            minhasInscricoesList.classList.toggle("d-none", state !== "ready");
+          }
+          if (minhasInscricoesSection) {
+            minhasInscricoesSection.classList.toggle("d-none", state === "hidden");
+          }
+        }
+
+        function normalizeMinhasInscricoes(data) {
+          if (!data) {
+            return [];
+          }
+
+          var entries;
+          if (Array.isArray(data)) {
+            entries = data;
+          } else if (Array.isArray(data.inscricoes)) {
+            entries = data.inscricoes;
+          } else if (Array.isArray(data.items)) {
+            entries = data.items;
+          } else if (Array.isArray(data.result)) {
+            entries = data.result;
+          } else if (Array.isArray(data.data)) {
+            entries = data.data;
+          } else if (isPlainObject(data)) {
+            entries = [data];
+          } else {
+            entries = [];
+          }
+
+          return entries
+            .map(function (item) {
+              if (!item) {
+                return null;
+              }
+
+              var numero =
+                item.numeroInscricao || item.inscricao || item.numero || item.codigo || item.id || item.registrationNumber;
+              if (numero) {
+                numero = String(numero).trim();
+              }
+
+              if (!numero) {
+                return null;
+              }
+
+              var cargo =
+                item.cargo ||
+                item.descricaoCargo ||
+                item.funcao ||
+                item.descricao ||
+                item.titulo ||
+                item.nomeCargo ||
+                "Cargo não informado";
+
+              cargo = cargo ? String(cargo).trim() : "Cargo não informado";
+
+              return {
+                numero: numero,
+                cargo: cargo,
+              };
+            })
+            .filter(function (entry) {
+              return entry !== null;
+            });
+        }
+
+        function renderMinhasInscricoes(entries) {
+          if (!minhasInscricoesList) {
+            return;
+          }
+
+          minhasInscricoesList.innerHTML = "";
+
+          entries.forEach(function (entry) {
+            var col = document.createElement("div");
+            col.className = "col";
+
+            var card = document.createElement("article");
+            card.className = "card h-100 shadow-sm minhas-inscricao-card";
+            card.setAttribute("role", "button");
+            card.setAttribute("tabindex", "0");
+            card.setAttribute("aria-label", "Consultar detalhes da inscrição " + entry.numero);
+
+            var cardBody = document.createElement("div");
+            cardBody.className = "card-body";
+
+            var title = document.createElement("h3");
+            title.className = "h6 fw-semibold text-primary mb-1";
+            title.textContent = entry.numero;
+
+            var description = document.createElement("p");
+            description.className = "text-muted mb-0";
+            description.textContent = entry.cargo || "Cargo não informado";
+
+            cardBody.appendChild(title);
+            cardBody.appendChild(description);
+            card.appendChild(cardBody);
+
+            card.addEventListener("click", function () {
+              consultarResumoInscricao(entry.numero, card);
+            });
+
+            card.addEventListener("keydown", function (event) {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                consultarResumoInscricao(entry.numero, card);
+              }
+            });
+
+            col.appendChild(card);
+            minhasInscricoesList.appendChild(col);
+          });
+
+          setMinhasInscricoesState(entries.length ? "ready" : "empty");
+        }
+
+        function consultarResumoInscricao(numero, sourceElement) {
+          if (!numero) {
+            showPopup("Não foi possível identificar o número da inscrição selecionada.", { tone: "warning" });
+            return;
+          }
+
+          if (sourceElement) {
+            sourceElement.classList.add("is-loading");
+            sourceElement.setAttribute("aria-busy", "true");
+          }
+
+          var cpfField = document.getElementById("cpf");
+          var cpfValue = cpfField ? cpfField.value : "";
+          var payload = { numeroInscricao: numero };
+
+          if (cpfValue) {
+            payload.cpf = cpfValue;
+          }
+
+          fetch(inscricoesResumoEndpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          })
+            .then(function (response) {
+              return response
+                .clone()
+                .json()
+                .catch(function () {
+                  return response.text();
+                })
+                .then(function (parsed) {
+                  return { parsed: parsed, ok: response.ok, status: response.status };
+                });
+            })
+            .then(function (result) {
+              var data = result.parsed;
+              var isSuccess = !!result.ok;
+
+              if (typeof data === "string") {
+                var toneFromMessage = determineToneFromContent(data, null);
+                if (!toneFromMessage && isSuccess) {
+                  toneFromMessage = "success";
+                }
+                showPopup(data, { tone: toneFromMessage || (isSuccess ? "success" : "error") });
+                return;
+              }
+
+              var tone = determineToneFromContent("", data);
+              if (!tone && isSuccess) {
+                tone = "success";
+              }
+
+              var htmlContent = buildResumoHtml(data, numero);
+              showPopup("", {
+                data: data,
+                tone: tone,
+                htmlContent: htmlContent,
+              });
+            })
+            .catch(function (error) {
+              console.error("Falha ao consultar inscrição:", error);
+              showPopup("Não foi possível consultar os detalhes da inscrição no momento.", { tone: "error" });
+            })
+            .finally(function () {
+              if (sourceElement) {
+                sourceElement.classList.remove("is-loading");
+                sourceElement.removeAttribute("aria-busy");
+              }
+            });
+        }
+
+        function carregarMinhasInscricoes() {
+          if (!minhasInscricoesList) {
+            return;
+          }
+
+          if (minhasInscricoesLoading && minhasInscricoesLoadingDefault) {
+            minhasInscricoesLoading.textContent = minhasInscricoesLoadingDefault;
+          }
+          if (minhasInscricoesEmpty && minhasInscricoesEmptyDefault) {
+            minhasInscricoesEmpty.textContent = minhasInscricoesEmptyDefault;
+          }
+
+          var cpfField = document.getElementById("cpf");
+          var cpfValue = cpfField ? cpfField.value : "";
+
+          if (!cpfValue) {
+            if (minhasInscricoesEmpty) {
+              minhasInscricoesEmpty.textContent = "Não foi possível localizar o CPF para consultar as inscrições.";
+            }
+            setMinhasInscricoesState("empty");
+            return;
+          }
+
+          setMinhasInscricoesState("loading");
+
+          fetch(inscricoesListEndpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ cpf: cpfValue }),
+          })
+            .then(function (response) {
+              if (!response.ok) {
+                throw new Error("Resposta inválida ao buscar inscrições");
+              }
+              return response.json();
+            })
+            .then(function (data) {
+              var entries = normalizeMinhasInscricoes(data);
+
+              if (!entries.length) {
+                setMinhasInscricoesState("empty");
+                return;
+              }
+
+              renderMinhasInscricoes(entries);
+            })
+            .catch(function (error) {
+              console.error("Falha ao carregar inscrições:", error);
+              if (minhasInscricoesEmpty) {
+                minhasInscricoesEmpty.textContent = "Não foi possível carregar suas inscrições. Tente novamente mais tarde.";
+              }
+              setMinhasInscricoesState("empty");
+            });
+        }
 
         function cleanupUpdateForm() {
           [
@@ -1225,6 +1674,7 @@
 
         handleInputChange();
         atualizarFeedbackRecurso(false);
+        carregarMinhasInscricoes();
 
         function getEmojiForUrl(url) {
           var extension = (url.split(".").pop() || "").toLowerCase();
