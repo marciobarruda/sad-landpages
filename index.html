@@ -419,11 +419,38 @@
                     </div>
                     <div class="col-md-2">
                       <label class="form-label" for="uf-input">UF</label>
-                      <input class="form-control text-uppercase" type="text" id="uf-input" name="uf" value="{{ $json.uf }}" placeholder="UF" maxlength="2" required />
+                      <input class="form-control text-uppercase is-invalid" type="text" id="uf-input" name="uf" value="" placeholder="UF" maxlength="2" required />
                     </div>
                   </div>
                 </details>
                 <button class="btn btn-outline-primary mt-3" id="btn-atualizar-cadastro" type="button" disabled>Enviar atualização de contato</button>
+              </div>
+            </article>
+            <article class="card card-programa">
+              <div class="card-header">
+                <span class="badge text-bg-light text-uppercase text-primary">Recursos</span>
+                <h3 class="h5 mt-3 mb-1">Interposição de recursos</h3>
+                <p class="mb-0 text-muted">Envie o recurso com o número da inscrição e um único anexo durante o período previsto no edital.</p>
+              </div>
+              <div class="card-body">
+                <ul class="mb-0">
+                  <li>Prepare o arquivo em formato PDF, imagem ou documento de texto com até 10&nbsp;MB.</li>
+                  <li>Confira os dados antes de enviar para que o protocolo seja registrado corretamente.</li>
+                </ul>
+                <details class="collapsible-form mt-3">
+                  <summary>Preparar envio do recurso</summary>
+                  <div class="mt-3">
+                    <label class="form-label" for="recurso-numero-input">Número da inscrição</label>
+                    <input class="form-control" type="text" id="recurso-numero-input" name="numeroInscricao" placeholder="Digite apenas números" inputmode="numeric" required />
+                    <div class="form-text">Informe o número exato da inscrição sem pontos ou traços.</div>
+                  </div>
+                  <div class="mt-3">
+                    <label class="form-label" for="recurso-arquivo-input">Anexo do recurso</label>
+                    <input class="form-control" type="file" id="recurso-arquivo-input" name="arquivoRecurso" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.odt" required />
+                    <div class="form-text">Selecione apenas um arquivo (até 10&nbsp;MB) contendo a fundamentação do recurso.</div>
+                  </div>
+                </details>
+                <button class="btn btn-outline-primary mt-3" id="btn-enviar-recurso" type="button" data-endpoint="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/204c8f95-ccdd-41e6-8ccf-40b7795a01fb" disabled>Enviar recurso</button>
               </div>
             </article>
           </div>
@@ -552,6 +579,11 @@
         var bairroHidden = document.getElementById("bairro");
         var cidadeHidden = document.getElementById("cidade");
         var ufHidden = document.getElementById("uf");
+        var recursoButton = document.getElementById("btn-enviar-recurso");
+        var recursoNumeroInput = document.getElementById("recurso-numero-input");
+        var recursoArquivoInput = document.getElementById("recurso-arquivo-input");
+        var recursoEndpoint = recursoButton ? recursoButton.getAttribute("data-endpoint") : "";
+        var recursoMaxFileSize = 10 * 1024 * 1024;
         var modalBackdrop = document.getElementById("feedback-modal");
         var modalTitle = document.getElementById("feedback-modal-title");
         var modalMessage = document.getElementById("feedback-modal-message");
@@ -818,14 +850,14 @@
           }
 
           var validityMap = [
-            [telefoneInput, state.telefoneValid],
-            [cepInput, state.cepValid],
-            [logradouroInput, state.logradouroValid],
-            [numeroInput, state.numeroValid],
-            [complementoInput, state.complementoValid],
-            [bairroInput, state.bairroValid],
-            [cidadeInput, state.cidadeValid],
-            [ufInput, state.ufValid],
+            [telefoneInput, state.telefoneValid, false],
+            [cepInput, state.cepValid, false],
+            [logradouroInput, state.logradouroValid, false],
+            [numeroInput, state.numeroValid, false],
+            [complementoInput, state.complementoValid, false],
+            [bairroInput, state.bairroValid, false],
+            [cidadeInput, state.cidadeValid, false],
+            [ufInput, state.ufValid, true],
           ];
 
           var shouldHighlight = forceHighlight || state.allFieldsFilled;
@@ -833,8 +865,10 @@
           validityMap.forEach(function (entry) {
             var field = entry[0];
             var valid = entry[1];
+            var alwaysHighlight = entry[2];
             if (field) {
-              field.classList.toggle("is-invalid", !valid && shouldHighlight);
+              var highlight = shouldHighlight || alwaysHighlight;
+              field.classList.toggle("is-invalid", highlight && !valid);
             }
           });
         }
@@ -885,6 +919,66 @@
 
           messages.state = state;
           return messages;
+        }
+
+        function collectResourceValues() {
+          var numero = recursoNumeroInput ? sanitizeDigits(recursoNumeroInput.value).slice(0, 20) : "";
+          if (recursoNumeroInput && recursoNumeroInput.value !== numero) {
+            recursoNumeroInput.value = numero;
+          }
+
+          var arquivo = recursoArquivoInput && recursoArquivoInput.files ? recursoArquivoInput.files[0] || null : null;
+
+          return {
+            numero: numero,
+            arquivo: arquivo,
+            pronto: !!numero && !!arquivo,
+          };
+        }
+
+        function atualizarFeedbackRecurso(forceHighlight) {
+          var state = collectResourceValues();
+          var highlightNumero = forceHighlight || (recursoNumeroInput && recursoNumeroInput.dataset.touched === "true");
+          var highlightArquivo = forceHighlight || (recursoArquivoInput && recursoArquivoInput.dataset.touched === "true");
+
+          if (recursoNumeroInput) {
+            recursoNumeroInput.classList.toggle("is-invalid", highlightNumero && !state.numero);
+          }
+
+          if (recursoArquivoInput) {
+            recursoArquivoInput.classList.toggle("is-invalid", highlightArquivo && !state.arquivo);
+          }
+
+          if (recursoButton) {
+            recursoButton.disabled = !state.pronto;
+          }
+
+          return state;
+        }
+
+        function lerArquivoComoBase64(file) {
+          return new Promise(function (resolve, reject) {
+            if (!file) {
+              reject(new Error("Arquivo inválido"));
+              return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (event) {
+              var result = event && event.target ? event.target.result : reader.result;
+              if (typeof result !== "string") {
+                reject(new Error("Não foi possível processar o arquivo"));
+                return;
+              }
+
+              var base64 = result.split(",").pop() || "";
+              resolve(base64);
+            };
+            reader.onerror = function () {
+              reject(new Error("Erro ao ler o arquivo"));
+            };
+            reader.readAsDataURL(file);
+          });
         }
 
         function handleCepLookup() {
@@ -1004,6 +1098,28 @@
           ufInput.value = String(ufInput.value || "").replace(/[^a-zA-Z]/g, "").slice(0, 2).toUpperCase();
         }
 
+        if (recursoNumeroInput) {
+          recursoNumeroInput.addEventListener("input", function () {
+            recursoNumeroInput.value = sanitizeDigits(recursoNumeroInput.value).slice(0, 20);
+            atualizarFeedbackRecurso(false);
+          });
+          recursoNumeroInput.addEventListener("blur", function () {
+            recursoNumeroInput.dataset.touched = "true";
+            atualizarFeedbackRecurso(false);
+          });
+        }
+
+        if (recursoArquivoInput) {
+          recursoArquivoInput.addEventListener("change", function () {
+            recursoArquivoInput.dataset.touched = "true";
+            atualizarFeedbackRecurso(false);
+          });
+          recursoArquivoInput.addEventListener("blur", function () {
+            recursoArquivoInput.dataset.touched = "true";
+            atualizarFeedbackRecurso(false);
+          });
+        }
+
         [emailInput, emailConfirmInput, telefoneInput, cepInput, logradouroInput, numeroInput, complementoInput, bairroInput, cidadeInput, ufInput]
           .filter(function (input) {
             return !!input;
@@ -1014,6 +1130,7 @@
           });
 
         handleInputChange();
+        atualizarFeedbackRecurso(false);
 
         function getEmojiForUrl(url) {
           var extension = (url.split(".").pop() || "").toLowerCase();
@@ -1221,6 +1338,84 @@
               .catch(function (error) {
                 console.error("Falha ao enviar atualização cadastral:", error);
                 showPopup("Não foi possível enviar a atualização cadastral. Tente novamente em instantes.", { tone: "error" });
+              });
+          });
+        }
+
+        if (recursoButton) {
+          recursoButton.addEventListener("click", function () {
+            if (recursoNumeroInput) {
+              recursoNumeroInput.dataset.touched = "true";
+            }
+            if (recursoArquivoInput) {
+              recursoArquivoInput.dataset.touched = "true";
+            }
+            var state = atualizarFeedbackRecurso(true);
+            if (!state.pronto) {
+              showPopup("Preencha o número da inscrição e selecione o arquivo do recurso para prosseguir.", { tone: "warning", data: { status: "warning" } });
+              return;
+            }
+
+            if (!recursoEndpoint) {
+              showPopup("Não foi possível enviar o recurso porque o endpoint não está configurado.", { tone: "error" });
+              return;
+            }
+
+            if (state.arquivo && state.arquivo.size > recursoMaxFileSize) {
+              showPopup("O arquivo do recurso deve ter no máximo 10 MB.", { tone: "warning", data: { status: "warning" } });
+              return;
+            }
+
+            recursoButton.setAttribute("data-original-text", recursoButton.textContent || "Enviar recurso");
+            recursoButton.textContent = "Enviando...";
+            recursoButton.disabled = true;
+
+            lerArquivoComoBase64(state.arquivo)
+              .then(function (base64) {
+                var cpfField = document.getElementById("cpf");
+                var payload = {
+                  numeroInscricao: state.numero,
+                  arquivoNome: state.arquivo ? state.arquivo.name : "",
+                  arquivoMime: state.arquivo ? state.arquivo.type : "",
+                  arquivoTamanho: state.arquivo ? state.arquivo.size : 0,
+                  arquivoBase64: base64,
+                  cpf: cpfField ? cpfField.value : "",
+                  acao: "recurso",
+                };
+
+                return fetch(recursoEndpoint, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(payload),
+                });
+              })
+              .then(function (response) {
+                return response
+                  .clone()
+                  .json()
+                  .catch(function () {
+                    return response.text();
+                  });
+              })
+              .then(function (data) {
+                if (typeof data === "string") {
+                  showPopup(data, { data: null });
+                  return;
+                }
+
+                var message = data.message || data.detail || data.statusText || JSON.stringify(data);
+                showPopup(message, { data: data });
+              })
+              .catch(function (error) {
+                console.error("Falha ao enviar recurso:", error);
+                showPopup("Não foi possível enviar o recurso. Tente novamente em instantes.", { tone: "error" });
+              })
+              .finally(function () {
+                var originalLabel = recursoButton.getAttribute("data-original-text") || "Enviar recurso";
+                recursoButton.textContent = originalLabel;
+                atualizarFeedbackRecurso(false);
               });
           });
         }
