@@ -969,12 +969,28 @@
         }
 
         if (cepInput && ufInput) {
-          var initialCep = sanitizeDigits(cepInput.value);
-          var initialUf = String(ufInput.value || "").trim().toUpperCase();
-          if (initialCep.length === 8 && (!initialUf || initialUf === "UN")) {
-            lastCepConsulted = "";
-            handleCepLookup();
-          }
+          (function attemptInitialCepLookup(attempt) {
+            if (!cepInput || !ufInput) {
+              return;
+            }
+
+            var cepValue = sanitizeDigits(cepInput.value);
+            var ufValue = String(ufInput.value || "").trim().toUpperCase();
+            var shouldLookup = cepValue.length === 8 && (!ufValue || ufValue === "UN");
+
+            if (shouldLookup) {
+              lastCepConsulted = "";
+              handleCepLookup();
+              return;
+            }
+
+            var needsRetry = (!ufValue || ufValue === "UN") && attempt < 5;
+            if (needsRetry) {
+              window.setTimeout(function () {
+                attemptInitialCepLookup(attempt + 1);
+              }, 200);
+            }
+          })(0);
         }
 
         if (ufInput) {
