@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Secretaria de Administração e Gestão de Pessoas - SADGP — Portal de Formulários</title>
+    <title>Secretaria de Administração e Gestão de Pessoas - SADGP — Seleção Simplificada Hospital Veterinário do Recife</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -205,14 +205,23 @@
   </head>
   <body>
     <input type="hidden" id="authorization" value="{{ $('Code in JavaScript2').item.json.authorization }}" />
+    <input type="hidden" id="cpf" value="{{ $json.cpf }}" />
+    <input type="hidden" id="email" value="{{ $json.email }}" />
+    <input type="hidden" id="telefone" value="{{ $json.telefone }}" />
+    <input type="hidden" id="endereco" value="{{ $json.endereco }}" />
     <header class="site-header">
       <div class="container">
         <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
-        <h1 class="display-6 fw-semibold mt-3">Portal de Formulários e Seleções</h1>
+        <h1 class="display-6 fw-semibold mt-3">Seleção Simplificada Hospital Veterinário do Recife</h1>
         <p class="lead mt-2">
-          Centralize o acesso a editais, formulários e documentos obrigatórios utilizados nas seleções
-          simplificadas conduzidas pela Secretaria de Administração e Gestão de Pessoas - SADGP. Confira os prazos, leia os editais e realize o envio das
-          documentações exigidas com segurança.
+          A SECRETARIA DE ADMINISTRAÇÃO e o GABINETE DE PROTEÇÃO E DEFESA DOS ANIMAIS, com fundamento no Decreto nº XXXX, de XX de
+          xxxxxxxxx de 2025, tornam pública a Seleção Pública Simplificada destinada à contratação temporária de 41 (quarenta e um)
+          profissionais, sendo 36 na Saúde e 05 vagas para Analista em Saúde Animal – Veterinário, com lotação prevista para Técnico em
+          Saúde Animal 35 vagas; e Analista em Saúde Animal – Veterinário 06 vagas, para atuação no Hospital Veterinário do Recife – HVR.
+          A seleção será realizada pela Secretaria de Administração e Gestão de Pessoas – SADGP, a formação da Comissão Coordenadora será
+          composta pelos servidores da SADGP e da Secretaria Executiva dos Direitos dos Animais – SEDA, a fim de garantir a avaliação técnica e
+          multidisciplinar do certame. O Hospital Veterinário do Recife Professor Robson José Gomes de Melo, vinculado à Secretaria Executiva
+          dos Direitos dos Animais – SEDA, será o local de atuação dos profissionais selecionados.
         </p>
       </div>
     </header>
@@ -249,20 +258,29 @@
             </article>
           </div>
 
-          <div class="col-lg-6">
+          <div class="col-lg-6 d-flex flex-column gap-4">
+            <section class="publicacoes-panel bg-white rounded-4 border shadow-sm p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="h6 text-uppercase text-secondary mb-0">Publicações</h3>
+                <span class="badge text-bg-light text-primary">Atualizado automaticamente</span>
+              </div>
+              <ul class="list-unstyled mb-0" id="publicacoes-list">
+                <li class="text-muted">Carregando publicações...</li>
+              </ul>
+            </section>
             <article class="card card-programa">
               <div class="card-header">
                 <span class="badge text-bg-light text-uppercase text-primary">Atualização cadastral</span>
                 <h3 class="h5 mt-3 mb-1">Hospital Veterinário — Cadastro de Reservas</h3>
-                <p class="mb-0 text-muted">Formulário para manutenção dos dados dos candidatos aprovados</p>
+                <p class="mb-0 text-muted">Atualize exclusivamente e-mail, telefone e endereço para manter o cadastro atualizado.</p>
               </div>
               <div class="card-body">
                 <ul class="mb-0">
                   <li>Destinado aos candidatos classificados nas seleções de 2024-2025.</li>
-                  <li>Atualize telefones, endereços e anexos de comprovação.</li>
+                  <li>Os dados de contato serão enviados diretamente ao setor responsável.</li>
                   <li>Suporte: sad.hvr@recife.pe.gov.br.</li>
                 </ul>
-                <a class="btn btn-outline-primary" href="selecao-hvet.html">Acessar painel do cadastro</a>
+                <button class="btn btn-outline-primary mt-3" id="btn-atualizar-cadastro" type="button">Enviar atualização de contato</button>
               </div>
             </article>
           </div>
@@ -317,17 +335,9 @@
         </div>
         <div class="col-lg-5">
           <div class="updates-panel bg-white rounded-4 p-4 shadow-sm">
-            <h3 class="h6 text-uppercase text-secondary fw-bold mb-3">Comunicados recentes</h3>
-            <div class="mb-4">
-              <time datetime="2025-10-18">18 out 2025</time>
-              <p class="mb-1 fw-semibold">Publicação da retificação nº 01 do edital SAD Nº 01/2025.</p>
-              <p class="mb-0">Inclui novos modelos de autodeclaração e ajustes no cronograma das entrevistas.</p>
-            </div>
-            <div>
-              <time datetime="2025-10-15">15 out 2025</time>
-              <p class="mb-1 fw-semibold">Disponibilização do formulário eletrônico atualizado.</p>
-              <p class="mb-0">Todas as inscrições enviadas antes dessa data permanecem válidas e não necessitam reenvio.</p>
-            </div>
+            <h3 class="h6 text-uppercase text-secondary fw-bold mb-3">Orientações adicionais</h3>
+            <p class="mb-2">Mantenha seus dados de contato atualizados para receber comunicados oficiais sobre o andamento do certame.</p>
+            <p class="mb-0">As publicações com listas, retificações e convocações serão disponibilizadas automaticamente na área "Publicações" acima.</p>
           </div>
         </div>
       </section>
@@ -372,28 +382,131 @@
         var authorizationField = document.getElementById("authorization");
         var targetUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
         var redirectUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
+        var updateButton = document.getElementById("btn-atualizar-cadastro");
 
-        if (!button) {
-          return;
+        function getEmojiForUrl(url) {
+          var extension = (url.split(".").pop() || "").toLowerCase();
+          if (extension.includes("pdf")) return "📄";
+          if (["xls", "xlsx", "csv"].includes(extension)) return "📊";
+          if (["doc", "docx", "odt"].includes(extension)) return "📝";
+          if (["png", "jpg", "jpeg", "gif", "bmp", "svg"].includes(extension)) return "🖼️";
+          if (["zip", "rar", "7z"].includes(extension)) return "🗂️";
+          if (["mp4", "mov", "avi", "mkv", "webm"].includes(extension)) return "🎬";
+          if (["mp3", "wav", "ogg"].includes(extension)) return "🎧";
+          return "🔗";
         }
 
-        button.addEventListener("click", function () {
-          var authorization = authorizationField ? authorizationField.value : "";
-
-          fetch(targetUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ authorization: authorization }),
+        fetch("https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c")
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("Falha ao carregar publicações");
+            }
+            return response.json();
           })
-            .catch(function (error) {
-              console.error("Falha ao enviar autorização:", error);
-            })
-            .finally(function () {
-              window.location.href = redirectUrl;
+          .then(function (data) {
+            var list = document.getElementById("publicacoes-list");
+            if (!list) {
+              return;
+            }
+
+            list.innerHTML = "";
+
+            if (!Array.isArray(data) || data.length === 0) {
+              list.innerHTML = '<li class="text-muted">Nenhuma publicação disponível no momento.</li>';
+              return;
+            }
+
+            data.forEach(function (item) {
+              if (!item || !item.url || !item.description) {
+                return;
+              }
+
+              var emoji = getEmojiForUrl(item.url);
+              var listItem = document.createElement("li");
+              listItem.className = "mb-2";
+              listItem.innerHTML =
+                '<a class="link-primary fw-semibold" href="' +
+                item.url +
+                '" target="_blank" rel="noopener">' +
+                emoji +
+                " " +
+                item.description +
+                "</a>";
+              list.appendChild(listItem);
             });
-        });
+          })
+          .catch(function (error) {
+            console.error(error);
+            var list = document.getElementById("publicacoes-list");
+            if (list) {
+              list.innerHTML = '<li class="text-muted">Não foi possível carregar as publicações.</li>';
+            }
+          });
+
+        if (button) {
+          button.addEventListener("click", function () {
+            var authorization = authorizationField ? authorizationField.value : "";
+
+            fetch(targetUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ authorization: authorization }),
+            })
+              .catch(function (error) {
+                console.error("Falha ao enviar autorização:", error);
+              })
+              .finally(function () {
+                window.location.href = redirectUrl;
+              });
+          });
+        }
+
+        if (updateButton) {
+          updateButton.addEventListener("click", function () {
+            var cpf = document.getElementById("cpf");
+            var email = document.getElementById("email");
+            var telefone = document.getElementById("telefone");
+            var endereco = document.getElementById("endereco");
+
+            var payload = {
+              cpf: cpf ? cpf.value : "",
+              email: email ? email.value : "",
+              telefone: telefone ? telefone.value : "",
+              endereco: endereco ? endereco.value : "",
+            };
+
+            fetch("https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/204c8f95-ccdd-41e6-8ccf-40b7795a01fb", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            })
+              .then(function (response) {
+                return response
+                  .clone()
+                  .json()
+                  .catch(function () {
+                    return response.text();
+                  });
+              })
+              .then(function (data) {
+                if (typeof data === "string") {
+                  alert(data);
+                  return;
+                }
+
+                var message = data.message || JSON.stringify(data);
+                alert(message);
+              })
+              .catch(function (error) {
+                console.error("Falha ao enviar atualização cadastral:", error);
+                alert("Não foi possível enviar a atualização cadastral. Tente novamente em instantes.");
+              });
+          });
+        }
       });
     </script>
   </body>
