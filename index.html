@@ -350,7 +350,7 @@
                 <div class="mt-4 pt-3 border-top">
                   <h4 class="h6 text-uppercase text-secondary mb-2">Interposição de recursos</h4>
                   <p class="text-muted small mb-3">
-                    Informe o número da inscrição no formato <strong>SSHVR2025XXXXXX</strong>, anexe um único arquivo (até 10&nbsp;MB) e envie para registro do recurso.
+                    Informe o número da inscrição no formato <strong>SSHVR2025XXXXXX</strong>, selecione os anexos pertinentes (até 10&nbsp;MB cada) e envie para registro do recurso.
                   </p>
                   <details class="collapsible-form mt-3">
                     <summary>Preparar envio do recurso</summary>
@@ -360,10 +360,21 @@
                       <div class="form-text">Use o prefixo fixo SSHVR2025 seguido de 6 dígitos numéricos.</div>
                     </div>
                     <div class="mt-3">
-                      <label class="form-label" for="recurso-arquivo-input">Anexo do recurso</label>
-                      <input class="form-control" type="file" id="recurso-arquivo-input" name="arquivoRecurso" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.odt" required />
-                      <div class="form-text">Selecione apenas um arquivo em formato permitido com até 10&nbsp;MB.</div>
+                      <label class="form-label" for="recurso-arquivo-curricular">Recurso sobre análise curricular</label>
+                      <input class="form-control" type="file" id="recurso-arquivo-curricular" name="arquivoRecursoCurricular" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.odt" data-tipo="analiseCurricular" data-legenda="Recurso sobre análise curricular" />
+                      <div class="form-text">Anexe o documento referente à etapa de análise curricular (até 10&nbsp;MB).</div>
                     </div>
+                    <div class="mt-3">
+                      <label class="form-label" for="recurso-arquivo-laudo">Recurso de Laudo Médico para Pessoas com Deficiência</label>
+                      <input class="form-control" type="file" id="recurso-arquivo-laudo" name="arquivoRecursoLaudo" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.odt" data-tipo="laudoMedicoPcd" data-legenda="Recurso de Laudo Médico para Pessoas com Deficiência" />
+                      <div class="form-text">Utilize este campo para anexar o laudo médico PcD (até 10&nbsp;MB).</div>
+                    </div>
+                    <div class="mt-3">
+                      <label class="form-label" for="recurso-arquivo-autodeclaracao">Recurso de Autodeclaração — Candidatos Negros</label>
+                      <input class="form-control" type="file" id="recurso-arquivo-autodeclaracao" name="arquivoRecursoAutodeclaracao" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.odt" data-tipo="autodeclaracaoNegros" data-legenda="Recurso de Autodeclaração — Candidatos Negros" />
+                      <div class="form-text">Anexe o documento de autodeclaração para candidatos negros (até 10&nbsp;MB).</div>
+                    </div>
+                    <div class="mt-3 text-muted small">Selecione apenas os arquivos necessários para o seu recurso. Pelo menos um anexo deve ser informado.</div>
                   </details>
                   <button class="btn btn-outline-primary mt-3" id="btn-enviar-recurso" type="button" data-endpoint="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d2d44182-1ae3-47db-ab77-4ece9878e6dd" disabled>Enviar recurso</button>
                 </div>
@@ -515,20 +526,6 @@
               <p class="mb-0 text-muted">Resposta em até 2 dias úteis.</p>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
-              <h3 class="h6 text-uppercase text-secondary">Telefone</h3>
-              <p class="mb-1 fw-semibold">(81) 3355-0000</p>
-              <p class="mb-0 text-muted">Segunda a sexta-feira, das 9h às 16h.</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
-              <h3 class="h6 text-uppercase text-secondary">Atendimento presencial</h3>
-              <p class="mb-1 fw-semibold">Av. Cais do Apolo, 925 — Bairro do Recife</p>
-              <p class="mb-0 text-muted">Agendamento prévio obrigatório.</p>
-            </div>
-          </div>
         </div>
       </section>
     </main>
@@ -574,7 +571,11 @@
         var ufHidden = document.getElementById("uf");
         var recursoButton = document.getElementById("btn-enviar-recurso");
         var recursoNumeroInput = document.getElementById("recurso-numero-input");
-        var recursoArquivoInput = document.getElementById("recurso-arquivo-input");
+        var recursoArquivoInputs = [
+          { input: document.getElementById("recurso-arquivo-curricular"), tipo: "analiseCurricular" },
+          { input: document.getElementById("recurso-arquivo-laudo"), tipo: "laudoMedicoPcd" },
+          { input: document.getElementById("recurso-arquivo-autodeclaracao"), tipo: "autodeclaracaoNegros" },
+        ];
         var recursoEndpoint = recursoButton ? recursoButton.getAttribute("data-endpoint") : "";
         var recursoMaxFileSize = 10 * 1024 * 1024;
         var recursoPrefix = "SSHVR2025";
@@ -749,11 +750,13 @@
             recursoNumeroInput.classList.remove("is-invalid");
             delete recursoNumeroInput.dataset.touched;
           }
-          if (recursoArquivoInput) {
-            recursoArquivoInput.value = "";
-            recursoArquivoInput.classList.remove("is-invalid");
-            delete recursoArquivoInput.dataset.touched;
-          }
+          recursoArquivoInputs.forEach(function (entry) {
+            if (entry.input) {
+              entry.input.value = "";
+              entry.input.classList.remove("is-invalid");
+              delete entry.input.dataset.touched;
+            }
+          });
           atualizarFeedbackRecurso(false);
         }
 
@@ -987,28 +990,47 @@
           }
 
           var numeroValido = recursoPattern.test(numero);
-          var arquivo = recursoArquivoInput && recursoArquivoInput.files ? recursoArquivoInput.files[0] || null : null;
+          var arquivosSelecionados = recursoArquivoInputs
+            .map(function (entry) {
+              if (!entry.input || !entry.input.files || !entry.input.files[0]) {
+                return null;
+              }
+              return {
+                input: entry.input,
+                tipo: entry.tipo,
+                file: entry.input.files[0],
+              };
+            })
+            .filter(function (item) {
+              return item !== null;
+            });
 
           return {
             numero: numero,
             numeroValido: numeroValido,
-            arquivo: arquivo,
-            pronto: numeroValido && !!arquivo,
+            arquivos: arquivosSelecionados,
+            pronto: numeroValido && arquivosSelecionados.length > 0,
           };
         }
 
         function atualizarFeedbackRecurso(forceHighlight) {
           var state = collectResourceValues();
           var highlightNumero = forceHighlight || (recursoNumeroInput && recursoNumeroInput.dataset.touched === "true");
-          var highlightArquivo = forceHighlight || (recursoArquivoInput && recursoArquivoInput.dataset.touched === "true");
+          var algumArquivoSelecionado = state.arquivos.length > 0;
 
           if (recursoNumeroInput) {
             recursoNumeroInput.classList.toggle("is-invalid", highlightNumero && !state.numeroValido);
           }
 
-          if (recursoArquivoInput) {
-            recursoArquivoInput.classList.toggle("is-invalid", highlightArquivo && !state.arquivo);
-          }
+          recursoArquivoInputs.forEach(function (entry) {
+            if (!entry.input) {
+              return;
+            }
+            var input = entry.input;
+            var touched = forceHighlight || input.dataset.touched === "true";
+            var possuiArquivo = input.files && input.files[0];
+            input.classList.toggle("is-invalid", touched && !possuiArquivo && !algumArquivoSelecionado);
+          });
 
           if (recursoButton) {
             recursoButton.disabled = !state.pronto;
@@ -1178,16 +1200,19 @@
           });
         }
 
-        if (recursoArquivoInput) {
-          recursoArquivoInput.addEventListener("change", function () {
-            recursoArquivoInput.dataset.touched = "true";
+        recursoArquivoInputs.forEach(function (entry) {
+          if (!entry.input) {
+            return;
+          }
+          entry.input.addEventListener("change", function () {
+            entry.input.dataset.touched = "true";
             atualizarFeedbackRecurso(false);
           });
-          recursoArquivoInput.addEventListener("blur", function () {
-            recursoArquivoInput.dataset.touched = "true";
+          entry.input.addEventListener("blur", function () {
+            entry.input.dataset.touched = "true";
             atualizarFeedbackRecurso(false);
           });
-        }
+        });
 
         [emailInput, emailConfirmInput, telefoneInput, cepInput, logradouroInput, numeroInput, complementoInput, bairroInput, cidadeInput, ufInput]
           .filter(function (input) {
@@ -1451,17 +1476,19 @@
             if (recursoNumeroInput) {
               recursoNumeroInput.dataset.touched = "true";
             }
-            if (recursoArquivoInput) {
-              recursoArquivoInput.dataset.touched = "true";
-            }
+            recursoArquivoInputs.forEach(function (entry) {
+              if (entry.input) {
+                entry.input.dataset.touched = "true";
+              }
+            });
             var state = atualizarFeedbackRecurso(true);
             if (!state.pronto) {
               var erros = [];
               if (!state.numeroValido) {
                 erros.push("Informe o número da inscrição no formato SSHVR2025XXXXXX.");
               }
-              if (!state.arquivo) {
-                erros.push("Selecione o arquivo do recurso para prosseguir.");
+              if (state.arquivos.length === 0) {
+                erros.push("Selecione ao menos um arquivo de recurso para prosseguir.");
               }
               showPopup(erros.join(" "), { tone: "warning", data: { status: "warning" } });
               return;
@@ -1472,8 +1499,15 @@
               return;
             }
 
-            if (state.arquivo && state.arquivo.size > recursoMaxFileSize) {
-              showPopup("O arquivo do recurso deve ter no máximo 10 MB.", { tone: "warning", data: { status: "warning" } });
+            var arquivoExcedido = state.arquivos.find(function (item) {
+              return item.file && item.file.size > recursoMaxFileSize;
+            });
+            if (arquivoExcedido) {
+              var legendaArquivo = arquivoExcedido.input ? arquivoExcedido.input.getAttribute("data-legenda") : "arquivo do recurso";
+              if (arquivoExcedido.input) {
+                arquivoExcedido.input.classList.add("is-invalid");
+              }
+              showPopup("O anexo \"" + legendaArquivo + "\" deve ter no máximo 10 MB.", { tone: "warning", data: { status: "warning" } });
               return;
             }
 
@@ -1481,18 +1515,33 @@
             recursoButton.textContent = "Enviando...";
             recursoButton.disabled = true;
 
-            lerArquivoComoBase64(state.arquivo)
-              .then(function (base64) {
-                var cpfField = document.getElementById("cpf");
-                var payload = {
-                  numeroInscricao: state.numero,
-                  arquivoNome: state.arquivo ? state.arquivo.name : "",
-                  arquivoMime: state.arquivo ? state.arquivo.type : "",
-                  arquivoTamanho: state.arquivo ? state.arquivo.size : 0,
-                  arquivoBase64: base64,
-                  cpf: cpfField ? cpfField.value : "",
-                  acao: "recurso",
-                };
+            var cpfField = document.getElementById("cpf");
+
+            Promise.all(
+              state.arquivos.map(function (item) {
+                return lerArquivoComoBase64(item.file).then(function (base64) {
+                  var input = item.input;
+                  var legenda = input ? input.getAttribute("data-legenda") : "";
+                  return {
+                    tipo: item.tipo,
+                    legenda: legenda || item.tipo,
+                    nomeOriginal: item.file.name,
+                    nomeComInscricao: state.numero + "_" + item.file.name,
+                    mime: item.file.type,
+                    tamanho: item.file.size,
+                    conteudoBase64: base64,
+                  };
+                });
+              })
+            )
+                .then(function (arquivosConvertidos) {
+                  var payload = {
+                    numeroInscricao: state.numero,
+                    cpf: cpfField ? cpfField.value : "",
+                    anexos: arquivosConvertidos,
+                    arquivos: arquivosConvertidos,
+                    acao: "recurso",
+                  };
 
                 return fetch(recursoEndpoint, {
                   method: "POST",
@@ -1561,6 +1610,7 @@
               .finally(function () {
                 var originalLabel = recursoButton.getAttribute("data-original-text") || "Enviar recurso";
                 recursoButton.textContent = originalLabel;
+                recursoButton.disabled = false;
                 atualizarFeedbackRecurso(false);
               });
           });
