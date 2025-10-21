@@ -1515,6 +1515,17 @@
                     <option value="Não">Não</option>
                   </select>
                 </div>
+                <div class="col-md-6 hidden" id="tipoPcdGroup">
+                  <label for="tipo_pcd" class="form-label">Tipo de deficiência</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="tipo_pcd"
+                    name="tipo_pcd"
+                    value="{{ String($json.tipo_pcd ?? '').trim() }}"
+                    data-force-required="true"
+                  />
+                </div>
                 <div class="col-12" id="condicaoEspecialGroup">
                   <span class="form-label">Necessita de condição especial?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
@@ -1541,17 +1552,6 @@
                       <label class="form-check-label" for="condicao_especial_nao">Não</label>
                     </div>
                   </div>
-                </div>
-                <div class="col-md-6 hidden" id="tipoPcdGroup">
-                  <label for="tipo_pcd" class="form-label">Tipo de deficiência</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="tipo_pcd"
-                    name="tipo_pcd"
-                    value="{{ String($json.tipo_pcd ?? '').trim() }}"
-                    data-force-required="true"
-                  />
                 </div>
                 <div class="col-md-6 hidden" id="pcdCidGroup">
                   <label for="pcd_cid" class="form-label">CID (se houver)</label>
