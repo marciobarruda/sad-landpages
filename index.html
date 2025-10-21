@@ -40,6 +40,8 @@
       header .lead {
         color: rgba(255, 255, 255, 0.82);
         max-width: 720px;
+        font-size: 1rem;
+        line-height: 1.65;
       }
 
       .badge-open {
@@ -70,6 +72,57 @@
       .user-greeting::before {
         content: "👋";
         font-size: 1.4rem;
+      }
+
+      .collapsible-form {
+        border: 1px solid rgba(0, 83, 164, 0.15);
+        border-radius: 0.9rem;
+        background: rgba(0, 83, 164, 0.05);
+        padding: 1rem 1.25rem;
+      }
+
+      .collapsible-form summary {
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+      }
+
+      .collapsible-form summary::marker {
+        display: none;
+      }
+
+      .collapsible-form summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .collapsible-form summary::before {
+        content: "➕";
+        font-size: 0.9rem;
+        transition: transform 0.2s ease;
+      }
+
+      .collapsible-form[open] summary::before {
+        transform: rotate(45deg);
+      }
+
+      .collapsible-form .form-label {
+        font-weight: 600;
+        color: var(--text-strong);
+      }
+
+      .collapsible-form .form-text {
+        color: var(--text-muted);
+      }
+
+      #publicacoes-list time {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--brand-secondary);
+        letter-spacing: 0.05em;
       }
 
       .section-title {
@@ -214,14 +267,10 @@
         <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
         <h1 class="display-6 fw-semibold mt-3">Seleção Simplificada Hospital Veterinário do Recife</h1>
         <p class="lead mt-2">
-          A SECRETARIA DE ADMINISTRAÇÃO e o GABINETE DE PROTEÇÃO E DEFESA DOS ANIMAIS, com fundamento no Decreto nº XXXX, de XX de
-          xxxxxxxxx de 2025, tornam pública a Seleção Pública Simplificada destinada à contratação temporária de 41 (quarenta e um)
-          profissionais, sendo 36 na Saúde e 05 vagas para Analista em Saúde Animal – Veterinário, com lotação prevista para Técnico em
-          Saúde Animal 35 vagas; e Analista em Saúde Animal – Veterinário 06 vagas, para atuação no Hospital Veterinário do Recife – HVR.
-          A seleção será realizada pela Secretaria de Administração e Gestão de Pessoas – SADGP, a formação da Comissão Coordenadora será
-          composta pelos servidores da SADGP e da Secretaria Executiva dos Direitos dos Animais – SEDA, a fim de garantir a avaliação técnica e
-          multidisciplinar do certame. O Hospital Veterinário do Recife Professor Robson José Gomes de Melo, vinculado à Secretaria Executiva
-          dos Direitos dos Animais – SEDA, será o local de atuação dos profissionais selecionados.
+          A Seleção Pública Simplificada oferta 41 vagas temporárias para técnicos e analistas em saúde animal que atuarão no Hospital
+          Veterinário do Recife Professor Robson José Gomes de Melo. O processo é conduzido pela Secretaria de Administração e Gestão de
+          Pessoas (SADGP) em parceria com a Secretaria Executiva dos Direitos dos Animais (SEDA), garantindo avaliação técnica e atendimento às
+          demandas do serviço.
         </p>
       </div>
     </header>
@@ -280,6 +329,24 @@
                   <li>Os dados de contato serão enviados diretamente ao setor responsável.</li>
                   <li>Suporte: sad.hvr@recife.pe.gov.br.</li>
                 </ul>
+                <details class="collapsible-form mt-3">
+                  <summary>Atualizar dados de contato</summary>
+                  <div class="mt-3">
+                    <label class="form-label" for="email-input">E-mail</label>
+                    <input class="form-control" type="email" id="email-input" name="email" value="{{ $json.email }}" placeholder="nome@exemplo.com" />
+                    <div class="form-text">Informe o endereço eletrônico para receber comunicados oficiais.</div>
+                  </div>
+                  <div class="mt-3">
+                    <label class="form-label" for="telefone-input">Telefone</label>
+                    <input class="form-control" type="tel" id="telefone-input" name="telefone" value="{{ $json.telefone }}" placeholder="(81) 99999-9999" />
+                    <div class="form-text">Utilize um telefone ativo com WhatsApp para contatos urgentes.</div>
+                  </div>
+                  <div class="mt-3">
+                    <label class="form-label" for="endereco-input">Endereço</label>
+                    <textarea class="form-control" id="endereco-input" name="endereco" rows="2" placeholder="Rua, número, bairro, cidade" spellcheck="false">{{ $json.endereco }}</textarea>
+                    <div class="form-text">Inclua logradouro, número, bairro e cidade.</div>
+                  </div>
+                </details>
                 <button class="btn btn-outline-primary mt-3" id="btn-atualizar-cadastro" type="button">Enviar atualização de contato</button>
               </div>
             </article>
@@ -383,6 +450,12 @@
         var targetUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
         var redirectUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
         var updateButton = document.getElementById("btn-atualizar-cadastro");
+        var emailInput = document.getElementById("email-input");
+        var telefoneInput = document.getElementById("telefone-input");
+        var enderecoInput = document.getElementById("endereco-input");
+        var emailHidden = document.getElementById("email");
+        var telefoneHidden = document.getElementById("telefone");
+        var enderecoHidden = document.getElementById("endereco");
 
         function getEmojiForUrl(url) {
           var extension = (url.split(".").pop() || "").toLowerCase();
@@ -394,6 +467,37 @@
           if (["mp4", "mov", "avi", "mkv", "webm"].includes(extension)) return "🎬";
           if (["mp3", "wav", "ogg"].includes(extension)) return "🎧";
           return "🔗";
+        }
+
+        function parseDate(raw) {
+          if (!raw || typeof raw !== "string") {
+            return null;
+          }
+
+          var normalized = raw.trim();
+          var directDate = new Date(normalized);
+          if (!isNaN(directDate.getTime())) {
+            return directDate;
+          }
+
+          var brPattern = /^([0-3]?\d)\/([0-1]?\d)\/(\d{4})$/;
+          var match = normalized.match(brPattern);
+          if (match) {
+            var day = parseInt(match[1], 10);
+            var month = parseInt(match[2], 10) - 1;
+            var year = parseInt(match[3], 10);
+            var parsed = new Date(year, month, day);
+            return isNaN(parsed.getTime()) ? null : parsed;
+          }
+
+          return null;
+        }
+
+        function formatDate(dateObj) {
+          if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
+            return "";
+          }
+          return dateObj.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
         }
 
         fetch("https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/7b3f9046-f11b-4cc3-b570-c3e586748f6c")
@@ -411,29 +515,69 @@
 
             list.innerHTML = "";
 
-            if (!Array.isArray(data) || data.length === 0) {
+            var entries = [];
+
+            if (Array.isArray(data)) {
+              entries = data;
+            } else if (data && Array.isArray(data.items)) {
+              entries = data.items;
+            }
+
+            if (!Array.isArray(entries) || entries.length === 0) {
               list.innerHTML = '<li class="text-muted">Nenhuma publicação disponível no momento.</li>';
               return;
             }
 
-            data.forEach(function (item) {
-              if (!item || !item.url || !item.description) {
-                return;
-              }
+            var processedEntries = entries
+              .map(function (item) {
+                if (!item || !item.url || !item.description) {
+                  return null;
+                }
 
-              var emoji = getEmojiForUrl(item.url);
-              var listItem = document.createElement("li");
-              listItem.className = "mb-2";
-              listItem.innerHTML =
-                '<a class="link-primary fw-semibold" href="' +
-                item.url +
-                '" target="_blank" rel="noopener">' +
-                emoji +
-                " " +
-                item.description +
-                "</a>";
-              list.appendChild(listItem);
-            });
+                var rawDate = item.date || item.data || item.dt || item.createdAt;
+                var dateObj = parseDate(rawDate);
+
+                return {
+                  url: item.url,
+                  description: item.description,
+                  dateObj: dateObj,
+                  rawDate: rawDate,
+                };
+              })
+              .filter(function (entry) {
+                return entry !== null;
+              });
+
+            if (!processedEntries.length) {
+              list.innerHTML = '<li class="text-muted">Nenhuma publicação disponível no momento.</li>';
+              return;
+            }
+
+            processedEntries
+              .sort(function (a, b) {
+                var timeA = a.dateObj ? a.dateObj.getTime() : 0;
+                var timeB = b.dateObj ? b.dateObj.getTime() : 0;
+                return timeB - timeA;
+              })
+              .forEach(function (entry) {
+                var emoji = getEmojiForUrl(entry.url);
+                var formattedDate = formatDate(entry.dateObj) || (entry.rawDate || "");
+                var listItem = document.createElement("li");
+                listItem.className = "mb-2";
+                listItem.innerHTML =
+                  '<div class="d-flex flex-column flex-sm-row align-items-sm-center gap-2">' +
+                  (formattedDate
+                    ? '<time datetime="' + (entry.dateObj ? entry.dateObj.toISOString() : entry.rawDate || "") + '">' + formattedDate + "</time>"
+                    : "") +
+                  '<a class="link-primary fw-semibold" href="' +
+                  entry.url +
+                  '" target="_blank" rel="noopener">' +
+                  emoji +
+                  " " +
+                  entry.description +
+                  "</a></div>";
+                list.appendChild(listItem);
+              });
           })
           .catch(function (error) {
             console.error(error);
@@ -466,15 +610,25 @@
         if (updateButton) {
           updateButton.addEventListener("click", function () {
             var cpf = document.getElementById("cpf");
-            var email = document.getElementById("email");
-            var telefone = document.getElementById("telefone");
-            var endereco = document.getElementById("endereco");
+            var emailValue = emailInput ? emailInput.value.trim() : "";
+            var telefoneValue = telefoneInput ? telefoneInput.value.trim() : "";
+            var enderecoValue = enderecoInput ? enderecoInput.value.trim() : "";
+
+            if (emailHidden) {
+              emailHidden.value = emailValue;
+            }
+            if (telefoneHidden) {
+              telefoneHidden.value = telefoneValue;
+            }
+            if (enderecoHidden) {
+              enderecoHidden.value = enderecoValue;
+            }
 
             var payload = {
               cpf: cpf ? cpf.value : "",
-              email: email ? email.value : "",
-              telefone: telefone ? telefone.value : "",
-              endereco: endereco ? endereco.value : "",
+              email: emailValue,
+              telefone: telefoneValue,
+              endereco: enderecoValue,
             };
 
             fetch("https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/204c8f95-ccdd-41e6-8ccf-40b7795a01fb", {
