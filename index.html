@@ -347,6 +347,26 @@
                 <div class="d-flex flex-wrap gap-2 mt-4">
                   <button class="btn btn-primary px-4 py-2" id="btn-preencher-inscricao" type="button">Preencher formulário de inscrição</button>
                 </div>
+                <div class="mt-4 pt-3 border-top">
+                  <h4 class="h6 text-uppercase text-secondary mb-2">Interposição de recursos</h4>
+                  <p class="text-muted small mb-3">
+                    Informe o número da inscrição no formato <strong>SSHVR2025XXXXXX</strong>, anexe um único arquivo (até 10&nbsp;MB) e envie para registro do recurso.
+                  </p>
+                  <details class="collapsible-form mt-3">
+                    <summary>Preparar envio do recurso</summary>
+                    <div class="mt-3">
+                      <label class="form-label" for="recurso-numero-input">Número da inscrição</label>
+                      <input class="form-control" type="text" id="recurso-numero-input" name="numeroInscricao" placeholder="SSHVR2025XXXXXX" autocomplete="off" inputmode="text" pattern="SSHVR2025\d{6}" maxlength="15" required />
+                      <div class="form-text">Use o prefixo fixo SSHVR2025 seguido de 6 dígitos numéricos.</div>
+                    </div>
+                    <div class="mt-3">
+                      <label class="form-label" for="recurso-arquivo-input">Anexo do recurso</label>
+                      <input class="form-control" type="file" id="recurso-arquivo-input" name="arquivoRecurso" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.odt" required />
+                      <div class="form-text">Selecione apenas um arquivo em formato permitido com até 10&nbsp;MB.</div>
+                    </div>
+                  </details>
+                  <button class="btn btn-outline-primary mt-3" id="btn-enviar-recurso" type="button" data-endpoint="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/d2d44182-1ae3-47db-ab77-4ece9878e6dd" disabled>Enviar recurso</button>
+                </div>
               </div>
             </article>
           </div>
@@ -424,33 +444,6 @@
                   </div>
                 </details>
                 <button class="btn btn-outline-primary mt-3" id="btn-atualizar-cadastro" type="button" disabled>Enviar atualização de contato</button>
-              </div>
-            </article>
-            <article class="card card-programa">
-              <div class="card-header">
-                <span class="badge text-bg-light text-uppercase text-primary">Recursos</span>
-                <h3 class="h5 mt-3 mb-1">Interposição de recursos</h3>
-                <p class="mb-0 text-muted">Envie o recurso com o número da inscrição e um único anexo durante o período previsto no edital.</p>
-              </div>
-              <div class="card-body">
-                <ul class="mb-0">
-                  <li>Prepare o arquivo em formato PDF, imagem ou documento de texto com até 10&nbsp;MB.</li>
-                  <li>Confira os dados antes de enviar para que o protocolo seja registrado corretamente.</li>
-                </ul>
-                <details class="collapsible-form mt-3">
-                  <summary>Preparar envio do recurso</summary>
-                  <div class="mt-3">
-                    <label class="form-label" for="recurso-numero-input">Número da inscrição</label>
-                    <input class="form-control" type="text" id="recurso-numero-input" name="numeroInscricao" placeholder="Digite apenas números" inputmode="numeric" required />
-                    <div class="form-text">Informe o número exato da inscrição sem pontos ou traços.</div>
-                  </div>
-                  <div class="mt-3">
-                    <label class="form-label" for="recurso-arquivo-input">Anexo do recurso</label>
-                    <input class="form-control" type="file" id="recurso-arquivo-input" name="arquivoRecurso" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.odt" required />
-                    <div class="form-text">Selecione apenas um arquivo (até 10&nbsp;MB) contendo a fundamentação do recurso.</div>
-                  </div>
-                </details>
-                <button class="btn btn-outline-primary mt-3" id="btn-enviar-recurso" type="button" data-endpoint="https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/204c8f95-ccdd-41e6-8ccf-40b7795a01fb" disabled>Enviar recurso</button>
               </div>
             </article>
           </div>
@@ -584,6 +577,9 @@
         var recursoArquivoInput = document.getElementById("recurso-arquivo-input");
         var recursoEndpoint = recursoButton ? recursoButton.getAttribute("data-endpoint") : "";
         var recursoMaxFileSize = 10 * 1024 * 1024;
+        var recursoPrefix = "SSHVR2025";
+        var recursoDigits = 6;
+        var recursoPattern = /^SSHVR2025\d{6}$/;
         var modalBackdrop = document.getElementById("feedback-modal");
         var modalTitle = document.getElementById("feedback-modal-title");
         var modalMessage = document.getElementById("feedback-modal-message");
@@ -592,6 +588,19 @@
 
         function sanitizeDigits(value) {
           return (value || "").replace(/\D/g, "");
+        }
+
+        function normalizeInscricao(value) {
+          var raw = (value || "").toString().toUpperCase();
+          var digitsPart;
+
+          if (raw.startsWith(recursoPrefix)) {
+            digitsPart = raw.slice(recursoPrefix.length).replace(/\D/g, "");
+          } else {
+            digitsPart = raw.replace(/\D/g, "");
+          }
+
+          return recursoPrefix + digitsPart.slice(0, recursoDigits);
         }
 
         function determineToneFromContent(message, data) {
@@ -922,17 +931,22 @@
         }
 
         function collectResourceValues() {
-          var numero = recursoNumeroInput ? sanitizeDigits(recursoNumeroInput.value).slice(0, 20) : "";
-          if (recursoNumeroInput && recursoNumeroInput.value !== numero) {
-            recursoNumeroInput.value = numero;
+          var numero = "";
+          if (recursoNumeroInput) {
+            numero = normalizeInscricao(recursoNumeroInput.value);
+            if (recursoNumeroInput.value !== numero) {
+              recursoNumeroInput.value = numero;
+            }
           }
 
+          var numeroValido = recursoPattern.test(numero);
           var arquivo = recursoArquivoInput && recursoArquivoInput.files ? recursoArquivoInput.files[0] || null : null;
 
           return {
             numero: numero,
+            numeroValido: numeroValido,
             arquivo: arquivo,
-            pronto: !!numero && !!arquivo,
+            pronto: numeroValido && !!arquivo,
           };
         }
 
@@ -942,7 +956,7 @@
           var highlightArquivo = forceHighlight || (recursoArquivoInput && recursoArquivoInput.dataset.touched === "true");
 
           if (recursoNumeroInput) {
-            recursoNumeroInput.classList.toggle("is-invalid", highlightNumero && !state.numero);
+            recursoNumeroInput.classList.toggle("is-invalid", highlightNumero && !state.numeroValido);
           }
 
           if (recursoArquivoInput) {
@@ -1100,8 +1114,16 @@
 
         if (recursoNumeroInput) {
           recursoNumeroInput.addEventListener("input", function () {
-            recursoNumeroInput.value = sanitizeDigits(recursoNumeroInput.value).slice(0, 20);
+            var normalized = normalizeInscricao(recursoNumeroInput.value);
+            if (recursoNumeroInput.value !== normalized) {
+              recursoNumeroInput.value = normalized;
+            }
             atualizarFeedbackRecurso(false);
+          });
+          recursoNumeroInput.addEventListener("focus", function () {
+            if (!recursoNumeroInput.value) {
+              recursoNumeroInput.value = recursoPrefix;
+            }
           });
           recursoNumeroInput.addEventListener("blur", function () {
             recursoNumeroInput.dataset.touched = "true";
@@ -1352,7 +1374,14 @@
             }
             var state = atualizarFeedbackRecurso(true);
             if (!state.pronto) {
-              showPopup("Preencha o número da inscrição e selecione o arquivo do recurso para prosseguir.", { tone: "warning", data: { status: "warning" } });
+              var erros = [];
+              if (!state.numeroValido) {
+                erros.push("Informe o número da inscrição no formato SSHVR2025XXXXXX.");
+              }
+              if (!state.arquivo) {
+                erros.push("Selecione o arquivo do recurso para prosseguir.");
+              }
+              showPopup(erros.join(" "), { tone: "warning", data: { status: "warning" } });
               return;
             }
 
