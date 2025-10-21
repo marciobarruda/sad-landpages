@@ -381,7 +381,7 @@
                   </div>
                   <div class="mt-3">
                     <label class="form-label" for="email-confirm-input">Confirmar e-mail</label>
-                    <input class="form-control" type="email" id="email-confirm-input" name="emailConfirm" value="{{ $json.email }}" placeholder="Confirme seu e-mail" autocomplete="email" required />
+                    <input class="form-control" type="email" id="email-confirm-input" name="emailConfirm" value="" placeholder="Confirme seu e-mail" autocomplete="email" required />
                     <div class="form-text">Digite novamente para validar o endereço informado.</div>
                   </div>
                   <div class="mt-3">
@@ -632,7 +632,10 @@
             modalTitle.textContent = title;
           }
           if (modalMessage) {
-            modalMessage.textContent = msg;
+            var trimmedMessage = msg.trim();
+            var complementoAviso = "Atualize também as suas informações cadastrais no ConectaRecife.";
+            var finalMessage = trimmedMessage ? trimmedMessage + " " + complementoAviso : complementoAviso;
+            modalMessage.textContent = finalMessage;
           }
           if (modalBackdrop) {
             modalBackdrop.classList.add("active");
@@ -963,6 +966,15 @@
           cepInput.addEventListener("change", handleCepLookup);
           cepInput.addEventListener("blur", handleCepLookup);
           cepInput.value = sanitizeDigits(cepInput.value).slice(0, 8);
+        }
+
+        if (cepInput && ufInput) {
+          var initialCep = sanitizeDigits(cepInput.value);
+          var initialUf = String(ufInput.value || "").trim().toUpperCase();
+          if (initialCep.length === 8 && (!initialUf || initialUf === "UN")) {
+            lastCepConsulted = "";
+            handleCepLookup();
+          }
         }
 
         if (ufInput) {
