@@ -641,7 +641,7 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
+        <span class="badge-open">Secretaria de Administração - SAD • Prefeitura do Recife</span>
         <h1 class="display-6 fw-semibold mt-3">Seleção Simplificada Hospital Veterinário do Recife</h1>
         <p class="lead mt-2">
           Inscrições abertas até 23:59:59 do dia 31 de outubro de 2025
@@ -655,7 +655,7 @@
         class="hero-image"
       />
        <div class="hero-content">
-        <span class="hero-badge">Secretaria de Administração e Gestão de Pessoas</span>
+        <span class="hero-badge">Secretaria de Administração - SAD</span>
         <h1 class="hero-title">Seleção Simplificada — Hospital Veterinário do Recife</h1>
         <p class="hero-subtitle">Complete as etapas abaixo para enviar sua inscrição</p>
       </div>
@@ -1515,7 +1515,7 @@
                     <option value="Não">Não</option>
                   </select>
                 </div>
-                <div class="col-md-4 hidden" id="condicaoEspecialGroup">
+                <div class="col-12" id="condicaoEspecialGroup">
                   <span class="form-label">Necessita de condição especial?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
                     <div class="form-check">
@@ -2590,10 +2590,7 @@
       const updatePCD = () => {
         const select = document.getElementById('is_pcd');
         const isYes = select && select.value === 'Sim';
-        const condicaoGroup = document.getElementById('condicaoEspecialGroup');
-        const necessidadeGroup = document.getElementById('necessidadeGroup');
         const docsGroup = document.getElementById('pcdDocs');
-        toggleHiddenGroup(isYes, condicaoGroup);
         toggleHiddenGroup(isYes, document.getElementById('tipoPcdGroup'));
         toggleHiddenGroup(isYes, document.getElementById('pcdCidGroup'));
         toggleHiddenGroup(isYes, docsGroup);
@@ -2605,28 +2602,20 @@
           });
         }
         if (!isYes) {
-          document.querySelectorAll('input[name="condicao_especial"]').forEach((input) => {
-            input.checked = false;
-          });
           const tipo = document.getElementById('tipo_pcd');
           const cid = document.getElementById('pcd_cid');
-          const necessidade = document.getElementById('necessidade');
           if (tipo) tipo.value = '';
           if (cid) cid.value = '';
-          if (necessidade) necessidade.value = '';
           if (docsGroup) {
             docsGroup.querySelectorAll('.upload-input').forEach(resetUploadIndicator);
           }
-          toggleHiddenGroup(false, necessidadeGroup);
-        } else {
-          updateNecessidade();
         }
+        updateNecessidade();
       };
 
       const updateNecessidade = () => {
         const sim = document.getElementById('condicao_especial_sim');
-        const isPcd = document.getElementById('is_pcd')?.value === 'Sim';
-        const shouldShow = Boolean(sim && sim.checked && isPcd);
+        const shouldShow = Boolean(sim && sim.checked);
         toggleHiddenGroup(shouldShow, document.getElementById('necessidadeGroup'));
         if (!shouldShow) {
           const necessidade = document.getElementById('necessidade');
