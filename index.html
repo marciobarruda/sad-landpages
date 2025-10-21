@@ -584,6 +584,7 @@
         var modalTitle = document.getElementById("feedback-modal-title");
         var modalMessage = document.getElementById("feedback-modal-message");
         var modalClose = document.getElementById("feedback-modal-close");
+        var popupCloseHandler = null;
         var lastCepConsulted = "";
 
         function sanitizeDigits(value) {
@@ -685,6 +686,7 @@
           if (modalClose) {
             modalClose.focus();
           }
+          popupCloseHandler = options && typeof options.onClose === "function" ? options.onClose : null;
         }
 
         function hidePopup() {
@@ -692,10 +694,18 @@
             modalBackdrop.classList.remove("active");
             modalBackdrop.setAttribute("aria-hidden", "true");
           }
+          popupCloseHandler = null;
         }
 
         if (modalClose) {
-          modalClose.addEventListener("click", hidePopup);
+          modalClose.addEventListener("click", function () {
+            if (typeof popupCloseHandler === "function") {
+              var handler = popupCloseHandler;
+              popupCloseHandler = null;
+              handler();
+            }
+            hidePopup();
+          });
         }
         if (modalBackdrop) {
           modalBackdrop.addEventListener("click", function (event) {
@@ -709,6 +719,43 @@
             hidePopup();
           }
         });
+
+        function cleanupUpdateForm() {
+          [
+            emailInput,
+            emailConfirmInput,
+            telefoneInput,
+            cepInput,
+            logradouroInput,
+            numeroInput,
+            complementoInput,
+            bairroInput,
+            cidadeInput,
+            ufInput,
+          ].forEach(function (input) {
+            if (input) {
+              input.value = "";
+              input.classList.remove("is-invalid");
+            }
+          });
+
+          lastCepConsulted = "";
+          handleInputChange();
+        }
+
+        function cleanupRecursoForm() {
+          if (recursoNumeroInput) {
+            recursoNumeroInput.value = "";
+            recursoNumeroInput.classList.remove("is-invalid");
+            delete recursoNumeroInput.dataset.touched;
+          }
+          if (recursoArquivoInput) {
+            recursoArquivoInput.value = "";
+            recursoArquivoInput.classList.remove("is-invalid");
+            delete recursoArquivoInput.dataset.touched;
+          }
+          atualizarFeedbackRecurso(false);
+        }
 
         function collectUpdateValues() {
           var cpfField = document.getElementById("cpf");
@@ -1346,16 +1393,51 @@
                   .json()
                   .catch(function () {
                     return response.text();
+                  })
+                  .then(function (parsed) {
+                    return { parsed: parsed, ok: response.ok, status: response.status };
                   });
               })
-              .then(function (data) {
+              .then(function (result) {
+                var data = result.parsed;
+                var isSuccess = !!result.ok;
+                var message;
+                var tone;
+
                 if (typeof data === "string") {
-                  showPopup(data, { data: null });
-                  return;
+                  message = data;
+                  tone = determineToneFromContent(message, null);
+                } else {
+                  var payloadMessage = data && (data.message || data.detail || data.statusText || data.title);
+                  message = payloadMessage || JSON.stringify(data);
+                  tone = determineToneFromContent(message, data);
+
+                  if (data && typeof data.success === "boolean") {
+                    isSuccess = data.success;
+                  } else if (data && typeof data.status === "string") {
+                    var normalizedStatus = data.status.toLowerCase();
+                    if (normalizedStatus === "success" || normalizedStatus === "sucesso" || normalizedStatus === "ok") {
+                      isSuccess = true;
+                    }
+                    if (normalizedStatus === "erro" || normalizedStatus === "error" || normalizedStatus === "falha") {
+                      isSuccess = false;
+                    }
+                  }
                 }
 
-                var message = data.message || data.detail || JSON.stringify(data);
-                showPopup(message, { data: data });
+                if (tone === "error" || tone === "warning") {
+                  isSuccess = false;
+                }
+
+                if (!tone && isSuccess) {
+                  tone = "success";
+                }
+
+                showPopup(message, {
+                  data: typeof data === "string" ? null : data,
+                  tone: tone,
+                  onClose: isSuccess ? cleanupUpdateForm : null,
+                });
               })
               .catch(function (error) {
                 console.error("Falha ao enviar atualização cadastral:", error);
@@ -1426,16 +1508,51 @@
                   .json()
                   .catch(function () {
                     return response.text();
+                  })
+                  .then(function (parsed) {
+                    return { parsed: parsed, ok: response.ok, status: response.status };
                   });
               })
-              .then(function (data) {
+              .then(function (result) {
+                var data = result.parsed;
+                var isSuccess = !!result.ok;
+                var message;
+                var tone;
+
                 if (typeof data === "string") {
-                  showPopup(data, { data: null });
-                  return;
+                  message = data;
+                  tone = determineToneFromContent(message, null);
+                } else {
+                  var payloadMessage = data && (data.message || data.detail || data.statusText || data.title);
+                  message = payloadMessage || JSON.stringify(data);
+                  tone = determineToneFromContent(message, data);
+
+                  if (data && typeof data.success === "boolean") {
+                    isSuccess = data.success;
+                  } else if (data && typeof data.status === "string") {
+                    var normalizedStatus = data.status.toLowerCase();
+                    if (normalizedStatus === "success" || normalizedStatus === "sucesso" || normalizedStatus === "ok") {
+                      isSuccess = true;
+                    }
+                    if (normalizedStatus === "erro" || normalizedStatus === "error" || normalizedStatus === "falha") {
+                      isSuccess = false;
+                    }
+                  }
                 }
 
-                var message = data.message || data.detail || data.statusText || JSON.stringify(data);
-                showPopup(message, { data: data });
+                if (tone === "error" || tone === "warning") {
+                  isSuccess = false;
+                }
+
+                if (!tone && isSuccess) {
+                  tone = "success";
+                }
+
+                showPopup(message, {
+                  data: typeof data === "string" ? null : data,
+                  tone: tone,
+                  onClose: isSuccess ? cleanupRecursoForm : null,
+                });
               })
               .catch(function (error) {
                 console.error("Falha ao enviar recurso:", error);
