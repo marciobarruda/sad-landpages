@@ -117,6 +117,43 @@
         color: var(--text-muted);
       }
 
+      .feedback-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(27, 38, 59, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        z-index: 1050;
+      }
+
+      .feedback-modal-backdrop.active {
+        display: flex;
+      }
+
+      .feedback-modal {
+        background: #ffffff;
+        border-radius: 1rem;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+        padding: 1.75rem;
+      }
+
+      .feedback-modal-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-strong);
+      }
+
+      .feedback-modal button {
+        border-radius: 999px;
+        padding-inline: 1.5rem;
+        font-weight: 600;
+      }
+
       #publicacoes-list time {
         font-size: 0.8rem;
         font-weight: 600;
@@ -261,16 +298,21 @@
     <input type="hidden" id="cpf" value="{{ $json.cpf }}" />
     <input type="hidden" id="email" value="{{ $json.email }}" />
     <input type="hidden" id="telefone" value="{{ $json.telefone }}" />
-    <input type="hidden" id="endereco" value="{{ $json.endereco }}" />
+    <input type="hidden" id="cep" value="{{ $json.cep }}" />
+    <input type="hidden" id="logradouro" value="{{ $json.logradouro }}" />
+    <input type="hidden" id="numero" value="{{ $json.numero }}" />
+    <input type="hidden" id="complemento" value="{{ $json.complemento }}" />
+    <input type="hidden" id="bairro" value="{{ $json.bairro }}" />
+    <input type="hidden" id="cidade" value="{{ $json.cidade }}" />
+    <input type="hidden" id="uf" value="{{ $json.uf }}" />
     <header class="site-header">
       <div class="container">
         <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
         <h1 class="display-6 fw-semibold mt-3">Seleção Simplificada Hospital Veterinário do Recife</h1>
         <p class="lead mt-2">
-          A Seleção Pública Simplificada oferta 41 vagas temporárias para técnicos e analistas em saúde animal que atuarão no Hospital
-          Veterinário do Recife Professor Robson José Gomes de Melo. O processo é conduzido pela Secretaria de Administração e Gestão de
-          Pessoas (SADGP) em parceria com a Secretaria Executiva dos Direitos dos Animais (SEDA), garantindo avaliação técnica e atendimento às
-          demandas do serviço.
+          A Seleção Pública Simplificada oferta 41 vagas temporárias para profissionais que integrarão o Hospital Veterinário do Recife Professor
+          Robson José Gomes de Melo. A Secretaria de Administração e Gestão de Pessoas (SADGP) coordena o certame junto ao Gabinete de Proteção e
+          Defesa dos Animais, preservando os critérios técnicos e a continuidade do atendimento à população.
         </p>
       </div>
     </header>
@@ -299,9 +341,8 @@
                   <li>Envio de documentos comprobatórios em formato PDF.</li>
                   <li>Etapas conduzidas no Sistema SAD Seleções.</li>
                 </ul>
-                <div class="d-flex flex-wrap gap-2">
-                  <button class="btn btn-primary" id="btn-preencher-inscricao" type="button">Preencher formulário de inscrição</button>
-                  <a class="btn btn-outline-primary" href="NOVO%20FORM%20DE%20INSCRIÇÃO%20(FORMULÁRIO%20PRINCIPAL).pdf" target="_blank" rel="noopener">Baixar edital</a>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                  <button class="btn btn-primary px-4 py-2" id="btn-preencher-inscricao" type="button">Preencher formulário de inscrição</button>
                 </div>
               </div>
             </article>
@@ -325,26 +366,58 @@
               </div>
               <div class="card-body">
                 <ul class="mb-0">
-                  <li>Destinado aos candidatos classificados nas seleções de 2024-2025.</li>
-                  <li>Os dados de contato serão enviados diretamente ao setor responsável.</li>
-                  <li>Suporte: sad.hvr@recife.pe.gov.br.</li>
+                  <li>Revise e confirme os dados antes de enviar a atualização.</li>
+                  <li>As informações seguem diretamente para a equipe responsável pelo cadastro reserva.</li>
                 </ul>
                 <details class="collapsible-form mt-3">
                   <summary>Atualizar dados de contato</summary>
                   <div class="mt-3">
                     <label class="form-label" for="email-input">E-mail</label>
-                    <input class="form-control" type="email" id="email-input" name="email" value="{{ $json.email }}" placeholder="nome@exemplo.com" />
-                    <div class="form-text">Informe o endereço eletrônico para receber comunicados oficiais.</div>
+                    <input class="form-control" type="email" id="email-input" name="email" value="{{ $json.email }}" placeholder="nome@exemplo.com" autocomplete="email" />
+                    <div class="form-text">Informe o endereço eletrônico que receberá os comunicados oficiais.</div>
+                  </div>
+                  <div class="mt-3">
+                    <label class="form-label" for="email-confirm-input">Confirmar e-mail</label>
+                    <input class="form-control" type="email" id="email-confirm-input" name="emailConfirm" value="{{ $json.email }}" placeholder="Confirme seu e-mail" autocomplete="email" />
+                    <div class="form-text">Digite novamente para validar o endereço informado.</div>
                   </div>
                   <div class="mt-3">
                     <label class="form-label" for="telefone-input">Telefone</label>
-                    <input class="form-control" type="tel" id="telefone-input" name="telefone" value="{{ $json.telefone }}" placeholder="(81) 99999-9999" />
-                    <div class="form-text">Utilize um telefone ativo com WhatsApp para contatos urgentes.</div>
+                    <input class="form-control" type="tel" id="telefone-input" name="telefone" value="{{ $json.telefone }}" placeholder="DDD + número" inputmode="numeric" maxlength="11" />
+                    <div class="form-text">Informe 11 dígitos numéricos (ex.: 81999999999) para contato preferencial.</div>
                   </div>
                   <div class="mt-3">
-                    <label class="form-label" for="endereco-input">Endereço</label>
-                    <textarea class="form-control" id="endereco-input" name="endereco" rows="2" placeholder="Rua, número, bairro, cidade" spellcheck="false">{{ $json.endereco }}</textarea>
-                    <div class="form-text">Inclua logradouro, número, bairro e cidade.</div>
+                    <label class="form-label" for="cep-input">CEP</label>
+                    <input class="form-control" type="text" id="cep-input" name="cep" value="{{ $json.cep }}" placeholder="00000000" inputmode="numeric" maxlength="8" />
+                    <div class="form-text">Após preencher os 8 dígitos, o endereço será buscado automaticamente na Brasil API.</div>
+                  </div>
+                  <div class="row g-3 mt-3">
+                    <div class="col-md-8">
+                      <label class="form-label" for="logradouro-input">Logradouro</label>
+                      <input class="form-control" type="text" id="logradouro-input" name="logradouro" value="{{ $json.logradouro }}" placeholder="Rua, avenida, travessa..." />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label" for="numero-input">Número</label>
+                      <input class="form-control" type="text" id="numero-input" name="numero" value="{{ $json.numero }}" placeholder="000" />
+                    </div>
+                  </div>
+                  <div class="mt-3">
+                    <label class="form-label" for="complemento-input">Complemento</label>
+                    <input class="form-control" type="text" id="complemento-input" name="complemento" value="{{ $json.complemento }}" placeholder="Apartamento, bloco, referência" />
+                  </div>
+                  <div class="row g-3 mt-3">
+                    <div class="col-md-6">
+                      <label class="form-label" for="bairro-input">Bairro</label>
+                      <input class="form-control" type="text" id="bairro-input" name="bairro" value="{{ $json.bairro }}" placeholder="Nome do bairro" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label" for="cidade-input">Cidade</label>
+                      <input class="form-control" type="text" id="cidade-input" name="cidade" value="{{ $json.cidade }}" placeholder="Município" />
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label" for="uf-input">UF</label>
+                      <input class="form-control text-uppercase" type="text" id="uf-input" name="uf" value="{{ $json.uf }}" placeholder="UF" maxlength="2" />
+                    </div>
                   </div>
                 </details>
                 <button class="btn btn-outline-primary mt-3" id="btn-atualizar-cadastro" type="button">Enviar atualização de contato</button>
@@ -443,6 +516,13 @@
         <span class="text-muted">© 2025 • Coordenadoria de Processos Seletivos</span>
       </div>
     </footer>
+    <div class="feedback-modal-backdrop" id="feedback-modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="feedback-modal">
+        <h4 class="feedback-modal-title" id="feedback-modal-title"></h4>
+        <p class="mb-0" id="feedback-modal-message"></p>
+        <button type="button" class="btn btn-primary mt-4" id="feedback-modal-close">Fechar</button>
+      </div>
+    </div>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         var button = document.getElementById("btn-preencher-inscricao");
@@ -451,11 +531,330 @@
         var redirectUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
         var updateButton = document.getElementById("btn-atualizar-cadastro");
         var emailInput = document.getElementById("email-input");
+        var emailConfirmInput = document.getElementById("email-confirm-input");
         var telefoneInput = document.getElementById("telefone-input");
-        var enderecoInput = document.getElementById("endereco-input");
+        var cepInput = document.getElementById("cep-input");
+        var logradouroInput = document.getElementById("logradouro-input");
+        var numeroInput = document.getElementById("numero-input");
+        var complementoInput = document.getElementById("complemento-input");
+        var bairroInput = document.getElementById("bairro-input");
+        var cidadeInput = document.getElementById("cidade-input");
+        var ufInput = document.getElementById("uf-input");
         var emailHidden = document.getElementById("email");
         var telefoneHidden = document.getElementById("telefone");
-        var enderecoHidden = document.getElementById("endereco");
+        var cepHidden = document.getElementById("cep");
+        var logradouroHidden = document.getElementById("logradouro");
+        var numeroHidden = document.getElementById("numero");
+        var complementoHidden = document.getElementById("complemento");
+        var bairroHidden = document.getElementById("bairro");
+        var cidadeHidden = document.getElementById("cidade");
+        var ufHidden = document.getElementById("uf");
+        var modalBackdrop = document.getElementById("feedback-modal");
+        var modalTitle = document.getElementById("feedback-modal-title");
+        var modalMessage = document.getElementById("feedback-modal-message");
+        var modalClose = document.getElementById("feedback-modal-close");
+        var lastCepConsulted = "";
+
+        function sanitizeDigits(value) {
+          return (value || "").replace(/\D/g, "");
+        }
+
+        function determineToneFromContent(message, data) {
+          var normalizedMessage = (message || "").toLowerCase();
+          var statusField = "";
+
+          if (data && typeof data === "object" && !Array.isArray(data)) {
+            if (data.status) {
+              statusField = String(data.status).toLowerCase();
+            } else if (data.result) {
+              statusField = String(data.result).toLowerCase();
+            } else if (data.type) {
+              statusField = String(data.type).toLowerCase();
+            } else if (data.title) {
+              statusField = String(data.title).toLowerCase();
+            }
+          }
+
+          if (statusField.includes("sucesso") || statusField === "success" || statusField === "ok") {
+            return "success";
+          }
+          if (statusField.includes("erro") || statusField.includes("error") || statusField.includes("falha") || statusField.includes("fail")) {
+            return "error";
+          }
+
+          if (normalizedMessage.includes("sucesso") || normalizedMessage.includes("atualiz")) {
+            return "success";
+          }
+          if (
+            normalizedMessage.includes("erro") ||
+            normalizedMessage.includes("falha") ||
+            normalizedMessage.includes("inválid") ||
+            normalizedMessage.includes("não foi possível")
+          ) {
+            return "error";
+          }
+          if (
+            normalizedMessage.includes("atenção") ||
+            normalizedMessage.includes("aguarde") ||
+            normalizedMessage.includes("verifique") ||
+            normalizedMessage.includes("pendente")
+          ) {
+            return "warning";
+          }
+          return null;
+        }
+
+        function showPopup(message, options) {
+          var msg = message === undefined || message === null ? "" : String(message);
+          var toneHint = options && options.tone;
+          var tone = toneHint || determineToneFromContent(msg, options && options.data);
+          var title;
+
+          switch (tone) {
+            case "success":
+              title = "✅ Sucesso";
+              break;
+            case "error":
+              title = "❌ Erro";
+              break;
+            case "warning":
+              title = "⚠️ Atenção";
+              break;
+            default:
+              title = "ℹ️ Informativo";
+              break;
+          }
+
+          if (modalTitle) {
+            modalTitle.textContent = title;
+          }
+          if (modalMessage) {
+            modalMessage.textContent = msg;
+          }
+          if (modalBackdrop) {
+            modalBackdrop.classList.add("active");
+            modalBackdrop.setAttribute("aria-hidden", "false");
+          }
+          if (modalClose) {
+            modalClose.focus();
+          }
+        }
+
+        function hidePopup() {
+          if (modalBackdrop) {
+            modalBackdrop.classList.remove("active");
+            modalBackdrop.setAttribute("aria-hidden", "true");
+          }
+        }
+
+        if (modalClose) {
+          modalClose.addEventListener("click", hidePopup);
+        }
+        if (modalBackdrop) {
+          modalBackdrop.addEventListener("click", function (event) {
+            if (event.target === modalBackdrop) {
+              hidePopup();
+            }
+          });
+        }
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            hidePopup();
+          }
+        });
+
+        function collectUpdateValues() {
+          var cpfField = document.getElementById("cpf");
+          var values = {
+            cpf: cpfField ? cpfField.value : "",
+            email: emailInput ? emailInput.value.trim() : "",
+            emailConfirm: emailConfirmInput ? emailConfirmInput.value.trim() : "",
+            telefone: telefoneInput ? sanitizeDigits(telefoneInput.value) : "",
+            cep: cepInput ? sanitizeDigits(cepInput.value) : "",
+            logradouro: logradouroInput ? logradouroInput.value.trim() : "",
+            numero: numeroInput ? numeroInput.value.trim() : "",
+            complemento: complementoInput ? complementoInput.value.trim() : "",
+            bairro: bairroInput ? bairroInput.value.trim() : "",
+            cidade: cidadeInput ? cidadeInput.value.trim() : "",
+            uf: ufInput ? ufInput.value.trim().toUpperCase() : "",
+          };
+
+          if (telefoneInput && telefoneInput.value !== values.telefone) {
+            telefoneInput.value = values.telefone;
+          }
+          if (cepInput && cepInput.value !== values.cep) {
+            cepInput.value = values.cep;
+          }
+          if (ufInput && ufInput.value !== values.uf) {
+            ufInput.value = values.uf;
+          }
+
+          return values;
+        }
+
+        function syncHiddenValues(values) {
+          if (!values) {
+            return;
+          }
+          if (emailHidden) {
+            emailHidden.value = values.email || "";
+          }
+          if (telefoneHidden) {
+            telefoneHidden.value = values.telefone || "";
+          }
+          if (cepHidden) {
+            cepHidden.value = values.cep || "";
+          }
+          if (logradouroHidden) {
+            logradouroHidden.value = values.logradouro || "";
+          }
+          if (numeroHidden) {
+            numeroHidden.value = values.numero || "";
+          }
+          if (complementoHidden) {
+            complementoHidden.value = values.complemento || "";
+          }
+          if (bairroHidden) {
+            bairroHidden.value = values.bairro || "";
+          }
+          if (cidadeHidden) {
+            cidadeHidden.value = values.cidade || "";
+          }
+          if (ufHidden) {
+            ufHidden.value = values.uf || "";
+          }
+        }
+
+        function validateUpdateData(values) {
+          var messages = [];
+          var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          if (!emailPattern.test(values.email)) {
+            messages.push("Informe um e-mail válido.");
+          }
+          if (!emailPattern.test(values.emailConfirm)) {
+            messages.push("Confirme o e-mail com um endereço válido.");
+          }
+          if (values.email && values.emailConfirm && values.email !== values.emailConfirm) {
+            messages.push("Os campos de e-mail devem ser idênticos.");
+          }
+          if (!/^\d{11}$/.test(values.telefone)) {
+            messages.push("O telefone deve conter exatamente 11 dígitos numéricos.");
+          }
+          if (values.cep.length !== 8) {
+            messages.push("Informe um CEP com 8 dígitos.");
+          }
+          if (!values.logradouro) {
+            messages.push("Preencha o logradouro.");
+          }
+          if (!values.numero) {
+            messages.push("Informe o número do endereço.");
+          }
+          if (!values.bairro) {
+            messages.push("Preencha o bairro.");
+          }
+          if (!values.cidade) {
+            messages.push("Informe a cidade.");
+          }
+          if (!values.uf || values.uf.length !== 2) {
+            messages.push("Informe a UF com duas letras.");
+          }
+
+          return messages;
+        }
+
+        function handleCepLookup() {
+          if (!cepInput) {
+            return;
+          }
+
+          var cepValue = sanitizeDigits(cepInput.value);
+          if (cepValue.length !== 8) {
+            lastCepConsulted = "";
+            return;
+          }
+
+          if (cepValue === lastCepConsulted) {
+            return;
+          }
+
+          lastCepConsulted = cepValue;
+
+          fetch("https://brasilapi.com.br/api/cep/v1/" + cepValue)
+            .then(function (response) {
+              if (!response.ok) {
+                throw new Error("CEP não encontrado");
+              }
+              return response.json();
+            })
+            .then(function (data) {
+              if (data) {
+                if (logradouroInput && data.street) {
+                  logradouroInput.value = data.street;
+                }
+                if (bairroInput && data.neighborhood) {
+                  bairroInput.value = data.neighborhood;
+                }
+                if (cidadeInput && data.city) {
+                  cidadeInput.value = data.city;
+                }
+                if (ufInput && data.state) {
+                  ufInput.value = String(data.state).toUpperCase();
+                }
+              }
+              syncHiddenValues(collectUpdateValues());
+            })
+            .catch(function (error) {
+              lastCepConsulted = "";
+              console.error("Erro ao consultar CEP:", error);
+              showPopup("Não encontramos informações para o CEP informado. Você pode preencher os campos manualmente.", { tone: "warning" });
+            });
+        }
+
+        if (telefoneInput) {
+          telefoneInput.addEventListener("input", function () {
+            var sanitized = sanitizeDigits(telefoneInput.value).slice(0, 11);
+            if (telefoneInput.value !== sanitized) {
+              telefoneInput.value = sanitized;
+            }
+          });
+          telefoneInput.value = sanitizeDigits(telefoneInput.value).slice(0, 11);
+        }
+
+        if (cepInput) {
+          cepInput.addEventListener("input", function () {
+            var sanitized = sanitizeDigits(cepInput.value).slice(0, 8);
+            if (cepInput.value !== sanitized) {
+              cepInput.value = sanitized;
+            }
+          });
+          cepInput.addEventListener("keyup", handleCepLookup);
+          cepInput.addEventListener("change", handleCepLookup);
+          cepInput.addEventListener("blur", handleCepLookup);
+          cepInput.value = sanitizeDigits(cepInput.value).slice(0, 8);
+        }
+
+        if (ufInput) {
+          ufInput.addEventListener("input", function () {
+            var sanitized = String(ufInput.value || "").replace(/[^a-zA-Z]/g, "").slice(0, 2).toUpperCase();
+            if (ufInput.value !== sanitized) {
+              ufInput.value = sanitized;
+            }
+          });
+          ufInput.value = String(ufInput.value || "").replace(/[^a-zA-Z]/g, "").slice(0, 2).toUpperCase();
+        }
+
+        [emailInput, emailConfirmInput, telefoneInput, cepInput, logradouroInput, numeroInput, complementoInput, bairroInput, cidadeInput, ufInput]
+          .filter(function (input) {
+            return !!input;
+          })
+          .forEach(function (input) {
+            input.addEventListener("blur", function () {
+              syncHiddenValues(collectUpdateValues());
+            });
+          });
+
+        syncHiddenValues(collectUpdateValues());
 
         function getEmojiForUrl(url) {
           var extension = (url.split(".").pop() || "").toLowerCase();
@@ -609,26 +1008,27 @@
 
         if (updateButton) {
           updateButton.addEventListener("click", function () {
-            var cpf = document.getElementById("cpf");
-            var emailValue = emailInput ? emailInput.value.trim() : "";
-            var telefoneValue = telefoneInput ? telefoneInput.value.trim() : "";
-            var enderecoValue = enderecoInput ? enderecoInput.value.trim() : "";
+            var values = collectUpdateValues();
+            syncHiddenValues(values);
 
-            if (emailHidden) {
-              emailHidden.value = emailValue;
-            }
-            if (telefoneHidden) {
-              telefoneHidden.value = telefoneValue;
-            }
-            if (enderecoHidden) {
-              enderecoHidden.value = enderecoValue;
+            var validationErrors = validateUpdateData(values);
+            if (validationErrors.length) {
+              showPopup(validationErrors.join("\n"), { tone: "warning" });
+              return;
             }
 
             var payload = {
-              cpf: cpf ? cpf.value : "",
-              email: emailValue,
-              telefone: telefoneValue,
-              endereco: enderecoValue,
+              cpf: values.cpf,
+              email: values.email,
+              emailConfirm: values.emailConfirm,
+              telefone: values.telefone,
+              cep: values.cep,
+              logradouro: values.logradouro,
+              numero: values.numero,
+              complemento: values.complemento,
+              bairro: values.bairro,
+              cidade: values.cidade,
+              uf: values.uf,
             };
 
             fetch("https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/204c8f95-ccdd-41e6-8ccf-40b7795a01fb", {
@@ -648,16 +1048,16 @@
               })
               .then(function (data) {
                 if (typeof data === "string") {
-                  alert(data);
+                  showPopup(data, { data: null });
                   return;
                 }
 
-                var message = data.message || JSON.stringify(data);
-                alert(message);
+                var message = data.message || data.detail || JSON.stringify(data);
+                showPopup(message, { data: data });
               })
               .catch(function (error) {
                 console.error("Falha ao enviar atualização cadastral:", error);
-                alert("Não foi possível enviar a atualização cadastral. Tente novamente em instantes.");
+                showPopup("Não foi possível enviar a atualização cadastral. Tente novamente em instantes.", { tone: "error" });
               });
           });
         }
