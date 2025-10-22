@@ -570,6 +570,50 @@
         min-width: 180px;
       }
 
+      .submission-loading {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(11, 36, 71, 0.55);
+        backdrop-filter: blur(2px);
+        z-index: 1080;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
+      }
+
+      .submission-loading.is-visible {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .submission-loading .loading-dialog {
+        background: rgba(11, 36, 71, 0.92);
+        color: #ffffff;
+        padding: 2.25rem 2.5rem;
+        border-radius: 1.25rem;
+        text-align: center;
+        box-shadow: 0 24px 48px rgba(11, 36, 71, 0.35);
+        max-width: 320px;
+        width: calc(100% - 48px);
+      }
+
+      .submission-loading .loading-text {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .submission-loading .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.35rem;
+      }
+
       .draft-toast {
         position: fixed;
         bottom: 32px;
@@ -1977,6 +2021,13 @@
       <span>Rascunho salvo com sucesso!</span>
     </div>
 
+    <div class="submission-loading" id="submissionLoading" aria-hidden="true" aria-live="polite">
+      <div class="loading-dialog" role="status">
+        <div class="spinner-border text-light mb-3" role="presentation" aria-hidden="true"></div>
+        <p class="loading-text">Conferindo seus dados...</p>
+      </div>
+    </div>
+
     <div class="modal fade" id="friendlyAlert" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -2002,6 +2053,9 @@
       const friendlyAlertTitle = document.getElementById('friendlyAlertTitle');
       const friendlyAlertTitleBaseClass = friendlyAlertTitle?.className || '';
       let friendlyAlertInstance;
+      const submissionLoading = document.getElementById('submissionLoading');
+      let submissionLoadingTimer;
+      const SUBMISSION_SUSPENSE_DELAY = 2300;
       const registrationNumberElement = document.getElementById('registrationNumber');
       const registrationValueElement = registrationNumberElement?.querySelector('.registration-value');
       const successScreen = document.getElementById('submissionSuccess');
@@ -2051,6 +2105,40 @@
       let cepController;
       const visitedSteps = new Set();
       const authorizationField = document.getElementById('initialAuthorization');
+      const showSubmissionSuspense = (callback, delay = SUBMISSION_SUSPENSE_DELAY) => {
+        if (submissionLoadingTimer) {
+          clearTimeout(submissionLoadingTimer);
+          submissionLoadingTimer = null;
+        }
+        const executeCallback = () => {
+          if (submissionLoading) {
+            submissionLoading.classList.remove('is-visible');
+            submissionLoading.setAttribute('aria-hidden', 'true');
+          }
+          submissionLoadingTimer = null;
+          if (typeof callback === 'function') {
+            callback();
+          }
+        };
+        if (!submissionLoading || delay <= 0) {
+          window.setTimeout(executeCallback, Math.max(delay, 0));
+          return;
+        }
+        submissionLoading.classList.add('is-visible');
+        submissionLoading.setAttribute('aria-hidden', 'false');
+        submissionLoadingTimer = window.setTimeout(executeCallback, delay);
+      };
+
+      const hideSubmissionSuspense = () => {
+        if (submissionLoadingTimer) {
+          clearTimeout(submissionLoadingTimer);
+          submissionLoadingTimer = null;
+        }
+        if (submissionLoading) {
+          submissionLoading.classList.remove('is-visible');
+          submissionLoading.setAttribute('aria-hidden', 'true');
+        }
+      };
       const showFriendlyAlert = (content, options = {}) => {
         if (!friendlyAlertElement || !friendlyAlertMessage) {
           window.alert(typeof content === 'string' ? content : String(content ?? ''));
@@ -3193,13 +3281,15 @@
           }
           updateWizardStepStates();
           const alertContent = buildMissingFieldsAlertContent(pendingFields);
-          showFriendlyAlert(alertContent, { title: '❌ Aviso!', titleClass: 'text-danger' });
-          if (firstInvalid && typeof firstInvalid.reportValidity === 'function') {
-            firstInvalid.reportValidity();
-          }
-          if (firstInvalid && typeof firstInvalid.focus === 'function') {
-            setTimeout(() => firstInvalid.focus({ preventScroll: false }), 0);
-          }
+          showSubmissionSuspense(() => {
+            showFriendlyAlert(alertContent, { title: '❌ Aviso!', titleClass: 'text-danger' });
+            if (firstInvalid && typeof firstInvalid.reportValidity === 'function') {
+              firstInvalid.reportValidity();
+            }
+            if (firstInvalid && typeof firstInvalid.focus === 'function') {
+              setTimeout(() => firstInvalid.focus({ preventScroll: false }), 0);
+            }
+          });
           return;
         }
         if (!validateCurrentStep()) {
