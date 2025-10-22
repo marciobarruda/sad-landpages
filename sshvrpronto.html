@@ -3,10 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="icon"
-      href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&amp;h=32&amp;fit=fill&amp;border=2,transparent,shrink"
-    />
     <title>Seleção Simplificada — Formulário</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -57,38 +53,11 @@
         padding: 3.5rem 0 2.75rem;
       }
 
-      .hero-container {
+      header.site-header .container {
         max-width: 1100px;
         margin: 0 auto;
         padding-left: 1.5rem;
         padding-right: 1.5rem;
-        display: flex;
-        justify-content: flex-start;
-      }
-
-      .hero-content-wrap {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.85rem;
-        width: 100%;
-      }
-
-      .hero-context-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem 0.95rem;
-        border-radius: 4px;
-        background: linear-gradient(135deg, rgba(64, 123, 255, 0.25), rgba(15, 83, 201, 0.45));
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        color: #ffffff;
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        box-shadow: 0 16px 30px rgba(12, 58, 150, 0.18);
-        backdrop-filter: blur(6px);
       }
 
       header .lead {
@@ -126,14 +95,11 @@
         position: relative;
         z-index: 1;
         color: #ffffff;
-        padding: 1.75rem 1.5rem;
+        padding: 2.75rem 3rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
         height: 320px;
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
       }
 
       .hero-badge {
@@ -152,19 +118,18 @@
       .hero-title {
         font-size: 2rem;
         font-weight: 700;
-        margin: 0;
+        margin-top: 0.75rem;
+        margin-bottom: 0.35rem;
       }
 
       .hero-subtitle {
         font-size: 1rem;
         opacity: 0.86;
-        max-width: 720px;
-        margin: 0;
       }
 
       .wizard-shell {
         background: var(--surface);
-        border-radius: 4px;
+        border-radius: 1.25rem;
         padding: 1.75rem 1.5rem;
         box-shadow: 0 18px 40px rgba(26, 115, 232, 0.12), 0 8px 22px rgba(26, 115, 232, 0.08);
         border: 1px solid rgba(26, 115, 232, 0.12);
@@ -319,13 +284,6 @@
         box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.15);
       }
 
-      .wizard-step.warning .wizard-index {
-        background: #facc15;
-        color: #7c2d12;
-        border-color: #fbbf24;
-        box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.25);
-      }
-
       .wizard-step.active::before,
       .wizard-step.active::after {
         background: linear-gradient(90deg, var(--brand) 0%, var(--brand-dark) 100%);
@@ -336,14 +294,9 @@
         background: linear-gradient(90deg, #198754 0%, #0f5132 100%);
       }
 
-      .wizard-step.warning::before,
-      .wizard-step.warning::after {
-        background: linear-gradient(90deg, #facc15 0%, #f59e0b 100%);
-      }
-
       .step-card {
         border: 0;
-        border-radius: 4px;
+        border-radius: 1.25rem;
         overflow: hidden;
         box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
         margin-bottom: 2.5rem;
@@ -445,7 +398,7 @@
 
       .summary-section {
         border: 1px solid rgba(26, 115, 232, 0.08);
-        border-radius: 4px;
+        border-radius: 1rem;
         padding: 1.25rem 1.5rem;
         margin-bottom: 1.25rem;
         background: #ffffff;
@@ -480,7 +433,7 @@
 
       .dropzone {
         border: 2px dashed rgba(26, 115, 232, 0.25);
-        border-radius: 4px;
+        border-radius: 1rem;
         padding: 1rem 1.25rem;
         background: rgba(232, 240, 254, 0.55);
         color: #34518a;
@@ -492,7 +445,7 @@
 
       .upload-card {
         border: 2px dashed rgba(17, 37, 82, 0.18);
-        border-radius: 4px;
+        border-radius: 1rem;
         background: rgba(255, 255, 255, 0.75);
         padding: 1.5rem 1.25rem;
         min-height: var(--upload-min-height);
@@ -580,7 +533,7 @@
         max-width: 720px;
         text-align: center;
         background: var(--surface);
-        border-radius: 4px;
+        border-radius: 1.25rem;
         padding: 3rem 2.5rem;
         box-shadow: 0 18px 40px rgba(26, 115, 232, 0.12), 0 8px 22px rgba(26, 115, 232, 0.08);
         border: 1px solid rgba(26, 115, 232, 0.12);
@@ -612,50 +565,6 @@
         min-width: 180px;
       }
 
-      .submission-loading {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(11, 36, 71, 0.55);
-        backdrop-filter: blur(2px);
-        z-index: 1080;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.25s ease;
-        pointer-events: none;
-      }
-
-      .submission-loading.is-visible {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-      }
-
-      .submission-loading .loading-dialog {
-        background: rgba(11, 36, 71, 0.92);
-        color: #ffffff;
-        padding: 2.25rem 2.5rem;
-        border-radius: 4px;
-        text-align: center;
-        box-shadow: 0 24px 48px rgba(11, 36, 71, 0.35);
-        max-width: 320px;
-        width: calc(100% - 48px);
-      }
-
-      .submission-loading .loading-text {
-        font-size: 1rem;
-        font-weight: 600;
-        margin: 0;
-      }
-
-      .submission-loading .spinner-border {
-        width: 3rem;
-        height: 3rem;
-        border-width: 0.35rem;
-      }
-
       .draft-toast {
         position: fixed;
         bottom: 32px;
@@ -663,7 +572,7 @@
         background: #0f5132;
         color: #fff;
         padding: 0.85rem 1.25rem;
-        border-radius: 4px;
+        border-radius: 0.75rem;
         box-shadow: 0 20px 45px rgba(15, 81, 50, 0.35);
         display: none;
         align-items: center;
@@ -678,16 +587,6 @@
       @media (max-width: 992px) {
         header.hero {
           height: 210px;
-        }
-
-        header.hero .hero-content {
-          padding: 1.5rem 1.1rem;
-          max-width: 100%;
-        }
-
-        .hero-container {
-          padding-left: 1.1rem;
-          padding-right: 1.1rem;
         }
 
         .wizard-shell {
@@ -736,12 +635,12 @@
   </head>
   <body>
     <header class="site-header">
-      <div class="container hero-container">
-        <div class="hero-content-wrap">
-          <span class="hero-context-badge">Secretaria de Administração - SAD • Prefeitura do Recife</span>
-          <h1 class="hero-title">Seleção Simplificada Hospital Veterinário do Recife</h1>
-          <p class="hero-subtitle">Inscrições abertas até 23:59:59 do dia 31 de outubro de 2025</p>
-        </div>
+      <div class="container">
+        <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
+        <h1 class="display-6 fw-semibold mt-3">Seleção Simplificada Hospital Veterinário do Recife</h1>
+        <p class="lead mt-2">
+          Inscrições abertas até 23:59:59 do dia 31 de outubro de 2025
+        </p>
       </div>
     </header>
     <!--<header class="hero">
@@ -751,7 +650,7 @@
         class="hero-image"
       />
        <div class="hero-content">
-        <span class="hero-badge">Secretaria de Administração - SAD</span>
+        <span class="hero-badge">Secretaria de Administração e Gestão de Pessoas</span>
         <h1 class="hero-title">Seleção Simplificada — Hospital Veterinário do Recife</h1>
         <p class="hero-subtitle">Complete as etapas abaixo para enviar sua inscrição</p>
       </div>
@@ -806,16 +705,10 @@
           value="{{ String($json.authorization ?? $json.Authorization ?? '') }}"
         />
 
-        <input
+        <input 
           type="hidden"
           name="inscricao"
           value="{{ String($json.inscricao ?? '').trim() }}"
-        />
-
-        <input
-          type="hidden"
-          id="cargosInscritos"
-          value='{{ JSON.stringify($json.cargos_inscritos ?? []) }}'
         />
 
         <section class="card step-card" data-step-panel="0">
@@ -1374,6 +1267,19 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-md-4">
+                  <span class="form-label required">Tem parentesco com agentes políticos?</span>
+                  <div class="d-flex gap-3" data-prefill-radio="{{ String($json.politicos ?? '').trim().toUpperCase() }}">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="politicos" id="politicos_sim" value="SIM" required />
+                      <label class="form-check-label" for="politicos_sim">Sim</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO" required />
+                      <label class="form-check-label" for="politicos_nao">Não</label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1425,7 +1331,7 @@
               <h3 class="section-title">Situação eleitoral</h3>
               <div class="row g-3">
                 <div class="col-md-4">
-                  <label for="titulo" class="form-label required">Título de Eleitor</label>
+                  <label for="titulo" class="form-label">Título de Eleitor</label>
                   <input
                     type="text"
                     class="form-control"
@@ -1437,12 +1343,10 @@
                     title="Informe apenas números"
                     data-numeric-only="true"
                     value="{{ String($json.titulo ?? $json.titulo_eleitor ?? '').replace(/\D+/g, '').slice(0,12) }}"
-                    required
-                    data-force-required="true"
                   />
                 </div>
                 <div class="col-md-4">
-                  <label for="zona" class="form-label required">Zona</label>
+                  <label for="zona" class="form-label">Zona</label>
                   <input
                     type="text"
                     class="form-control"
@@ -1454,12 +1358,10 @@
                     title="Informe apenas números"
                     data-numeric-only="true"
                     value="{{ String($json.zona ?? '').replace(/\D+/g, '').slice(0,4) }}"
-                    required
-                    data-force-required="true"
                   />
                 </div>
                 <div class="col-md-4">
-                  <label for="secao" class="form-label required">Seção</label>
+                  <label for="secao" class="form-label">Seção</label>
                   <input
                     type="text"
                     class="form-control"
@@ -1471,8 +1373,6 @@
                     title="Informe apenas números"
                     data-numeric-only="true"
                     value="{{ String($json.secao ?? '').replace(/\D+/g, '').slice(0,4) }}"
-                    required
-                    data-force-required="true"
                   />
                 </div>
               </div>
@@ -1604,23 +1504,8 @@
                     <option value="Não">Não</option>
                   </select>
                 </div>
-                <div class="col-md-6 hidden" id="tipoPcdGroup">
-                  <label for="tipo_pcd" class="form-label">Tipo de deficiência</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="tipo_pcd"
-                    name="tipo_pcd"
-                    value="{{ String($json.tipo_pcd ?? '').trim() }}"
-                    data-force-required="true"
-                  />
-                </div>
-                <div class="col-md-6 hidden" id="pcdCidGroup">
-                  <label for="pcd_cid" class="form-label">CID (se houver)</label>
-                  <input type="text" class="form-control" id="pcd_cid" name="pcd_cid" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}" />
-                </div>
-                <div class="col-12" id="condicaoEspecialGroup">
-                  <span class="form-label required">Necessita de condição especial?</span>
+                <div class="col-md-4 hidden" id="condicaoEspecialGroup">
+                  <span class="form-label">Necessita de condição especial?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
                     <div class="form-check">
                       <input
@@ -1630,7 +1515,6 @@
                         id="condicao_especial_sim"
                         value="Sim"
                         data-force-required="true"
-                        required
                       />
                       <label class="form-check-label" for="condicao_especial_sim">Sim</label>
                     </div>
@@ -1646,6 +1530,21 @@
                       <label class="form-check-label" for="condicao_especial_nao">Não</label>
                     </div>
                   </div>
+                </div>
+                <div class="col-md-6 hidden" id="tipoPcdGroup">
+                  <label for="tipo_pcd" class="form-label">Tipo de deficiência</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="tipo_pcd"
+                    name="tipo_pcd"
+                    value="{{ String($json.tipo_pcd ?? '').trim() }}"
+                    data-force-required="true"
+                  />
+                </div>
+                <div class="col-md-6 hidden" id="pcdCidGroup">
+                  <label for="pcd_cid" class="form-label">CID (se houver)</label>
+                  <input type="text" class="form-control" id="pcd_cid" name="pcd_cid" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}" />
                 </div>
                 <div class="col-12 hidden" id="necessidadeGroup">
                   <label for="necessidade" class="form-label">Descreva a necessidade</label>
@@ -1758,7 +1657,7 @@
                   <div class="upload-card" data-upload-card>
                     <div class="upload-emoji" aria-hidden="true">🎖️</div>
                     <p class="upload-title">Quitação do serviço militar</p>
-                    <p class="upload-instruction">Candidatos do sexo masculino.</p>
+                    <p class="upload-instruction">Obrigatório para candidatos do sexo masculino.</p>
                     <input
                       type="file"
                       class="upload-input"
@@ -2077,41 +1976,11 @@
       <span>Rascunho salvo com sucesso!</span>
     </div>
 
-    <div class="submission-loading" id="submissionLoading" aria-hidden="true" aria-live="polite">
-      <div class="loading-dialog" role="status">
-        <div class="spinner-border text-light mb-3" role="presentation" aria-hidden="true"></div>
-        <p class="loading-text">Conferindo seus dados...</p>
-      </div>
-    </div>
-
-    <div class="modal fade" id="friendlyAlert" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="friendlyAlertTitle">Aviso!</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-          </div>
-          <div class="modal-body" id="friendlyAlertMessage"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendi</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <script>
       const form = document.getElementById('inscricaoForm');
       const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
       const stepPanels = Array.from(document.querySelectorAll('[data-step-panel]'));
       const draftToast = document.getElementById('draftToast');
-      const friendlyAlertElement = document.getElementById('friendlyAlert');
-      const friendlyAlertMessage = document.getElementById('friendlyAlertMessage');
-      const friendlyAlertTitle = document.getElementById('friendlyAlertTitle');
-      const friendlyAlertTitleBaseClass = friendlyAlertTitle?.className || '';
-      let friendlyAlertInstance;
-      const submissionLoading = document.getElementById('submissionLoading');
-      let submissionLoadingTimer;
-      const SUBMISSION_SUSPENSE_DELAY = 2300;
       const registrationNumberElement = document.getElementById('registrationNumber');
       const registrationValueElement = registrationNumberElement?.querySelector('.registration-value');
       const successScreen = document.getElementById('submissionSuccess');
@@ -2122,8 +1991,6 @@
       const naturalidadeUfLabel = document.querySelector('label[for="naturalidade_uf"]');
       const ufSelects = Array.from(document.querySelectorAll('[data-uf-select]'));
       const generoSelect = document.getElementById('genero');
-      const cargoSelect = document.getElementById('cargo');
-      const cargosInscritosInput = document.getElementById('cargosInscritos');
       const generoBaseOptions = generoSelect
         ? Array.from(generoSelect.options).map((option) => ({ value: option.value, label: option.textContent }))
         : [];
@@ -2161,274 +2028,6 @@
       let cepController;
       const visitedSteps = new Set();
       const authorizationField = document.getElementById('initialAuthorization');
-      const showSubmissionSuspense = (callback, delay = SUBMISSION_SUSPENSE_DELAY) => {
-        if (submissionLoadingTimer) {
-          clearTimeout(submissionLoadingTimer);
-          submissionLoadingTimer = null;
-        }
-        const executeCallback = () => {
-          if (submissionLoading) {
-            submissionLoading.classList.remove('is-visible');
-            submissionLoading.setAttribute('aria-hidden', 'true');
-          }
-          submissionLoadingTimer = null;
-          if (typeof callback === 'function') {
-            callback();
-          }
-        };
-        if (!submissionLoading || delay <= 0) {
-          window.setTimeout(executeCallback, Math.max(delay, 0));
-          return;
-        }
-        submissionLoading.classList.add('is-visible');
-        submissionLoading.setAttribute('aria-hidden', 'false');
-        submissionLoadingTimer = window.setTimeout(executeCallback, delay);
-      };
-
-      const hideSubmissionSuspense = () => {
-        if (submissionLoadingTimer) {
-          clearTimeout(submissionLoadingTimer);
-          submissionLoadingTimer = null;
-        }
-        if (submissionLoading) {
-          submissionLoading.classList.remove('is-visible');
-          submissionLoading.setAttribute('aria-hidden', 'true');
-        }
-      };
-      const showFriendlyAlert = (content, options = {}) => {
-        if (!friendlyAlertElement || !friendlyAlertMessage) {
-          window.alert(typeof content === 'string' ? content : String(content ?? ''));
-          return;
-        }
-        const { title, titleClass } = options ?? {};
-        if (friendlyAlertTitle) {
-          friendlyAlertTitle.className = friendlyAlertTitleBaseClass;
-          const titleText = typeof title === 'string' && title.trim() ? title : 'Aviso!';
-          friendlyAlertTitle.textContent = titleText;
-          if (titleClass) {
-            const classes = Array.isArray(titleClass)
-              ? titleClass
-              : String(titleClass)
-                  .split(/\s+/)
-                  .filter(Boolean);
-            classes.forEach((className) => friendlyAlertTitle.classList.add(className));
-          }
-        }
-        friendlyAlertMessage.innerHTML = '';
-        if (typeof content === 'string') {
-          const paragraph = document.createElement('p');
-          paragraph.className = 'mb-0';
-          paragraph.textContent = content;
-          friendlyAlertMessage.appendChild(paragraph);
-        } else if (content instanceof Node) {
-          friendlyAlertMessage.appendChild(content);
-        } else {
-          const paragraph = document.createElement('p');
-          paragraph.className = 'mb-0';
-          paragraph.textContent = String(content ?? '');
-          friendlyAlertMessage.appendChild(paragraph);
-        }
-        if (typeof bootstrap !== 'undefined' && bootstrap?.Modal) {
-          friendlyAlertInstance = bootstrap.Modal.getOrCreateInstance(friendlyAlertElement);
-          friendlyAlertInstance.show();
-        } else {
-          window.alert(friendlyAlertMessage.textContent || '');
-        }
-      };
-
-      const escapeSelector = (value) => {
-        const stringValue = String(value ?? '');
-        if (typeof CSS !== 'undefined' && CSS.escape) {
-          return CSS.escape(stringValue);
-        }
-        return stringValue.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
-      };
-
-      const isElementVisible = (element) => {
-        if (!element) return false;
-        if (element.offsetParent !== null) return true;
-        return element.getClientRects().length > 0;
-      };
-
-      const getFieldLabel = (field) => {
-        if (!field) return '';
-        if (field.labels && field.labels.length > 0) {
-          const labelText = Array.from(field.labels)
-            .map((label) => label.textContent?.trim())
-            .find((text) => text);
-          if (labelText) {
-            return labelText;
-          }
-        }
-        let container = field.parentElement;
-        while (container && container !== form) {
-          const label = container.querySelector('.form-label, label');
-          if (label && !label.classList.contains('form-check-label')) {
-            const text = label.textContent?.trim();
-            if (text) {
-              return text.replace(/\s*\*+$/, '').trim();
-            }
-          }
-          container = container.parentElement;
-        }
-        return field.getAttribute('placeholder')?.trim() || field.name || 'Campo obrigatório';
-      };
-
-      const getSectionName = (field) => {
-        if (!field) return 'Formulário';
-        const sectionBlock = field.closest('.section-block');
-        const sectionTitle = sectionBlock?.querySelector('.section-title')?.textContent?.trim();
-        if (sectionTitle) return sectionTitle;
-        const stepCard = field.closest('.step-card');
-        const cardHeading = stepCard?.querySelector('.card-header h2')?.textContent?.trim();
-        if (cardHeading) return cardHeading;
-        return 'Formulário';
-      };
-
-      const collectInvalidFields = (root, { ignoreVisibility = false } = {}) => {
-        if (!root) return [];
-        const items = [];
-        const radioNames = new Set();
-        const fields = Array.from(root.querySelectorAll('input, select, textarea'));
-        fields.forEach((field) => {
-          if (!field) return;
-          if (field.disabled) return;
-          if (field.type === 'hidden') return;
-          if (field.type === 'radio') {
-            if (!field.name || radioNames.has(field.name)) return;
-            radioNames.add(field.name);
-            const selector = `input[type="radio"][name="${escapeSelector(field.name)}"]`;
-            const group = Array.from(root.querySelectorAll(selector));
-            if (!group.length) return;
-            const hasVisibleOption = group.some((radio) => ignoreVisibility || isElementVisible(radio));
-            if (!hasVisibleOption) return;
-            const hasSelection = group.some((radio) => radio.checked);
-            if (!hasSelection) {
-              const representative = group.find((radio) => ignoreVisibility || isElementVisible(radio)) || field;
-              items.push({
-                field: representative,
-                label: getFieldLabel(representative),
-                section: getSectionName(representative),
-              });
-            }
-            return;
-          }
-          if (!ignoreVisibility && !isElementVisible(field)) return;
-          if (!field.checkValidity()) {
-            items.push({ field, label: getFieldLabel(field), section: getSectionName(field) });
-          }
-        });
-        return items;
-      };
-
-      const buildMissingFieldsAlertContent = (items) => {
-        const container = document.createElement('div');
-        const intro = document.createElement('p');
-        intro.textContent = 'Os seguintes campos obrigatórios ainda precisam ser preenchidos:';
-        container.appendChild(intro);
-        const list = document.createElement('ul');
-        list.className = 'mb-0';
-        const grouped = new Map();
-        items.forEach(({ label, section }) => {
-          const sectionName = section || 'Formulário';
-          if (!grouped.has(sectionName)) {
-            grouped.set(sectionName, new Set());
-          }
-          if (label) {
-            grouped.get(sectionName).add(label);
-          }
-        });
-        if (!grouped.size) {
-          const fallback = document.createElement('li');
-          fallback.textContent = 'Preencha os campos obrigatórios.';
-          list.appendChild(fallback);
-        } else {
-          grouped.forEach((labels, section) => {
-            const sectionItem = document.createElement('li');
-            const strong = document.createElement('strong');
-            strong.textContent = section;
-            sectionItem.appendChild(strong);
-            const innerList = document.createElement('ul');
-            labels.forEach((label) => {
-              const item = document.createElement('li');
-              item.textContent = label;
-              innerList.appendChild(item);
-            });
-            sectionItem.appendChild(innerList);
-            list.appendChild(sectionItem);
-          });
-        }
-        container.appendChild(list);
-        return container;
-      };
-
-      const stepHasPendingRequired = (index) => {
-        const panel = stepPanels[index];
-        if (!panel) return false;
-        return collectInvalidFields(panel, { ignoreVisibility: true }).length > 0;
-      };
-
-      const updateWizardStepStates = () => {
-        wizardSteps.forEach((step, i) => {
-          const isActive = i === currentStep;
-          const wasVisited = visitedSteps.has(i);
-          const hasPending = stepHasPendingRequired(i);
-          const shouldShowStatus = (wasVisited || i < currentStep) && !isActive;
-          const isCompleted = shouldShowStatus && !hasPending && i < currentStep;
-          const isWarning = shouldShowStatus && hasPending;
-          step.classList.toggle('active', isActive);
-          step.classList.toggle('completed', isCompleted);
-          step.classList.toggle('warning', isWarning);
-          step.setAttribute('aria-selected', isActive ? 'true' : 'false');
-          step.setAttribute('tabindex', isActive ? '0' : '-1');
-          const indexLabel = step.querySelector('.wizard-index-label');
-          if (indexLabel) {
-            const original = indexLabel.dataset.stepIndex || String(i + 1);
-            if (isCompleted) {
-              indexLabel.textContent = '✓';
-            } else if (isWarning) {
-              indexLabel.textContent = '!';
-            } else {
-              indexLabel.textContent = original;
-            }
-          }
-        });
-      };
-
-      const parseCargosInscritos = () => {
-        if (!cargosInscritosInput) return [];
-        const raw = cargosInscritosInput.value?.trim();
-        if (!raw) return [];
-        try {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            return parsed.map((value) => String(value ?? '').trim()).filter(Boolean);
-          }
-        } catch (error) {
-          // Ignored — fallback to string parsing below.
-        }
-        return raw
-          .split(/[;,\n]+/)
-          .map((value) => value.trim())
-          .filter(Boolean);
-      };
-
-      const filterCargoOptions = () => {
-        if (!cargoSelect) return;
-        const inscritos = parseCargosInscritos();
-        if (!inscritos.length) return;
-        const allowedValue = cargoSelect.dataset.prefill?.trim().toUpperCase() || '';
-        const bloqueados = new Set(inscritos.map((value) => value.toUpperCase()));
-        Array.from(cargoSelect.options).forEach((option) => {
-          const optionValue = option.value?.trim();
-          if (!optionValue) return;
-          const normalized = optionValue.toUpperCase();
-          if (bloqueados.has(normalized) && normalized !== allowedValue) {
-            option.remove();
-          }
-        });
-      };
-
       const resolveInitialAuthorization = () => {
         const bodyAuth = document.body?.dataset?.authorization?.trim();
         const hiddenAuth = authorizationField?.value?.trim();
@@ -2490,7 +2089,7 @@
           confirm.classList.add('is-invalid');
           if ((shouldAlert || document.activeElement !== confirm) && !emailMismatchAlertShown) {
             emailMismatchAlertShown = true;
-            showFriendlyAlert('Os e-mails informados não coincidem.');
+            alert('Os e-mails informados não coincidem.');
           }
           return false;
         }
@@ -2519,7 +2118,7 @@
           successScreen.classList.add('show');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-          showFriendlyAlert('Inscrição enviada com sucesso!');
+          alert('Inscrição enviada com sucesso!');
         }
       };
 
@@ -2593,7 +2192,19 @@
         stepPanels.forEach((panel, i) => {
           panel.classList.toggle('d-none', i !== currentStep);
         });
-        updateWizardStepStates();
+        wizardSteps.forEach((step, i) => {
+          const isActive = i === currentStep;
+          const isCompleted = visitedSteps.has(i) && i < currentStep;
+          step.classList.toggle('active', isActive);
+          step.classList.toggle('completed', isCompleted);
+          step.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          step.setAttribute('tabindex', '0');
+          const indexLabel = step.querySelector('.wizard-index-label');
+          if (indexLabel) {
+            const original = indexLabel.dataset.stepIndex || String(i + 1);
+            indexLabel.textContent = isCompleted ? '✓' : original;
+          }
+        });
         if (currentStep === stepPanels.length - 1) {
           buildReview();
         }
@@ -2724,7 +2335,10 @@
       const updatePCD = () => {
         const select = document.getElementById('is_pcd');
         const isYes = select && select.value === 'Sim';
+        const condicaoGroup = document.getElementById('condicaoEspecialGroup');
+        const necessidadeGroup = document.getElementById('necessidadeGroup');
         const docsGroup = document.getElementById('pcdDocs');
+        toggleHiddenGroup(isYes, condicaoGroup);
         toggleHiddenGroup(isYes, document.getElementById('tipoPcdGroup'));
         toggleHiddenGroup(isYes, document.getElementById('pcdCidGroup'));
         toggleHiddenGroup(isYes, docsGroup);
@@ -2736,20 +2350,28 @@
           });
         }
         if (!isYes) {
+          document.querySelectorAll('input[name="condicao_especial"]').forEach((input) => {
+            input.checked = false;
+          });
           const tipo = document.getElementById('tipo_pcd');
           const cid = document.getElementById('pcd_cid');
+          const necessidade = document.getElementById('necessidade');
           if (tipo) tipo.value = '';
           if (cid) cid.value = '';
+          if (necessidade) necessidade.value = '';
           if (docsGroup) {
             docsGroup.querySelectorAll('.upload-input').forEach(resetUploadIndicator);
           }
+          toggleHiddenGroup(false, necessidadeGroup);
+        } else {
+          updateNecessidade();
         }
-        updateNecessidade();
       };
 
       const updateNecessidade = () => {
         const sim = document.getElementById('condicao_especial_sim');
-        const shouldShow = Boolean(sim && sim.checked);
+        const isPcd = document.getElementById('is_pcd')?.value === 'Sim';
+        const shouldShow = Boolean(sim && sim.checked && isPcd);
         toggleHiddenGroup(shouldShow, document.getElementById('necessidadeGroup'));
         if (!shouldShow) {
           const necessidade = document.getElementById('necessidade');
@@ -3041,6 +2663,7 @@
               { label: 'Certificado de reservista', name: 'alistamento_numero' },
               { label: 'Órgão do certificado', name: 'alistamento_orgao' },
               { label: 'Data do certificado', name: 'alistamento_data' },
+              { label: 'Parentesco com agentes políticos', name: 'politicos' },
               { label: 'Atuação como jurado(a)', name: 'foi_jurado' },
               { label: 'Informações do jurado', name: 'jurado_periodo' },
               { label: 'Vínculo público', name: 'vinculo_publico' },
@@ -3147,11 +2770,11 @@
             draftToast.classList.add('show');
             setTimeout(() => draftToast.classList.remove('show'), 3200);
           } else {
-            showFriendlyAlert('Rascunho salvo com sucesso!');
+            alert('Rascunho salvo com sucesso!');
           }
         } catch (error) {
           console.error('Erro ao salvar rascunho', error);
-          showFriendlyAlert('Não foi possível salvar o rascunho neste navegador.');
+          alert('Não foi possível salvar o rascunho neste navegador.');
         }
       };
 
@@ -3324,31 +2947,8 @@
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        validateEmailsMatch(false);
-        const pendingFields = collectInvalidFields(form, { ignoreVisibility: true });
-        if (pendingFields.length > 0) {
-          event.stopPropagation();
-          const firstInvalid = pendingFields[0]?.field || null;
-          if (firstInvalid) {
-            const targetStepIndex = stepPanels.findIndex((panel) => panel.contains(firstInvalid));
-            if (targetStepIndex >= 0 && targetStepIndex !== currentStep) {
-              showStep(targetStepIndex);
-            }
-          }
-          updateWizardStepStates();
-          const alertContent = buildMissingFieldsAlertContent(pendingFields);
-          showSubmissionSuspense(() => {
-            showFriendlyAlert(alertContent, { title: '❌ Aviso!', titleClass: 'text-danger' });
-            if (firstInvalid && typeof firstInvalid.reportValidity === 'function') {
-              firstInvalid.reportValidity();
-            }
-            if (firstInvalid && typeof firstInvalid.focus === 'function') {
-              setTimeout(() => firstInvalid.focus({ preventScroll: false }), 0);
-            }
-          });
-          return;
-        }
-        if (!validateCurrentStep()) {
+        validateEmailsMatch(true);
+        if (!form.checkValidity() || !validateCurrentStep()) {
           event.stopPropagation();
           return;
         }
@@ -3415,7 +3015,6 @@
       applyUppercaseTransform();
       enforceNumericOnly();
       populateUfSelects();
-      filterCargoOptions();
       selectPrefills();
       void populateNacionalidades();
       radioPrefills();
