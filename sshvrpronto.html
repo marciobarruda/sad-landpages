@@ -1329,7 +1329,7 @@
               <h3 class="section-title">Situação eleitoral</h3>
               <div class="row g-3">
                 <div class="col-md-4">
-                  <label for="titulo" class="form-label">Título de Eleitor</label>
+                  <label for="titulo" class="form-label required">Título de Eleitor</label>
                   <input
                     type="text"
                     class="form-control"
@@ -1341,10 +1341,11 @@
                     title="Informe apenas números"
                     data-numeric-only="true"
                     value="{{ String($json.titulo ?? $json.titulo_eleitor ?? '').replace(/\D+/g, '').slice(0,12) }}"
+                    required
                   />
                 </div>
                 <div class="col-md-4">
-                  <label for="zona" class="form-label">Zona</label>
+                  <label for="zona" class="form-label required">Zona</label>
                   <input
                     type="text"
                     class="form-control"
@@ -1356,10 +1357,11 @@
                     title="Informe apenas números"
                     data-numeric-only="true"
                     value="{{ String($json.zona ?? '').replace(/\D+/g, '').slice(0,4) }}"
+                    required
                   />
                 </div>
                 <div class="col-md-4">
-                  <label for="secao" class="form-label">Seção</label>
+                  <label for="secao" class="form-label required">Seção</label>
                   <input
                     type="text"
                     class="form-control"
@@ -1371,6 +1373,7 @@
                     title="Informe apenas números"
                     data-numeric-only="true"
                     value="{{ String($json.secao ?? '').replace(/\D+/g, '').slice(0,4) }}"
+                    required
                   />
                 </div>
               </div>
@@ -1655,7 +1658,7 @@
                   <div class="upload-card" data-upload-card>
                     <div class="upload-emoji" aria-hidden="true">🎖️</div>
                     <p class="upload-title">Quitação do serviço militar</p>
-                    <p class="upload-instruction">Obrigatório para candidatos do sexo masculino.</p>
+                    <p class="upload-instruction">Candidatos do sexo masculino.</p>
                     <input
                       type="file"
                       class="upload-input"
