@@ -62,6 +62,33 @@
         margin: 0 auto;
         padding-left: 1.5rem;
         padding-right: 1.5rem;
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .hero-content-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+        width: 100%;
+      }
+
+      .hero-context-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.95rem;
+        border-radius: 4px;
+        background: linear-gradient(135deg, rgba(64, 123, 255, 0.25), rgba(15, 83, 201, 0.45));
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        box-shadow: 0 16px 30px rgba(12, 58, 150, 0.18);
+        backdrop-filter: blur(6px);
       }
 
       header .lead {
@@ -125,13 +152,14 @@
       .hero-title {
         font-size: 2rem;
         font-weight: 700;
-        margin-top: 0.75rem;
-        margin-bottom: 0.35rem;
+        margin: 0;
       }
 
       .hero-subtitle {
         font-size: 1rem;
         opacity: 0.86;
+        max-width: 720px;
+        margin: 0;
       }
 
       .wizard-shell {
@@ -709,11 +737,11 @@
   <body>
     <header class="site-header">
       <div class="container hero-container">
-        <span class="badge-open">Secretaria de Administração - SAD • Prefeitura do Recife</span>
-        <h1 class="display-6 fw-semibold mt-3">Seleção Simplificada Hospital Veterinário do Recife</h1>
-        <p class="lead mt-2">
-          Inscrições abertas até 23:59:59 do dia 31 de outubro de 2025
-        </p>
+        <div class="hero-content-wrap">
+          <span class="hero-context-badge">Secretaria de Administração - SAD • Prefeitura do Recife</span>
+          <h1 class="hero-title">Seleção Simplificada Hospital Veterinário do Recife</h1>
+          <p class="hero-subtitle">Inscrições abertas até 23:59:59 do dia 31 de outubro de 2025</p>
+        </div>
       </div>
     </header>
     <!--<header class="hero">
