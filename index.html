@@ -87,6 +87,7 @@
         cursor: pointer;
         transition: transform 0.18s ease, box-shadow 0.18s ease;
         border: 1px solid rgba(0, 83, 164, 0.12);
+        border-radius: 4px;
       }
 
       .minhas-inscricao-card:hover {
@@ -101,7 +102,7 @@
 
       .minhas-inscricoes-placeholder {
         padding: 1.25rem;
-        border-radius: 0.9rem;
+        border-radius: 4px;
         background: rgba(0, 83, 164, 0.05);
         border: 1px dashed rgba(0, 83, 164, 0.2);
         color: var(--text-muted);
@@ -128,9 +129,17 @@
         margin-bottom: 0;
       }
 
+      .card {
+        border-radius: 4px;
+      }
+
+      .rounded-4 {
+        border-radius: 4px !important;
+      }
+
       .collapsible-form {
         border: 1px solid rgba(0, 83, 164, 0.15);
-        border-radius: 0.9rem;
+        border-radius: 4px;
         background: rgba(0, 83, 164, 0.05);
         padding: 1rem 1.25rem;
       }
@@ -256,7 +265,7 @@
 
       .card-programa {
         border: 1px solid rgba(0, 83, 164, 0.08);
-        border-radius: 1.1rem;
+        border-radius: 4px;
         background: var(--surface-strong);
         box-shadow: 0 16px 34px rgba(0, 45, 98, 0.08);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -306,12 +315,17 @@
       .download-card {
         border: 1px solid var(--border-color);
         background: var(--surface-strong);
-        border-radius: 1rem;
+        border-radius: 4px;
         padding: 1.35rem 1.4rem;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
         min-height: 170px;
+      }
+
+      .publicacoes-panel,
+      .updates-panel {
+        border-radius: 4px;
       }
 
       .download-card strong {
