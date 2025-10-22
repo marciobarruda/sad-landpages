@@ -1568,7 +1568,7 @@
                   <input type="text" class="form-control" id="pcd_cid" name="pcd_cid" value="{{ String($json.pcd_cid ?? '').trim().toUpperCase() }}" />
                 </div>
                 <div class="col-12" id="condicaoEspecialGroup">
-                  <span class="form-label">Necessita de condição especial?</span>
+                  <span class="form-label required">Necessita de condição especial?</span>
                   <div class="d-flex gap-3" data-prefill-radio="{{ String($json.condicao_especial ?? '').trim() }}">
                     <div class="form-check">
                       <input
@@ -1578,6 +1578,7 @@
                         id="condicao_especial_sim"
                         value="Sim"
                         data-force-required="true"
+                        required
                       />
                       <label class="form-check-label" for="condicao_especial_sim">Sim</label>
                     </div>
