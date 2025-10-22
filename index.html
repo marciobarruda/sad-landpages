@@ -730,19 +730,23 @@
           var tone = toneHint || determineToneFromContent(msg, options && options.data);
           var title;
 
-          switch (tone) {
-            case "success":
-              title = "✅ Sucesso";
-              break;
-            case "error":
-              title = "❌ Erro";
-              break;
-            case "warning":
-              title = "⚠️ Atenção";
-              break;
-            default:
-              title = "ℹ️ Informativo";
-              break;
+          if (options && options.title) {
+            title = String(options.title);
+          } else {
+            switch (tone) {
+              case "success":
+                title = "✅ Sucesso";
+                break;
+              case "error":
+                title = "❌ Erro";
+                break;
+              case "warning":
+                title = "⚠️ Atenção";
+                break;
+              default:
+                title = "ℹ️ Informativo";
+                break;
+            }
           }
 
           if (modalTitle) {
@@ -1052,7 +1056,11 @@
 
           var cpfField = document.getElementById("cpf");
           var cpfValue = cpfField ? cpfField.value : "";
-          var payload = { numeroInscricao: numero };
+          var payload = {
+            numeroInscricao: numero,
+            inscricao: numero,
+            numero: numero,
+          };
 
           if (cpfValue) {
             payload.cpf = cpfValue;
@@ -1099,6 +1107,8 @@
                 data: data,
                 tone: tone,
                 htmlContent: htmlContent,
+                appendReminder: false,
+                title: "📄 Resumo da inscrição",
               });
             })
             .catch(function (error) {
