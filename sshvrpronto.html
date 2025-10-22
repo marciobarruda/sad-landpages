@@ -1386,6 +1386,7 @@
                     data-numeric-only="true"
                     value="{{ String($json.titulo ?? $json.titulo_eleitor ?? '').replace(/\D+/g, '').slice(0,12) }}"
                     required
+                    data-force-required="true"
                   />
                 </div>
                 <div class="col-md-4">
@@ -1402,6 +1403,7 @@
                     data-numeric-only="true"
                     value="{{ String($json.zona ?? '').replace(/\D+/g, '').slice(0,4) }}"
                     required
+                    data-force-required="true"
                   />
                 </div>
                 <div class="col-md-4">
@@ -1418,6 +1420,7 @@
                     data-numeric-only="true"
                     value="{{ String($json.secao ?? '').replace(/\D+/g, '').slice(0,4) }}"
                     required
+                    data-force-required="true"
                   />
                 </div>
               </div>
