@@ -189,6 +189,11 @@
         width: 100%;
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
         padding: 1.75rem;
+        margin: 0 auto;
+      }
+
+      .feedback-modal.feedback-modal--wide {
+        max-width: 720px;
       }
 
       .feedback-modal-title {
@@ -196,6 +201,18 @@
         font-size: 1.1rem;
         margin-bottom: 0.75rem;
         color: var(--text-strong);
+      }
+
+      .feedback-modal-message {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--text-strong);
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+
+      .feedback-modal-message > :last-child {
+        margin-bottom: 0;
       }
 
       .feedback-modal button {
@@ -605,7 +622,7 @@
     <div class="feedback-modal-backdrop" id="feedback-modal" role="dialog" aria-modal="true" aria-hidden="true">
       <div class="feedback-modal">
         <h4 class="feedback-modal-title" id="feedback-modal-title"></h4>
-        <p class="mb-0" id="feedback-modal-message"></p>
+        <div class="feedback-modal-message" id="feedback-modal-message"></div>
         <button type="button" class="btn btn-primary mt-4" id="feedback-modal-close">Fechar</button>
       </div>
     </div>
@@ -651,6 +668,7 @@
         var modalTitle = document.getElementById("feedback-modal-title");
         var modalMessage = document.getElementById("feedback-modal-message");
         var modalClose = document.getElementById("feedback-modal-close");
+        var modalContainer = modalBackdrop ? modalBackdrop.querySelector(".feedback-modal") : null;
         var popupCloseHandler = null;
         var lastCepConsulted = "";
         var minhasInscricoesSection = document.getElementById("minhas-inscricoes-section");
@@ -724,11 +742,29 @@
           return null;
         }
 
+        function applyModalVariant(variant) {
+          if (!modalContainer) {
+            return;
+          }
+
+          modalContainer.classList.remove("feedback-modal--wide");
+
+          if (!variant) {
+            return;
+          }
+
+          if (variant === "wide") {
+            modalContainer.classList.add("feedback-modal--wide");
+          }
+        }
+
         function showPopup(message, options) {
           var msg = message === undefined || message === null ? "" : String(message);
           var toneHint = options && options.tone;
           var tone = toneHint || determineToneFromContent(msg, options && options.data);
           var title;
+
+          applyModalVariant(options && options.size);
 
           if (options && options.title) {
             title = String(options.title);
@@ -1109,6 +1145,7 @@
                 htmlContent: htmlContent,
                 appendReminder: false,
                 title: "📄 Resumo da inscrição",
+                size: "wide",
               });
             })
             .catch(function (error) {
