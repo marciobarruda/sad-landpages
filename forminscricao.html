@@ -837,7 +837,7 @@
               <h3 class="section-title">Dados básicos</h3>
               <p class="section-subtitle">Informe seus dados pessoais conforme documento oficial.</p>
               <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-12 col-md-6 col-lg-6">
                   <label for="nome" class="form-label required">Nome completo</label>
                   <input
                     type="text"
@@ -846,9 +846,10 @@
                     name="nome"
                     value="{{ String($json.nome ?? $json.name ?? '').trim() || String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}"
                     required
+                    readonly
                   />
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4 col-lg-4">
                   <label for="nome_social" class="form-label">Nome social</label>
                   <input
                     type="text"
@@ -858,7 +859,7 @@
                     value="{{ String($json.nome_social ?? $json.socialName ?? '').trim().toUpperCase() }}"
                   />
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-2 col-lg-2">
                   <label for="cpf" class="form-label required">CPF</label>
                   <input
                     type="text"
@@ -872,9 +873,10 @@
                     data-numeric-only="true"
                     value="{{ String(($json.cpf ?? $json.preferred_username ?? '')).replace(/\D+/g, '').slice(0,11) }}"
                     required
+                    readonly
                   />
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                   <label for="nasc" class="form-label required">Data de nascimento</label>
                   <input
                     type="date"
@@ -883,6 +885,7 @@
                     name="nasc"
                     value="{{ (($json.nasc ?? $json.dob) || '').split('/').reverse().join('-') }}"
                     required
+                    readonly
                   />
                 </div>
                 <div class="col-md-4">
