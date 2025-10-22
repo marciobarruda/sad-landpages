@@ -1278,19 +1278,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4">
-                  <span class="form-label required">Tem parentesco com agentes políticos?</span>
-                  <div class="d-flex gap-3" data-prefill-radio="{{ String($json.politicos ?? '').trim().toUpperCase() }}">
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="politicos" id="politicos_sim" value="SIM" required />
-                      <label class="form-check-label" for="politicos_sim">Sim</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="radio" name="politicos" id="politicos_nao" value="NAO" required />
-                      <label class="form-check-label" for="politicos_nao">Não</label>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -2907,7 +2894,6 @@
               { label: 'Certificado de reservista', name: 'alistamento_numero' },
               { label: 'Órgão do certificado', name: 'alistamento_orgao' },
               { label: 'Data do certificado', name: 'alistamento_data' },
-              { label: 'Parentesco com agentes políticos', name: 'politicos' },
               { label: 'Atuação como jurado(a)', name: 'foi_jurado' },
               { label: 'Informações do jurado', name: 'jurado_periodo' },
               { label: 'Vínculo público', name: 'vinculo_publico' },
