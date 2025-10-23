@@ -2145,43 +2145,53 @@
       const especialidadeEntries = [
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h',
-          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Clínica Médica',
+          value: 'Clínica Médica',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h - Especialidade: Clínica Médica'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h',
-          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Cirurgia',
+          value: 'Cirurgia',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h - Especialidade: Cirurgia'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h',
-          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Ortopedia',
+          value: 'Ortopedia',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h - Especialidade: Ortopedia'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h',
-          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Cardiologia',
+          value: 'Cardiologia',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h - Especialidade: Cardiologia'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h',
-          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Patologia',
+          value: 'Patologia',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h - Especialidade: Patologia'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
-          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista – Especialidade: Diagnóstico por Imagem',
+          value: 'Diagnóstico por Imagem',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h Plantonista – Especialidade: Diagnóstico por Imagem'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
-          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Clínica Médica',
+          value: 'Clínica Médica',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Clínica Médica'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
-          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Cirurgia',
+          value: 'Cirurgia',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Cirurgia'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
-          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Anestesia',
+          value: 'Anestesia',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Anestesia'],
         },
         {
           cargo: 'Analista em Saúde Animal – Veterinário 20h',
-          value: 'Analista em Saúde Animal – Veterinário 20h - Especialidade: Dermatologia',
+          value: 'Dermatologia',
+          legacyValues: ['Analista em Saúde Animal – Veterinário 20h - Especialidade: Dermatologia'],
         },
       ];
       const normalizeEspecialidadeValue = (value) =>
@@ -2190,6 +2200,15 @@
           .replace(/[\u0300-\u036f]/g, '')
           .trim()
           .toUpperCase();
+      const findMatchingEspecialidade = (entries, normalizedValue) =>
+        entries.find((entry) => {
+          if (normalizeEspecialidadeValue(entry.value) === normalizedValue) {
+            return true;
+          }
+          return (entry.legacyValues || []).some(
+            (legacyValue) => normalizeEspecialidadeValue(legacyValue) === normalizedValue,
+          );
+        });
 
       const updateEspecialidadeOptions = () => {
         if (!cargoSelect || !especialidadeSelect || !especialidadeGroup) return;
@@ -2220,18 +2239,14 @@
         });
         let targetValue = '';
         if (normalizedPrefill) {
-          const matchedPrefill = matchingEntries.find(
-            (entry) => normalizeEspecialidadeValue(entry.value) === normalizedPrefill,
-          );
+          const matchedPrefill = findMatchingEspecialidade(matchingEntries, normalizedPrefill);
           if (matchedPrefill) {
             targetValue = matchedPrefill.value;
             delete especialidadeSelect.dataset.prefill;
           }
         }
         if (!targetValue && normalizedStored) {
-          const matchedStored = matchingEntries.find(
-            (entry) => normalizeEspecialidadeValue(entry.value) === normalizedStored,
-          );
+          const matchedStored = findMatchingEspecialidade(matchingEntries, normalizedStored);
           if (matchedStored) {
             targetValue = matchedStored.value;
           }
