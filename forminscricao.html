@@ -2228,6 +2228,83 @@
           );
         });
 
+      const normalizeCargoValue = (value) =>
+        String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .trim()
+          .toUpperCase();
+
+      const extractCargoEspecialidade = (value) => {
+        const rawValue = String(value ?? '').trim();
+        if (!rawValue) {
+          return { cargo: '', especialidade: '' };
+        }
+        const legacyMatch = rawValue.match(/^(.*?)-\s*Especialidade:\s*(.+)$/i);
+        if (legacyMatch) {
+          return { cargo: legacyMatch[1].trim(), especialidade: legacyMatch[2].trim() };
+        }
+        const dashSeparators = [' — ', ' – '];
+        for (const separator of dashSeparators) {
+          const index = rawValue.indexOf(separator);
+          if (index !== -1) {
+            const cargo = rawValue.slice(0, index).trim();
+            const especialidade = rawValue.slice(index + separator.length).trim();
+            if (cargo && especialidade) {
+              return { cargo, especialidade };
+            }
+          }
+        }
+        return { cargo: rawValue, especialidade: '' };
+      };
+
+      const parseCargosInscritos = () => {
+        if (!cargosInscritosInput) return [];
+        const raw = cargosInscritosInput.value?.trim();
+        if (!raw) return [];
+        let values = [];
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            values = parsed;
+          }
+        } catch (error) {
+          // Ignored — fallback to string parsing below.
+        }
+        if (!values.length) {
+          values = raw.split(/[;,\n]+/);
+        }
+        return values
+          .map((value) => {
+            const trimmed = String(value ?? '').trim();
+            if (!trimmed) return null;
+            const { cargo, especialidade } = extractCargoEspecialidade(trimmed);
+            return { raw: trimmed, cargo, especialidade };
+          })
+          .filter(Boolean);
+      };
+
+      const buildCargosInscritosIndex = () => {
+        const entries = parseCargosInscritos();
+        const blockedCargos = new Set();
+        const blockedEspecialidades = new Map();
+        entries.forEach(({ cargo, especialidade }) => {
+          const normalizedCargo = normalizeCargoValue(cargo);
+          if (!normalizedCargo) return;
+          if (especialidade) {
+            const normalizedEspecialidade = normalizeEspecialidadeValue(especialidade);
+            if (!normalizedEspecialidade) return;
+            if (!blockedEspecialidades.has(normalizedCargo)) {
+              blockedEspecialidades.set(normalizedCargo, new Set());
+            }
+            blockedEspecialidades.get(normalizedCargo).add(normalizedEspecialidade);
+            return;
+          }
+          blockedCargos.add(normalizedCargo);
+        });
+        return { entries, blockedCargos, blockedEspecialidades };
+      };
+
       const normalizeSimpleValue = (value) =>
         String(value || '')
           .normalize('NFD')
@@ -2278,12 +2355,36 @@
       const updateEspecialidadeOptions = () => {
         if (!cargoSelect || !especialidadeSelect || !especialidadeGroup) return;
         const selectedCargo = cargoSelect.value?.trim();
+        const selectedCargoNormalized = normalizeCargoValue(selectedCargo);
         const storedValue = especialidadeSelect.dataset.currentValue || especialidadeSelect.value || '';
         const normalizedStored = normalizeEspecialidadeValue(storedValue);
         const normalizedPrefill = normalizeEspecialidadeValue(especialidadeSelect.dataset.prefill);
-        const matchingEntries = especialidadeEntries.filter((entry) => entry.cargo === selectedCargo);
+        const { blockedEspecialidades } = buildCargosInscritosIndex();
+        const blockedForCargo = blockedEspecialidades.get(selectedCargoNormalized) || new Set();
+        const allowedNormalizedValues = new Set(
+          [normalizedPrefill, normalizedStored].filter((value) => value),
+        );
+        const matchingEntries = especialidadeEntries.filter(
+          (entry) => normalizeCargoValue(entry.cargo) === selectedCargoNormalized,
+        );
         especialidadeSelect.innerHTML = '';
         if (!matchingEntries.length) {
+          especialidadeGroup.classList.add('d-none');
+          especialidadeSelect.required = false;
+          especialidadeSelect.removeAttribute('required');
+          especialidadeSelect.value = '';
+          especialidadeSelect.dataset.currentValue = '';
+          especialidadeSelect.classList.remove('is-invalid');
+          return;
+        }
+        const availableEntries = matchingEntries.filter((entry) => {
+          const normalizedEntry = normalizeEspecialidadeValue(entry.value);
+          if (allowedNormalizedValues.has(normalizedEntry)) {
+            return true;
+          }
+          return !blockedForCargo.has(normalizedEntry);
+        });
+        if (!availableEntries.length) {
           especialidadeGroup.classList.add('d-none');
           especialidadeSelect.required = false;
           especialidadeSelect.removeAttribute('required');
@@ -2301,7 +2402,7 @@
         placeholderOption.disabled = true;
         placeholderOption.selected = true;
         especialidadeSelect.appendChild(placeholderOption);
-        matchingEntries.forEach((entry) => {
+        availableEntries.forEach((entry) => {
           const option = document.createElement('option');
           option.value = entry.value;
           option.textContent = entry.value;
@@ -2309,20 +2410,20 @@
         });
         let targetValue = '';
         if (normalizedPrefill) {
-          const matchedPrefill = findMatchingEspecialidade(matchingEntries, normalizedPrefill);
+          const matchedPrefill = findMatchingEspecialidade(availableEntries, normalizedPrefill);
           if (matchedPrefill) {
             targetValue = matchedPrefill.value;
             delete especialidadeSelect.dataset.prefill;
           }
         }
         if (!targetValue && normalizedStored) {
-          const matchedStored = findMatchingEspecialidade(matchingEntries, normalizedStored);
+          const matchedStored = findMatchingEspecialidade(availableEntries, normalizedStored);
           if (matchedStored) {
             targetValue = matchedStored.value;
           }
         }
-        if (!targetValue && matchingEntries.length === 1) {
-          targetValue = matchingEntries[0].value;
+        if (!targetValue && availableEntries.length === 1) {
+          targetValue = availableEntries[0].value;
         }
         especialidadeSelect.value = targetValue;
         if (!targetValue) {
@@ -2602,42 +2703,23 @@
         });
       };
 
-      const parseCargosInscritos = () => {
-        if (!cargosInscritosInput) return [];
-        const raw = cargosInscritosInput.value?.trim();
-        if (!raw) return [];
-        try {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            return parsed.map((value) => String(value ?? '').trim()).filter(Boolean);
-          }
-        } catch (error) {
-          // Ignored — fallback to string parsing below.
-        }
-        return raw
-          .split(/[;,\n]+/)
-          .map((value) => value.trim())
-          .filter(Boolean);
-      };
-
       const filterCargoOptions = () => {
         if (!cargoSelect || !cargoBaseOptions.length) return;
         const previousValue = cargoSelect.value || '';
-        const previousNormalized = previousValue.trim().toUpperCase();
-        const inscritos = parseCargosInscritos();
-        const allowedValue = cargoSelect.dataset.prefill?.trim().toUpperCase() || '';
-        const bloqueados = new Set(inscritos.map((value) => value.toUpperCase()));
+        const previousNormalized = normalizeCargoValue(previousValue);
+        const { blockedCargos } = buildCargosInscritosIndex();
+        const allowedValueNormalized = normalizeCargoValue(cargoSelect.dataset.prefill);
         const nivelValue = nivelSelect ? nivelSelect.value || nivelSelect.dataset.prefill : '';
         const nivelTier = getNivelTier(nivelValue);
         const filteredOptions = cargoBaseOptions.filter((option) => {
           if (!option.value) {
             return true;
           }
-          const normalized = option.value.trim().toUpperCase();
+          const normalized = normalizeCargoValue(option.value);
           if (
-            bloqueados.size &&
-            bloqueados.has(normalized) &&
-            normalized !== allowedValue &&
+            blockedCargos.size &&
+            blockedCargos.has(normalized) &&
+            normalized !== allowedValueNormalized &&
             normalized !== previousNormalized
           ) {
             return false;
@@ -2666,11 +2748,15 @@
           cargoSelect.appendChild(option);
         });
         let targetValue = '';
-        if (filteredOptions.some((option) => option.value === previousValue)) {
+        if (
+          filteredOptions.some(
+            (option) => normalizeCargoValue(option.value) === previousNormalized,
+          )
+        ) {
           targetValue = previousValue;
-        } else if (allowedValue) {
+        } else if (allowedValueNormalized) {
           const allowedMatch = filteredOptions.find(
-            (option) => option.value?.trim().toUpperCase() === allowedValue,
+            (option) => normalizeCargoValue(option.value) === allowedValueNormalized,
           );
           if (allowedMatch) {
             targetValue = allowedMatch.value;
