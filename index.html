@@ -1043,9 +1043,20 @@
 
               cargo = cargo ? String(cargo).trim() : "Cargo não informado";
 
+              var especialidade =
+                item.especialidade ||
+                item.areaEspecialidade ||
+                item.area ||
+                item.funcaoDetalhada ||
+                item.disciplina ||
+                "";
+
+              especialidade = especialidade ? String(especialidade).trim() : "";
+
               return {
                 numero: numero,
                 cargo: cargo,
+                especialidade: especialidade,
               };
             })
             .filter(function (entry) {
@@ -1068,7 +1079,14 @@
             card.className = "card h-100 shadow-sm minhas-inscricao-card";
             card.setAttribute("role", "button");
             card.setAttribute("tabindex", "0");
-            card.setAttribute("aria-label", "Consultar detalhes da inscrição " + entry.numero);
+            var ariaLabel = "Consultar detalhes da inscrição " + entry.numero;
+            if (entry.cargo) {
+              ariaLabel += ", " + entry.cargo;
+            }
+            if (entry.especialidade) {
+              ariaLabel += ", especialidade " + entry.especialidade;
+            }
+            card.setAttribute("aria-label", ariaLabel);
 
             var cardBody = document.createElement("div");
             cardBody.className = "card-body";
@@ -1077,12 +1095,17 @@
             title.className = "h6 fw-semibold text-primary mb-1";
             title.textContent = entry.numero;
 
-            var description = document.createElement("p");
-            description.className = "text-muted mb-0";
-            description.textContent = entry.cargo || "Cargo não informado";
+            var cargoEl = document.createElement("p");
+            cargoEl.className = "text-muted mb-1";
+            cargoEl.textContent = entry.cargo || "Cargo não informado";
 
             cardBody.appendChild(title);
-            cardBody.appendChild(description);
+            cardBody.appendChild(cargoEl);
+
+            var especialidadeEl = document.createElement("p");
+            especialidadeEl.className = "text-muted small mb-0";
+            especialidadeEl.textContent = entry.especialidade ? entry.especialidade : "Especialidade não informada";
+            cardBody.appendChild(especialidadeEl);
             card.appendChild(cardBody);
 
             card.addEventListener("click", function () {
@@ -1864,18 +1887,39 @@
                 var formattedDate = formatDate(entry.dateObj) || (entry.rawDate || "");
                 var listItem = document.createElement("li");
                 listItem.className = "mb-2";
-                listItem.innerHTML =
-                  '<div class="d-flex flex-column flex-sm-row align-items-sm-center gap-2">' +
-                  (formattedDate
-                    ? '<time datetime="' + (entry.dateObj ? entry.dateObj.toISOString() : entry.rawDate || "") + '">' + formattedDate + "</time>"
-                    : "") +
-                  '<a class="link-primary fw-semibold" href="' +
-                  entry.url +
-                  '" target="_blank" rel="noopener">' +
-                  emoji +
-                  " " +
-                  entry.description +
-                  "</a></div>";
+
+                var container = document.createElement("div");
+                container.className = "d-flex flex-column flex-sm-row align-items-sm-center gap-2";
+
+                if (formattedDate) {
+                  var timeEl = document.createElement("time");
+                  timeEl.textContent = formattedDate;
+                  timeEl.dateTime = entry.dateObj ? entry.dateObj.toISOString() : entry.rawDate || "";
+                  container.appendChild(timeEl);
+                }
+
+                var linkEl = document.createElement("a");
+                linkEl.className = "link-primary fw-semibold";
+                linkEl.target = "_blank";
+                linkEl.rel = "noopener noreferrer";
+
+                var normalizedUrl = entry.url;
+                try {
+                  normalizedUrl = new URL(entry.url, window.location.href).href;
+                } catch (error) {
+                  normalizedUrl = entry.url;
+                }
+
+                linkEl.href = normalizedUrl;
+
+                if (normalizedUrl.split("?")[0].toLowerCase().endsWith(".pdf")) {
+                  linkEl.type = "application/pdf";
+                }
+
+                linkEl.appendChild(document.createTextNode(emoji + " " + entry.description));
+
+                container.appendChild(linkEl);
+                listItem.appendChild(container);
                 list.appendChild(listItem);
               });
           })
