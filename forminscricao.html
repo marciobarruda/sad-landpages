@@ -1362,7 +1362,7 @@
                   </select>
                 </div>
                 <div class="col-md-6 d-none" id="especialidadeGroup">
-                  <label for="especialidade" class="form-label">Especialidade (quando houver)</label>
+                  <label for="especialidade" class="form-label required">Especialidade (quando houver)</label>
                   <select
                     class="form-select"
                     id="especialidade"
@@ -2282,6 +2282,7 @@
         if (!matchingEntries.length) {
           especialidadeGroup.classList.add('d-none');
           especialidadeSelect.required = false;
+          especialidadeSelect.removeAttribute('required');
           especialidadeSelect.value = '';
           especialidadeSelect.dataset.currentValue = '';
           especialidadeSelect.classList.remove('is-invalid');
@@ -2289,6 +2290,7 @@
         }
         especialidadeGroup.classList.remove('d-none');
         especialidadeSelect.required = true;
+        especialidadeSelect.setAttribute('required', '');
         const placeholderOption = document.createElement('option');
         placeholderOption.value = '';
         placeholderOption.textContent = 'Selecione...';
