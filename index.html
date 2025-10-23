@@ -1900,8 +1900,6 @@
 
                 var linkEl = document.createElement("a");
                 linkEl.className = "link-primary fw-semibold";
-                linkEl.target = "_blank";
-                linkEl.rel = "noopener noreferrer";
 
                 var normalizedUrl = entry.url;
                 try {
@@ -1912,8 +1910,46 @@
 
                 linkEl.href = normalizedUrl;
 
-                if (normalizedUrl.split("?")[0].toLowerCase().endsWith(".pdf")) {
+                var urlWithoutParams = normalizedUrl.split("#")[0].split("?")[0];
+                var extension = (urlWithoutParams.split(".").pop() || "").toLowerCase();
+                var isPdf = extension === "pdf";
+                var isImage = ["png", "jpg", "jpeg", "gif", "bmp", "svg", "webp"].includes(extension);
+
+                if (isPdf) {
                   linkEl.type = "application/pdf";
+                  var fileName = urlWithoutParams.substring(urlWithoutParams.lastIndexOf("/") + 1) || "publicacao.pdf";
+                  linkEl.rel = "noopener noreferrer";
+                  linkEl.target = "_self";
+                  linkEl.setAttribute("download", fileName);
+                  linkEl.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    fetch(normalizedUrl)
+                      .then(function (response) {
+                        if (!response.ok) {
+                          throw new Error("Falha ao baixar o arquivo PDF");
+                        }
+                        return response.blob();
+                      })
+                      .then(function (blob) {
+                        var blobUrl = URL.createObjectURL(blob);
+                        var tempLink = document.createElement("a");
+                        tempLink.href = blobUrl;
+                        tempLink.download = fileName;
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        document.body.removeChild(tempLink);
+                        setTimeout(function () {
+                          URL.revokeObjectURL(blobUrl);
+                        }, 1000);
+                      })
+                      .catch(function (error) {
+                        console.error(error);
+                        window.location.href = normalizedUrl;
+                      });
+                  });
+                } else {
+                  linkEl.target = "_blank";
+                  linkEl.rel = "noopener noreferrer";
                 }
 
                 linkEl.appendChild(document.createTextNode(emoji + " " + entry.description));
