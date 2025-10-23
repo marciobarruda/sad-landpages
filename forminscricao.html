@@ -52,7 +52,9 @@
       }
 
       header.site-header {
-        background: linear-gradient(90deg, #1a6dd9 0%, #1152ad 100%);
+        background:
+          linear-gradient(90deg, rgba(17, 82, 173, 0.88) 0%, rgba(11, 36, 71, 0.88) 100%),
+          url("https://statics.recife.pe.gov.br/images/dynamics/automacao/header.png?w=3000") center/cover no-repeat;
         color: #ffffff;
         padding: 2.75rem 0 2.25rem;
         box-shadow: 0 12px 32px rgba(17, 82, 173, 0.25);
@@ -1346,15 +1348,16 @@
                     <option value="Técnico em Saúde Animal - Radiologia e Imagenologia 24h">Técnico em Saúde Animal - Radiologia e Imagenologia 24h</option>
                   </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 d-none" id="especialidadeGroup">
                   <label for="especialidade" class="form-label">Especialidade (quando houver)</label>
-                  <input
-                    type="text"
-                    class="form-control"
+                  <select
+                    class="form-select"
                     id="especialidade"
                     name="especialidade"
-                    value="{{ String($json.especialidade ?? '').trim().toUpperCase() }}"
-                  />
+                    data-prefill="{{ String($json.especialidade ?? '').trim() }}"
+                  >
+                    <option value="">Selecione...</option>
+                  </select>
                 </div>
                 <div
                   class="col-md-4 hidden"
@@ -2137,6 +2140,112 @@
       const generoSelect = document.getElementById('genero');
       const cargoSelect = document.getElementById('cargo');
       const cargosInscritosInput = document.getElementById('cargosInscritos');
+      const especialidadeGroup = document.getElementById('especialidadeGroup');
+      const especialidadeSelect = document.getElementById('especialidade');
+      const especialidadeEntries = [
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h',
+          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Clínica Médica',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h',
+          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Cirurgia',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h',
+          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Ortopedia',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h',
+          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Cardiologia',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h',
+          value: 'Analista em Saúde Animal – Veterinário 40h - Especialidade: Patologia',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
+          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista – Especialidade: Diagnóstico por Imagem',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
+          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Clínica Médica',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
+          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Cirurgia',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 40h Plantonista',
+          value: 'Analista em Saúde Animal – Veterinário 40h Plantonista - Especialidade: Anestesia',
+        },
+        {
+          cargo: 'Analista em Saúde Animal – Veterinário 20h',
+          value: 'Analista em Saúde Animal – Veterinário 20h - Especialidade: Dermatologia',
+        },
+      ];
+      const normalizeEspecialidadeValue = (value) =>
+        String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .trim()
+          .toUpperCase();
+
+      const updateEspecialidadeOptions = () => {
+        if (!cargoSelect || !especialidadeSelect || !especialidadeGroup) return;
+        const selectedCargo = cargoSelect.value?.trim();
+        const storedValue = especialidadeSelect.dataset.currentValue || especialidadeSelect.value || '';
+        const normalizedStored = normalizeEspecialidadeValue(storedValue);
+        const normalizedPrefill = normalizeEspecialidadeValue(especialidadeSelect.dataset.prefill);
+        const matchingEntries = especialidadeEntries.filter((entry) => entry.cargo === selectedCargo);
+        especialidadeSelect.innerHTML = '';
+        if (!matchingEntries.length) {
+          especialidadeGroup.classList.add('d-none');
+          especialidadeSelect.value = '';
+          especialidadeSelect.dataset.currentValue = '';
+          return;
+        }
+        especialidadeGroup.classList.remove('d-none');
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Selecione...';
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        especialidadeSelect.appendChild(placeholderOption);
+        matchingEntries.forEach((entry) => {
+          const option = document.createElement('option');
+          option.value = entry.value;
+          option.textContent = entry.value;
+          especialidadeSelect.appendChild(option);
+        });
+        let targetValue = '';
+        if (normalizedPrefill) {
+          const matchedPrefill = matchingEntries.find(
+            (entry) => normalizeEspecialidadeValue(entry.value) === normalizedPrefill,
+          );
+          if (matchedPrefill) {
+            targetValue = matchedPrefill.value;
+            delete especialidadeSelect.dataset.prefill;
+          }
+        }
+        if (!targetValue && normalizedStored) {
+          const matchedStored = matchingEntries.find(
+            (entry) => normalizeEspecialidadeValue(entry.value) === normalizedStored,
+          );
+          if (matchedStored) {
+            targetValue = matchedStored.value;
+          }
+        }
+        if (!targetValue && matchingEntries.length === 1) {
+          targetValue = matchingEntries[0].value;
+        }
+        especialidadeSelect.value = targetValue;
+        if (!targetValue) {
+          especialidadeSelect.value = '';
+        }
+        placeholderOption.selected = !especialidadeSelect.value;
+        especialidadeSelect.dataset.currentValue = especialidadeSelect.value || '';
+      };
       const generoBaseOptions = generoSelect
         ? Array.from(generoSelect.options).map((option) => ({ value: option.value, label: option.textContent }))
         : [];
@@ -3395,6 +3504,14 @@
         showSuccessFeedback();
       });
 
+      if (cargoSelect) {
+        cargoSelect.addEventListener('change', updateEspecialidadeOptions);
+      }
+      if (especialidadeSelect) {
+        especialidadeSelect.addEventListener('change', () => {
+          especialidadeSelect.dataset.currentValue = especialidadeSelect.value || '';
+        });
+      }
       document.getElementById('genero').addEventListener('change', updateGeneroOutro);
       document.getElementById('sexo').addEventListener('change', updateMilitar);
       document.querySelectorAll('input[name="jurado_funcao"]').forEach((input) => input.addEventListener('change', updateJurado));
@@ -3429,10 +3546,12 @@
       enforceNumericOnly();
       populateUfSelects();
       filterCargoOptions();
+      updateEspecialidadeOptions();
       selectPrefills();
       void populateNacionalidades();
       radioPrefills();
       loadDraft();
+      updateEspecialidadeOptions();
       updateGeneroOptions();
       updateGeneroOutro();
       updateMilitar();
