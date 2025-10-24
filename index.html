@@ -1909,6 +1909,8 @@
                 }
 
                 linkEl.href = normalizedUrl;
+                linkEl.target = "_blank";
+                linkEl.rel = "noopener";
 
                 var urlWithoutFragment = normalizedUrl.split("#")[0];
                 var urlWithoutParams = urlWithoutFragment.split("?")[0];
@@ -1916,43 +1918,9 @@
                 var rawFileName = lastSlashIndex !== -1 ? urlWithoutParams.substring(lastSlashIndex + 1) : urlWithoutParams;
                 var lastDotIndex = rawFileName.lastIndexOf(".");
                 var extension = lastDotIndex !== -1 ? rawFileName.substring(lastDotIndex + 1).toLowerCase() : "";
-                var fileName = rawFileName || "publicacao";
-                var isPdf = extension === "pdf";
-                var isImage = ["png", "jpg", "jpeg", "gif", "bmp", "svg", "webp"].includes(extension);
 
-                var urlObject = null;
-                try {
-                  urlObject = new URL(normalizedUrl);
-                } catch (error) {
-                  urlObject = null;
-                }
-                var isSameOrigin = urlObject ? urlObject.origin === window.location.origin : false;
-
-                if (isPdf) {
+                if (extension === "pdf") {
                   linkEl.type = "application/pdf";
-
-                  if (isSameOrigin) {
-                    linkEl.target = "_self";
-                    linkEl.setAttribute("download", fileName || "publicacao.pdf");
-                    linkEl.addEventListener("click", function (event) {
-                      event.preventDefault();
-                      var tempLink = document.createElement("a");
-                      tempLink.href = normalizedUrl;
-                      tempLink.download = fileName || "publicacao.pdf";
-                      document.body.appendChild(tempLink);
-                      tempLink.click();
-                      document.body.removeChild(tempLink);
-                    });
-                  } else {
-                    linkEl.target = "_blank";
-                    linkEl.rel = "noopener";
-                  }
-                } else if (isImage) {
-                  linkEl.target = "_blank";
-                  linkEl.rel = "noopener";
-                } else {
-                  linkEl.target = "_blank";
-                  linkEl.rel = "noopener";
                 }
 
                 linkEl.appendChild(document.createTextNode(emoji + " " + entry.description));
