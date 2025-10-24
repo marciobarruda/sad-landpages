@@ -582,6 +582,7 @@
             <a
               class="link-primary"
               href="FORM%20MODELO%20DE%20LAUDO%20MÉDICO%20PARA%20PESSOAS%20COM%20DEFICIÊNCIA.pdf"
+              data-open-pdf="true"
               >Baixar modelo em PDF</a
             >
           </article>
@@ -592,6 +593,7 @@
             <a
               class="link-primary"
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20CANDIDATOS%20NEGROS%20(PRETO%20E%20PARDO).pdf"
+              data-open-pdf="true"
               >Baixar termo em PDF</a
             >
           </article>
@@ -602,6 +604,7 @@
             <a
               class="link-primary"
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20IDENTIDADE%20INDÍGENA%20-%20TADII.pdf"
+              data-open-pdf="true"
               >Baixar termo em PDF</a
             >
           </article>
@@ -715,6 +718,49 @@
         var inscricoesResumoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/consultar-sesuite";
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
+
+        function attachPdfHandler(anchor) {
+          if (!anchor || anchor.dataset.pdfHandlerAttached === "true") {
+            return;
+          }
+
+          anchor.dataset.pdfHandlerAttached = "true";
+
+          anchor.addEventListener("click", function (event) {
+            if (
+              event.defaultPrevented ||
+              event.button !== 0 ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            ) {
+              return;
+            }
+
+            var targetUrl = anchor.href;
+            if (!targetUrl) {
+              return;
+            }
+
+            event.preventDefault();
+
+            var newWindow = window.open(targetUrl, "_blank", "noopener");
+            if (!newWindow) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+
+        function setupPdfLinks(scope) {
+          var root = scope || document;
+          var pdfAnchors = root.querySelectorAll('a[data-open-pdf="true"]');
+          pdfAnchors.forEach(function (anchor) {
+            attachPdfHandler(anchor);
+          });
+        }
+
+        setupPdfLinks();
 
         function sanitizeDigits(value) {
           return (value || "").replace(/\D/g, "");
@@ -1924,6 +1970,8 @@
 
                 if (normalizedUrl.split("?")[0].toLowerCase().endsWith(".pdf")) {
                   linkEl.type = "application/pdf";
+                  linkEl.dataset.openPdf = "true";
+                  attachPdfHandler(linkEl);
                 }
 
                 linkEl.appendChild(document.createTextNode(emoji + " " + entry.description));
