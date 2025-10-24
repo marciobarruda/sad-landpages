@@ -2011,9 +2011,25 @@
                 var linkEl = document.createElement("a");
                 linkEl.className = "publicacoes-item-link link-primary";
                 linkEl.href = normalizedUrl;
-                linkEl.target = "_blank";
-                linkEl.rel = "noopener";
                 linkEl.title = entry.description;
+
+                var downloadName = "";
+                try {
+                  var urlObject = new URL(normalizedUrl, window.location.href);
+                  downloadName = urlObject.pathname.split("/").pop() || "";
+                  if (downloadName) {
+                    downloadName = decodeURIComponent(downloadName);
+                  }
+                } catch (error) {
+                  var fallbackPath = normalizedUrl.split("?")[0].split("#")[0];
+                  downloadName = fallbackPath.split("/").pop() || "";
+                }
+
+                if (downloadName) {
+                  linkEl.setAttribute("download", downloadName);
+                } else {
+                  linkEl.setAttribute("download", "");
+                }
 
                 var iconSpan = document.createElement("span");
                 iconSpan.className = "publicacoes-item-icon";
