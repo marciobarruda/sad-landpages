@@ -1921,32 +1921,35 @@
                   linkEl.rel = "noopener noreferrer";
                   linkEl.target = "_self";
                   linkEl.setAttribute("download", fileName);
-                  linkEl.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    fetch(normalizedUrl)
-                      .then(function (response) {
-                        if (!response.ok) {
-                          throw new Error("Falha ao baixar o arquivo PDF");
-                        }
-                        return response.blob();
-                      })
-                      .then(function (blob) {
-                        var blobUrl = URL.createObjectURL(blob);
-                        var tempLink = document.createElement("a");
-                        tempLink.href = blobUrl;
-                        tempLink.download = fileName;
-                        document.body.appendChild(tempLink);
-                        tempLink.click();
-                        document.body.removeChild(tempLink);
-                        setTimeout(function () {
-                          URL.revokeObjectURL(blobUrl);
-                        }, 1000);
-                      })
-                      .catch(function (error) {
-                        console.error(error);
-                        window.location.href = normalizedUrl;
-                      });
-                  });
+
+                  (function (urlToDownload, fileNameToUse) {
+                    linkEl.addEventListener("click", function (event) {
+                      event.preventDefault();
+                      fetch(urlToDownload)
+                        .then(function (response) {
+                          if (!response.ok) {
+                            throw new Error("Falha ao baixar o arquivo PDF");
+                          }
+                          return response.blob();
+                        })
+                        .then(function (blob) {
+                          var blobUrl = URL.createObjectURL(blob);
+                          var tempLink = document.createElement("a");
+                          tempLink.href = blobUrl;
+                          tempLink.download = fileNameToUse;
+                          document.body.appendChild(tempLink);
+                          tempLink.click();
+                          document.body.removeChild(tempLink);
+                          setTimeout(function () {
+                            URL.revokeObjectURL(blobUrl);
+                          }, 1000);
+                        })
+                        .catch(function (error) {
+                          console.error(error);
+                          window.location.href = urlToDownload;
+                        });
+                    });
+                  })(normalizedUrl, fileName);
                 } else {
                   linkEl.target = "_blank";
                   linkEl.rel = "noopener noreferrer";
