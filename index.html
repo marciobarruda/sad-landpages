@@ -901,20 +901,22 @@
           }
 
           var normalizedLabel = label && String(label).trim() ? String(label).trim() : "";
+          var previewSource = resolvePreviewSource(url);
 
           applyPreviewLabel(normalizedLabel);
 
-          if (previewFrame.getAttribute("src") !== url) {
-            previewFrame.setAttribute("src", url);
+          if (previewFrame.getAttribute("src") !== previewSource.display) {
+            previewFrame.setAttribute("src", previewSource.display);
           }
 
-          previewFrame.dataset.currentSrc = url;
+          previewFrame.dataset.currentSrc = previewSource.display;
+          previewFrame.dataset.originalSrc = previewSource.original;
           previewContainer.classList.add("active");
           previewContainer.removeAttribute("hidden");
           previewContainer.setAttribute("aria-hidden", "false");
 
           if (previewOverlay && previewOverlay.classList.contains("active") && previewOverlayFrame) {
-            previewOverlayFrame.setAttribute("src", url);
+            previewOverlayFrame.setAttribute("src", previewSource.display);
           }
 
           if (typeof previewContainer.scrollIntoView === "function") {
@@ -926,6 +928,7 @@
           if (previewFrame) {
             previewFrame.removeAttribute("src");
             previewFrame.dataset.currentSrc = "";
+            delete previewFrame.dataset.originalSrc;
           }
 
           if (previewContainer) {
@@ -1075,6 +1078,75 @@
           ".xml",
           ".json",
         ];
+
+        var previewProxyExtensions = [
+          ".pdf",
+          ".doc",
+          ".docx",
+          ".xls",
+          ".xlsx",
+          ".csv",
+          ".ppt",
+          ".pptx",
+          ".odt",
+          ".ods",
+        ];
+
+        function toAbsoluteUrl(url) {
+          if (!url) {
+            return "";
+          }
+
+          try {
+            return new URL(url, window.location.href).toString();
+          } catch (error) {
+            return url;
+          }
+        }
+
+        function shouldUsePreviewProxy(url) {
+          if (!url) {
+            return false;
+          }
+
+          if (/^data:/i.test(url) || /^blob:/i.test(url)) {
+            return false;
+          }
+
+          var pathComponent = url;
+
+          try {
+            var parsed = new URL(url);
+            pathComponent = parsed.pathname || url;
+          } catch (error) {
+            var queryIndex = url.indexOf("?");
+            var hashIndex = url.indexOf("#");
+            var endIndex = queryIndex !== -1 ? queryIndex : hashIndex !== -1 ? hashIndex : url.length;
+            pathComponent = url.slice(0, endIndex);
+          }
+
+          var lowerPath = pathComponent.toLowerCase();
+
+          return previewProxyExtensions.some(function (extension) {
+            return lowerPath.endsWith(extension);
+          });
+        }
+
+        function resolvePreviewSource(url) {
+          var absoluteUrl = toAbsoluteUrl(url);
+
+          if (shouldUsePreviewProxy(absoluteUrl)) {
+            return {
+              original: absoluteUrl,
+              display: "https://docs.google.com/gview?embedded=1&url=" + encodeURIComponent(absoluteUrl),
+            };
+          }
+
+          return {
+            original: absoluteUrl,
+            display: absoluteUrl,
+          };
+        }
 
         function isFileLikeUrl(hrefValue) {
           if (!hrefValue) {
