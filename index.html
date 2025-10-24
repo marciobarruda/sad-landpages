@@ -582,7 +582,7 @@
             <a
               class="link-primary"
               href="FORM%20MODELO%20DE%20LAUDO%20MÉDICO%20PARA%20PESSOAS%20COM%20DEFICIÊNCIA.pdf"
-              data-open-pdf="true"
+              data-open-external="true"
               >Baixar modelo em PDF</a
             >
           </article>
@@ -593,7 +593,7 @@
             <a
               class="link-primary"
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20CANDIDATOS%20NEGROS%20(PRETO%20E%20PARDO).pdf"
-              data-open-pdf="true"
+              data-open-external="true"
               >Baixar termo em PDF</a
             >
           </article>
@@ -604,7 +604,7 @@
             <a
               class="link-primary"
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20IDENTIDADE%20INDÍGENA%20-%20TADII.pdf"
-              data-open-pdf="true"
+              data-open-external="true"
               >Baixar termo em PDF</a
             >
           </article>
@@ -719,12 +719,16 @@
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
 
-        function attachPdfHandler(anchor) {
-          if (!anchor || anchor.dataset.pdfHandlerAttached === "true") {
+        function attachExternalOpenHandler(anchor) {
+          if (
+            !anchor ||
+            anchor.dataset.externalHandlerAttached === "true" ||
+            anchor.dataset.allowSameTab === "true"
+          ) {
             return;
           }
 
-          anchor.dataset.pdfHandlerAttached = "true";
+          anchor.dataset.externalHandlerAttached = "true";
 
           anchor.addEventListener("click", function (event) {
             if (
@@ -745,22 +749,45 @@
 
             event.preventDefault();
 
-            var newWindow = window.open(targetUrl, "_blank", "noopener");
+            var newWindow = window.open(targetUrl, "_blank", "noopener=yes,noreferrer=yes");
             if (!newWindow) {
               window.location.href = targetUrl;
             }
           });
         }
 
-        function setupPdfLinks(scope) {
+        function setupExternalOpenLinks(scope) {
           var root = scope || document;
-          var pdfAnchors = root.querySelectorAll('a[data-open-pdf="true"]');
-          pdfAnchors.forEach(function (anchor) {
-            attachPdfHandler(anchor);
+          var anchors = root.querySelectorAll("a[href]");
+
+          anchors.forEach(function (anchor) {
+            if (anchor.dataset.allowSameTab === "true") {
+              return;
+            }
+
+            var shouldMarkExternal =
+              anchor.dataset.openExternal !== "true" && anchor.dataset.openPdf !== "true";
+
+            if (shouldMarkExternal) {
+              var hrefValue = anchor.getAttribute("href") || "";
+              if (!hrefValue) {
+                return;
+              }
+
+              if (hrefValue.trim().charAt(0) === "#") {
+                return;
+              }
+
+              anchor.dataset.openExternal = "true";
+            }
+
+            if (anchor.dataset.openExternal === "true" || anchor.dataset.openPdf === "true") {
+              attachExternalOpenHandler(anchor);
+            }
           });
         }
 
-        setupPdfLinks();
+        setupExternalOpenLinks();
 
         function sanitizeDigits(value) {
           return (value || "").replace(/\D/g, "");
@@ -1968,11 +1995,14 @@
 
                 linkEl.href = normalizedUrl;
 
+                linkEl.dataset.openExternal = "true";
+
                 if (normalizedUrl.split("?")[0].toLowerCase().endsWith(".pdf")) {
                   linkEl.type = "application/pdf";
                   linkEl.dataset.openPdf = "true";
-                  attachPdfHandler(linkEl);
                 }
+
+                attachExternalOpenHandler(linkEl);
 
                 linkEl.appendChild(document.createTextNode(emoji + " " + entry.description));
 
