@@ -750,7 +750,12 @@
             event.preventDefault();
 
             var newWindow = window.open(targetUrl, "_blank", "noopener=yes,noreferrer=yes");
-            if (!newWindow) {
+
+            if (newWindow) {
+              if ("opener" in newWindow) {
+                newWindow.opener = null;
+              }
+            } else {
               window.location.href = targetUrl;
             }
           });
