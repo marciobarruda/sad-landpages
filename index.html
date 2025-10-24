@@ -348,6 +348,63 @@
         font-weight: 600;
       }
 
+      #publicacoes-list li + li {
+        margin-top: 0.75rem;
+      }
+
+      .publicacoes-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .publicacoes-item-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+      }
+
+      .publicacoes-item-icon {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        flex-shrink: 0;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+      }
+
+      .publicacoes-item-icon--pdf {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d32f2f' d='M6 2h7l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/%3E%3Cpath fill='%23ef5350' d='M13 2v5h5'/%3E%3Ctext x='12' y='17' text-anchor='middle' font-family='Arial, sans-serif' font-size='7' font-weight='700' fill='%23fff'%3EPDF%3C/text%3E%3C/svg%3E");
+      }
+
+      .publicacoes-item-icon--image {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='4' width='18' height='16' rx='2' fill='%23215695'/%3E%3Crect x='4.5' y='5.5' width='15' height='13' rx='1.2' fill='%233968c8'/%3E%3Ccircle cx='9' cy='11' r='2.2' fill='%23fff59d'/%3E%3Cpath fill='%23c5cae9' d='M6 18l4.2-4.6 2.7 3.2 2.6-3L18 18z'/%3E%3C/svg%3E");
+      }
+
+      .publicacoes-item-icon--generic {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%233f51b5' d='M7 2h7l5 5v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/%3E%3Cpath fill='%235c6bc0' d='M14 2v5h5'/%3E%3Crect x='8.5' y='12' width='7' height='1.5' rx='.75' fill='%23c5cae9'/%3E%3Crect x='8.5' y='15' width='5' height='1.5' rx='.75' fill='%23c5cae9'/%3E%3C/svg%3E");
+      }
+
+      .publicacoes-item time {
+        flex-shrink: 0;
+      }
+
+      @media (min-width: 576px) {
+        .publicacoes-item {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+
+      @media (max-width: 575.98px) {
+        .publicacoes-item-link {
+          align-items: flex-start;
+        }
+      }
+
       .updates-panel {
         border-left: 3px solid var(--brand-highlight);
         padding-left: 1.2rem;
@@ -579,19 +636,43 @@
           <article class="download-card">
             <strong>Modelo de Laudo Médico para Pessoas com Deficiência</strong>
             <p>Documento comprobatório exigido para candidatos que solicitam reserva de vagas PcD.</p>
-            <a class="link-primary" href="FORM%20MODELO%20DE%20LAUDO%20MÉDICO%20PARA%20PESSOAS%20COM%20DEFICIÊNCIA.pdf" target="_blank" rel="noopener">Baixar modelo em PDF</a>
+            <a
+              class="link-primary"
+              href="FORM%20MODELO%20DE%20LAUDO%20MÉDICO%20PARA%20PESSOAS%20COM%20DEFICIÊNCIA.pdf"
+              download="FORM MODELO DE LAUDO MÉDICO PARA PESSOAS COM DEFICIÊNCIA.pdf"
+              data-open-external="true"
+              data-force-download="true"
+              data-preview-label="Modelo de Laudo Médico para Pessoas com Deficiência"
+              >Baixar modelo em PDF</a
+            >
           </article>
 
           <article class="download-card">
             <strong>Termo de Autodeclaração — Candidatos Negros (Preto e Pardo)</strong>
             <p>Assinatura obrigatória para candidatos que optarem pela reserva de vagas para pessoas negras.</p>
-            <a class="link-primary" href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20CANDIDATOS%20NEGROS%20(PRETO%20E%20PARDO).pdf" target="_blank" rel="noopener">Baixar termo em PDF</a>
+            <a
+              class="link-primary"
+              href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20CANDIDATOS%20NEGROS%20(PRETO%20E%20PARDO).pdf"
+              download="FORM TERMO DE AUTODECLARAÇÃO DE CANDIDATOS NEGROS (PRETO E PARDO).pdf"
+              data-open-external="true"
+              data-force-download="true"
+              data-preview-label="Termo de Autodeclaração — Candidatos Negros"
+              >Baixar termo em PDF</a
+            >
           </article>
 
           <article class="download-card">
             <strong>Termo de Autodeclaração de Identidade Indígena (TADII)</strong>
             <p>Documento exigido para autodeclaração de pertencimento a povos indígenas.</p>
-            <a class="link-primary" href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20IDENTIDADE%20INDÍGENA%20-%20TADII.pdf" target="_blank" rel="noopener">Baixar termo em PDF</a>
+            <a
+              class="link-primary"
+              href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20IDENTIDADE%20INDÍGENA%20-%20TADII.pdf"
+              download="FORM TERMO DE AUTODECLARAÇÃO DE IDENTIDADE INDÍGENA - TADII.pdf"
+              data-open-external="true"
+              data-force-download="true"
+              data-preview-label="Termo de Autodeclaração de Identidade Indígena"
+              >Baixar termo em PDF</a
+            >
           </article>
         </div>
       </section>
@@ -654,8 +735,8 @@
       document.addEventListener("DOMContentLoaded", function () {
         var button = document.getElementById("btn-preencher-inscricao");
         var authorizationField = document.getElementById("authorization");
-        var targetUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
-        var redirectUrl = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
+        var targetUrl = "https://secti.recife.pe.gov.br/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
+        var redirectUrl = "https://secti.recife.pe.gov.br/47e510d9-7e40-4191-a7b9-8993e2a05eb7";
         var updateButton = document.getElementById("btn-atualizar-cadastro");
         var emailInput = document.getElementById("email-input");
         var emailConfirmInput = document.getElementById("email-confirm-input");
@@ -703,6 +784,61 @@
         var inscricoesResumoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/consultar-sesuite";
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
+        function getPublicationIcon(mimeType, extension, url) {
+          var normalizedExtension = "";
+          var normalizedMime = "";
+
+          if (mimeType) {
+            normalizedMime = String(mimeType).toLowerCase().trim();
+          }
+
+          if (extension) {
+            normalizedExtension = String(extension).toLowerCase().trim();
+          }
+
+          if (normalizedExtension.startsWith(".")) {
+            normalizedExtension = normalizedExtension.slice(1);
+          }
+
+          if (!normalizedExtension && url) {
+            var guessed = String(url).split("?")[0].split("#")[0];
+            var parts = guessed.split(".");
+            normalizedExtension = parts.length > 1 ? parts.pop().toLowerCase() : "";
+          }
+
+          if (normalizedMime) {
+            if (normalizedMime === "application/pdf" || normalizedMime === "application/x-pdf") {
+              return "pdf";
+            }
+
+            if (normalizedMime.indexOf("image/") === 0) {
+              return "image";
+            }
+          }
+
+          if (normalizedExtension === "pdf") {
+            return "pdf";
+          }
+
+          var imageExtensions = {
+            jpg: true,
+            jpeg: true,
+            png: true,
+            gif: true,
+            bmp: true,
+            svg: true,
+            webp: true,
+            tif: true,
+            tiff: true,
+            heic: true,
+          };
+
+          if (normalizedExtension && imageExtensions[normalizedExtension]) {
+            return "image";
+          }
+
+          return "generic";
+        }
 
         function sanitizeDigits(value) {
           return (value || "").replace(/\D/g, "");
@@ -1770,18 +1906,6 @@
         atualizarFeedbackRecurso(false);
         carregarMinhasInscricoes();
 
-        function getEmojiForUrl(url) {
-          var extension = (url.split(".").pop() || "").toLowerCase();
-          if (extension.includes("pdf")) return "📄";
-          if (["xls", "xlsx", "csv"].includes(extension)) return "📊";
-          if (["doc", "docx", "odt"].includes(extension)) return "📝";
-          if (["png", "jpg", "jpeg", "gif", "bmp", "svg"].includes(extension)) return "🖼️";
-          if (["zip", "rar", "7z"].includes(extension)) return "🗂️";
-          if (["mp4", "mov", "avi", "mkv", "webm"].includes(extension)) return "🎬";
-          if (["mp3", "wav", "ogg"].includes(extension)) return "🎧";
-          return "🔗";
-        }
-
         function parseDate(raw) {
           if (!raw || typeof raw !== "string") {
             return null;
@@ -1860,11 +1984,25 @@
                 var rawDate = item.date || item.data || item.dt || item.createdAt;
                 var dateObj = parseDate(rawDate);
 
+                var extension =
+                  item.extension ||
+                  item.extensao ||
+                  item.fileExtension ||
+                  item.tipoArquivo ||
+                  "";
+
                 return {
                   url: item.url,
                   description: description,
                   dateObj: dateObj,
                   rawDate: rawDate,
+                  mimetype:
+                    item.mimetype ||
+                    item.mimeType ||
+                    item.contentType ||
+                    item.tipoMime ||
+                    "",
+                  extension: extension,
                 };
               })
               .filter(function (entry) {
@@ -1883,25 +2021,10 @@
                 return timeB - timeA;
               })
               .forEach(function (entry) {
-                var emoji = getEmojiForUrl(entry.url);
-                var formattedDate = formatDate(entry.dateObj) || (entry.rawDate || "");
+                var icon = getPublicationIcon(entry.mimetype, entry.extension, entry.url);
+                var formattedDate = formatDate(entry.dateObj);
                 var listItem = document.createElement("li");
-                listItem.className = "mb-2";
-
-                var container = document.createElement("div");
-                container.className = "d-flex flex-column flex-sm-row align-items-sm-center gap-2";
-
-                if (formattedDate) {
-                  var timeEl = document.createElement("time");
-                  timeEl.textContent = formattedDate;
-                  timeEl.dateTime = entry.dateObj ? entry.dateObj.toISOString() : entry.rawDate || "";
-                  container.appendChild(timeEl);
-                }
-
-                var linkEl = document.createElement("a");
-                linkEl.className = "link-primary fw-semibold";
-                linkEl.target = "_blank";
-                linkEl.rel = "noopener noreferrer";
+                listItem.className = "publicacoes-item";
 
                 var normalizedUrl = entry.url;
                 try {
@@ -1910,16 +2033,49 @@
                   normalizedUrl = entry.url;
                 }
 
+                var linkEl = document.createElement("a");
+                linkEl.className = "publicacoes-item-link link-primary";
                 linkEl.href = normalizedUrl;
+                linkEl.title = entry.description;
 
-                if (normalizedUrl.split("?")[0].toLowerCase().endsWith(".pdf")) {
-                  linkEl.type = "application/pdf";
+                var downloadName = "";
+                try {
+                  var urlObject = new URL(normalizedUrl, window.location.href);
+                  downloadName = urlObject.pathname.split("/").pop() || "";
+                  if (downloadName) {
+                    downloadName = decodeURIComponent(downloadName);
+                  }
+                } catch (error) {
+                  var fallbackPath = normalizedUrl.split("?")[0].split("#")[0];
+                  downloadName = fallbackPath.split("/").pop() || "";
                 }
 
-                linkEl.appendChild(document.createTextNode(emoji + " " + entry.description));
+                if (downloadName) {
+                  linkEl.setAttribute("download", downloadName);
+                } else {
+                  linkEl.setAttribute("download", "");
+                }
 
-                container.appendChild(linkEl);
-                listItem.appendChild(container);
+                var iconSpan = document.createElement("span");
+                var iconType = icon || "generic";
+                iconSpan.className = "publicacoes-item-icon publicacoes-item-icon--" + iconType;
+                iconSpan.setAttribute("aria-hidden", "true");
+
+                var textSpan = document.createElement("span");
+                textSpan.textContent = entry.description;
+
+                linkEl.appendChild(iconSpan);
+                linkEl.appendChild(textSpan);
+
+                listItem.appendChild(linkEl);
+
+                if (formattedDate) {
+                  var timeEl = document.createElement("time");
+                  timeEl.textContent = formattedDate;
+                  timeEl.dateTime = entry.dateObj ? entry.dateObj.toISOString() : entry.rawDate || "";
+                  listItem.appendChild(timeEl);
+                }
+
                 list.appendChild(listItem);
               });
           })
