@@ -348,79 +348,43 @@
         font-weight: 600;
       }
 
-      .publicacoes-preview {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background: var(--surface-strong);
-        padding: 1.25rem;
-        box-shadow: 0 12px 32px rgba(0, 45, 98, 0.08);
-        display: none;
+      #publicacoes-list li + li {
+        margin-top: 0.75rem;
       }
 
-      .publicacoes-preview.active {
-        display: block;
-      }
-
-      .publicacoes-preview-frame-wrapper {
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        overflow: hidden;
-        background: #000;
-        min-height: 320px;
-      }
-
-      .publicacoes-preview iframe {
-        border: 0;
-      }
-
-      .publicacoes-preview-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(27, 38, 59, 0.7);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        z-index: 1200;
-      }
-
-      .publicacoes-preview-overlay.active {
+      .publicacoes-item {
         display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
       }
 
-      .publicacoes-preview-overlay-content {
-        width: min(100%, 1080px);
-        background: var(--surface-strong);
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+      .publicacoes-item-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
       }
 
-      .publicacoes-preview-overlay .ratio {
-        border-radius: 8px;
-        overflow: hidden;
-        background: #000;
+      .publicacoes-item-icon {
+        font-size: 1.25rem;
+        line-height: 1;
       }
 
-      .publicacoes-preview-overlay iframe {
-        border: 0;
+      .publicacoes-item time {
+        flex-shrink: 0;
       }
 
-      body.publicacoes-overlay-open {
-        overflow: hidden;
+      @media (min-width: 576px) {
+        .publicacoes-item {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
       }
 
       @media (max-width: 575.98px) {
-        .publicacoes-preview {
-          padding: 1rem;
-        }
-
-        .publicacoes-preview-overlay {
-          padding: 1rem;
-        }
-
-        .publicacoes-preview-overlay-content {
-          padding: 1rem;
+        .publicacoes-item-link {
+          align-items: flex-start;
         }
       }
 
@@ -557,37 +521,6 @@
               <ul class="list-unstyled mb-0" id="publicacoes-list">
                 <li class="text-muted">Carregando publicações...</li>
               </ul>
-              <div class="publicacoes-preview mt-4" id="publicacoes-preview" hidden aria-hidden="true">
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                  <h4 class="h6 mb-0" id="publicacoes-preview-title">Visualização do arquivo</h4>
-                  <div class="btn-group btn-group-sm" role="group" aria-label="Ações da visualização">
-                    <button
-                      type="button"
-                      class="btn btn-outline-primary"
-                      id="publicacoes-expandir"
-                      aria-controls="publicacoes-preview-overlay"
-                      aria-expanded="false"
-                    >
-                      Expandir
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary"
-                      id="publicacoes-fechar"
-                      aria-controls="publicacoes-preview"
-                    >
-                      Ocultar
-                    </button>
-                  </div>
-                </div>
-                <div class="ratio ratio-4x3 publicacoes-preview-frame-wrapper">
-                  <iframe
-                    id="publicacoes-frame"
-                    title="Visualização de arquivos de publicações"
-                    allowfullscreen
-                  ></iframe>
-                </div>
-              </div>
             </section>
             <article class="card card-programa">
               <div class="card-header">
@@ -781,34 +714,6 @@
         <button type="button" class="btn btn-primary mt-4" id="feedback-modal-close">Fechar</button>
       </div>
     </div>
-    <div
-      class="publicacoes-preview-overlay"
-      id="publicacoes-preview-overlay"
-      hidden
-      aria-hidden="true"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="publicacoes-overlay-title"
-    >
-      <div class="publicacoes-preview-overlay-content">
-        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-          <h3 class="h5 mb-0" id="publicacoes-overlay-title">Visualização ampliada</h3>
-          <button
-            type="button"
-            class="btn-close"
-            id="publicacoes-overlay-close"
-            aria-label="Fechar visualização ampliada"
-          ></button>
-        </div>
-        <div class="ratio ratio-16x9">
-          <iframe
-            id="publicacoes-overlay-frame"
-            title="Visualização ampliada de arquivos de publicações"
-            allowfullscreen
-          ></iframe>
-        </div>
-      </div>
-    </div>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         var button = document.getElementById("btn-preencher-inscricao");
@@ -862,375 +767,59 @@
         var inscricoesResumoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/consultar-sesuite";
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
-        var previewContainer = document.getElementById("publicacoes-preview");
-        var previewFrame = document.getElementById("publicacoes-frame");
-        var previewTitle = document.getElementById("publicacoes-preview-title");
-        var previewExpandButton = document.getElementById("publicacoes-expandir");
-        var previewHideButton = document.getElementById("publicacoes-fechar");
-        var previewOverlay = document.getElementById("publicacoes-preview-overlay");
-        var previewOverlayFrame = document.getElementById("publicacoes-overlay-frame");
-        var previewOverlayTitle = document.getElementById("publicacoes-overlay-title");
-        var previewOverlayClose = document.getElementById("publicacoes-overlay-close");
+        function getPublicationIcon(extension, url) {
+          var normalizedExtension = "";
 
-        function applyPreviewLabel(label) {
-          var fallback = "Visualização do arquivo";
-          var normalized = label && String(label).trim() ? String(label).trim() : fallback;
-
-          if (previewContainer) {
-            previewContainer.dataset.previewLabel = normalized;
+          if (extension) {
+            normalizedExtension = String(extension).toLowerCase().trim();
           }
 
-          if (previewTitle) {
-            previewTitle.textContent = normalized;
+          if (normalizedExtension.startsWith(".")) {
+            normalizedExtension = normalizedExtension.slice(1);
           }
 
-          if (previewOverlayTitle) {
-            previewOverlayTitle.textContent =
-              normalized === fallback ? "Visualização ampliada" : "Visualização ampliada — " + normalized;
-          }
-        }
-
-        function showFilePreview(url, label) {
-          if (!url) {
-            return;
+          if (!normalizedExtension && url) {
+            var guessed = String(url).split("?")[0].split("#")[0];
+            var parts = guessed.split(".");
+            normalizedExtension = parts.length > 1 ? parts.pop().toLowerCase() : "";
           }
 
-          if (!previewContainer || !previewFrame) {
-            window.open(url, "_blank");
-            return;
-          }
-
-          var normalizedLabel = label && String(label).trim() ? String(label).trim() : "";
-          var previewSource = resolvePreviewSource(url);
-
-          applyPreviewLabel(normalizedLabel);
-
-          if (previewFrame.getAttribute("src") !== previewSource.display) {
-            previewFrame.setAttribute("src", previewSource.display);
-          }
-
-          previewFrame.dataset.currentSrc = previewSource.display;
-          previewFrame.dataset.originalSrc = previewSource.original;
-          previewContainer.classList.add("active");
-          previewContainer.removeAttribute("hidden");
-          previewContainer.setAttribute("aria-hidden", "false");
-
-          if (previewOverlay && previewOverlay.classList.contains("active") && previewOverlayFrame) {
-            previewOverlayFrame.setAttribute("src", previewSource.display);
-          }
-
-          if (typeof previewContainer.scrollIntoView === "function") {
-            previewContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }
-
-        function hideFilePreview() {
-          if (previewFrame) {
-            previewFrame.removeAttribute("src");
-            previewFrame.dataset.currentSrc = "";
-            delete previewFrame.dataset.originalSrc;
-          }
-
-          if (previewContainer) {
-            previewContainer.classList.remove("active");
-            previewContainer.setAttribute("hidden", "true");
-            previewContainer.setAttribute("aria-hidden", "true");
-          }
-
-          closePreviewOverlay();
-        }
-
-        function openPreviewOverlay() {
-          if (!previewOverlay || !previewOverlayFrame) {
-            return;
-          }
-
-          var currentSrc =
-            (previewFrame && (previewFrame.dataset.currentSrc || previewFrame.getAttribute("src"))) || "";
-
-          if (!currentSrc) {
-            return;
-          }
-
-          previewOverlayFrame.setAttribute("src", currentSrc);
-          previewOverlay.classList.add("active");
-          previewOverlay.removeAttribute("hidden");
-          previewOverlay.setAttribute("aria-hidden", "false");
-          document.body.classList.add("publicacoes-overlay-open");
-
-          if (previewOverlayClose) {
-            previewOverlayClose.focus();
-          }
-
-          if (previewExpandButton) {
-            previewExpandButton.setAttribute("aria-expanded", "true");
-          }
-        }
-
-        function closePreviewOverlay() {
-          if (!previewOverlay) {
-            return;
-          }
-
-          var wasActive = previewOverlay.classList.contains("active");
-
-          if (previewOverlayFrame) {
-            previewOverlayFrame.removeAttribute("src");
-          }
-
-          previewOverlay.classList.remove("active");
-          previewOverlay.setAttribute("hidden", "true");
-          previewOverlay.setAttribute("aria-hidden", "true");
-          document.body.classList.remove("publicacoes-overlay-open");
-
-          if (previewExpandButton) {
-            previewExpandButton.setAttribute("aria-expanded", "false");
-          }
-
-          if (wasActive && previewExpandButton) {
-            previewExpandButton.focus();
-          }
-        }
-
-        if (previewHideButton) {
-          previewHideButton.addEventListener("click", hideFilePreview);
-        }
-
-        if (previewExpandButton) {
-          previewExpandButton.addEventListener("click", openPreviewOverlay);
-        }
-
-        if (previewOverlayClose) {
-          previewOverlayClose.addEventListener("click", closePreviewOverlay);
-        }
-
-        if (previewOverlay) {
-          previewOverlay.addEventListener("click", function (event) {
-            if (event.target === previewOverlay) {
-              closePreviewOverlay();
-            }
-          });
-        }
-
-        document.addEventListener("keydown", function (event) {
-          if (event.key === "Escape" && previewOverlay && previewOverlay.classList.contains("active")) {
-            event.preventDefault();
-            closePreviewOverlay();
-          }
-        });
-
-        function attachExternalOpenHandler(anchor) {
-          if (
-            !anchor ||
-            anchor.dataset.externalHandlerAttached === "true" ||
-            anchor.dataset.allowSameTab === "true"
-          ) {
-            return;
-          }
-
-          anchor.dataset.externalHandlerAttached = "true";
-
-          anchor.addEventListener("click", function (event) {
-            if (
-              event.defaultPrevented ||
-              event.button !== 0 ||
-              event.metaKey ||
-              event.ctrlKey ||
-              event.shiftKey ||
-              event.altKey
-            ) {
-              return;
-            }
-
-            var targetUrl = anchor.href;
-            if (!targetUrl) {
-              return;
-            }
-
-            event.preventDefault();
-
-            var previewLabel =
-              anchor.getAttribute("data-preview-label") ||
-              anchor.getAttribute("download") ||
-              anchor.getAttribute("title") ||
-              anchor.textContent;
-
-            showFilePreview(targetUrl, previewLabel);
-          });
-        }
-
-        var downloadExtensions = [
-          ".pdf",
-          ".doc",
-          ".docx",
-          ".xls",
-          ".xlsx",
-          ".csv",
-          ".ppt",
-          ".pptx",
-          ".odt",
-          ".ods",
-          ".zip",
-          ".rar",
-          ".7z",
-          ".txt",
-          ".rtf",
-          ".xml",
-          ".json",
-        ];
-
-        var previewProxyExtensions = [
-          ".pdf",
-          ".doc",
-          ".docx",
-          ".xls",
-          ".xlsx",
-          ".csv",
-          ".ppt",
-          ".pptx",
-          ".odt",
-          ".ods",
-        ];
-
-        function toAbsoluteUrl(url) {
-          if (!url) {
-            return "";
-          }
-
-          try {
-            return new URL(url, window.location.href).toString();
-          } catch (error) {
-            return url;
-          }
-        }
-
-        function shouldUsePreviewProxy(url) {
-          if (!url) {
-            return false;
-          }
-
-          if (/^data:/i.test(url) || /^blob:/i.test(url)) {
-            return false;
-          }
-
-          var pathComponent = url;
-
-          try {
-            var parsed = new URL(url);
-            pathComponent = parsed.pathname || url;
-          } catch (error) {
-            var queryIndex = url.indexOf("?");
-            var hashIndex = url.indexOf("#");
-            var endIndex = queryIndex !== -1 ? queryIndex : hashIndex !== -1 ? hashIndex : url.length;
-            pathComponent = url.slice(0, endIndex);
-          }
-
-          var lowerPath = pathComponent.toLowerCase();
-
-          return previewProxyExtensions.some(function (extension) {
-            return lowerPath.endsWith(extension);
-          });
-        }
-
-        function resolvePreviewSource(url) {
-          var absoluteUrl = toAbsoluteUrl(url);
-
-          if (shouldUsePreviewProxy(absoluteUrl)) {
-            return {
-              original: absoluteUrl,
-              display: "https://docs.google.com/gview?embedded=1&url=" + encodeURIComponent(absoluteUrl),
-            };
-          }
-
-          return {
-            original: absoluteUrl,
-            display: absoluteUrl,
+          var iconMap = {
+            pdf: "📄",
+            doc: "📝",
+            docx: "📝",
+            odt: "📝",
+            xls: "📊",
+            xlsx: "📊",
+            csv: "📊",
+            ods: "📊",
+            ppt: "📑",
+            pptx: "📑",
+            zip: "🗂️",
+            rar: "🗂️",
+            "7z": "🗂️",
+            mp4: "🎬",
+            mov: "🎬",
+            avi: "🎬",
+            mkv: "🎬",
+            webm: "🎬",
+            mp3: "🎧",
+            wav: "🎧",
+            ogg: "🎧",
+            jpg: "🖼️",
+            jpeg: "🖼️",
+            png: "🖼️",
+            gif: "🖼️",
+            bmp: "🖼️",
+            svg: "🖼️",
+            txt: "📜",
+            rtf: "📜",
+            xml: "🧾",
+            json: "🧾",
           };
+
+          return iconMap[normalizedExtension] || "📎";
         }
-
-        function isFileLikeUrl(hrefValue) {
-          if (!hrefValue) {
-            return false;
-          }
-
-          var trimmed = hrefValue.trim();
-          if (!trimmed || trimmed.charAt(0) === "#") {
-            return false;
-          }
-
-          if (/^mailto:/i.test(trimmed) || /^tel:/i.test(trimmed) || /^javascript:/i.test(trimmed)) {
-            return false;
-          }
-
-          var pathComponent = trimmed;
-          try {
-            var parsed = new URL(trimmed, window.location.href);
-            pathComponent = parsed.pathname || trimmed;
-          } catch (error) {
-            var questionIndex = trimmed.indexOf("?");
-            var hashIndex = trimmed.indexOf("#");
-            var endIndex = questionIndex !== -1 ? questionIndex : hashIndex !== -1 ? hashIndex : trimmed.length;
-            pathComponent = trimmed.slice(0, endIndex);
-          }
-
-          var lowerPath = pathComponent.toLowerCase();
-          if (
-            lowerPath.includes("/download") ||
-            lowerPath.endsWith("download") ||
-            /[?&]download(=|$)/i.test(trimmed)
-          ) {
-            return true;
-          }
-
-          return downloadExtensions.some(function (extension) {
-            return lowerPath.endsWith(extension);
-          });
-        }
-
-        function shouldHandleDownload(anchor) {
-          if (!anchor || anchor.dataset.allowSameTab === "true") {
-            return false;
-          }
-
-          if (anchor.dataset.forceDownload === "true") {
-            return true;
-          }
-
-          if (anchor.dataset.openPdf === "true") {
-            return true;
-          }
-
-          if (anchor.hasAttribute("download")) {
-            return true;
-          }
-
-          if (anchor.type && /^application\//i.test(anchor.type)) {
-            return true;
-          }
-
-          var hrefValue = anchor.getAttribute("href") || "";
-          if (!hrefValue) {
-            return false;
-          }
-
-          return isFileLikeUrl(hrefValue);
-        }
-
-        function setupExternalOpenLinks(scope) {
-          var root = scope || document;
-          var anchors = root.querySelectorAll("a[href]");
-
-          anchors.forEach(function (anchor) {
-            if (!shouldHandleDownload(anchor)) {
-              return;
-            }
-
-            anchor.dataset.openExternal = "true";
-            attachExternalOpenHandler(anchor);
-          });
-        }
-
-        setupExternalOpenLinks();
 
         function sanitizeDigits(value) {
           return (value || "").replace(/\D/g, "");
@@ -2298,18 +1887,6 @@
         atualizarFeedbackRecurso(false);
         carregarMinhasInscricoes();
 
-        function getEmojiForUrl(url) {
-          var extension = (url.split(".").pop() || "").toLowerCase();
-          if (extension.includes("pdf")) return "📄";
-          if (["xls", "xlsx", "csv"].includes(extension)) return "📊";
-          if (["doc", "docx", "odt"].includes(extension)) return "📝";
-          if (["png", "jpg", "jpeg", "gif", "bmp", "svg"].includes(extension)) return "🖼️";
-          if (["zip", "rar", "7z"].includes(extension)) return "🗂️";
-          if (["mp4", "mov", "avi", "mkv", "webm"].includes(extension)) return "🎬";
-          if (["mp3", "wav", "ogg"].includes(extension)) return "🎧";
-          return "🔗";
-        }
-
         function parseDate(raw) {
           if (!raw || typeof raw !== "string") {
             return null;
@@ -2388,11 +1965,19 @@
                 var rawDate = item.date || item.data || item.dt || item.createdAt;
                 var dateObj = parseDate(rawDate);
 
+                var extension =
+                  item.extension ||
+                  item.extensao ||
+                  item.fileExtension ||
+                  item.tipoArquivo ||
+                  "";
+
                 return {
                   url: item.url,
                   description: description,
                   dateObj: dateObj,
                   rawDate: rawDate,
+                  extension: extension,
                 };
               })
               .filter(function (entry) {
@@ -2411,23 +1996,10 @@
                 return timeB - timeA;
               })
               .forEach(function (entry) {
-                var emoji = getEmojiForUrl(entry.url);
+                var icon = getPublicationIcon(entry.extension, entry.url);
                 var formattedDate = formatDate(entry.dateObj) || (entry.rawDate || "");
                 var listItem = document.createElement("li");
-                listItem.className = "mb-2";
-
-                var container = document.createElement("div");
-                container.className = "d-flex flex-column flex-sm-row align-items-sm-center gap-2";
-
-                if (formattedDate) {
-                  var timeEl = document.createElement("time");
-                  timeEl.textContent = formattedDate;
-                  timeEl.dateTime = entry.dateObj ? entry.dateObj.toISOString() : entry.rawDate || "";
-                  container.appendChild(timeEl);
-                }
-
-                var linkEl = document.createElement("a");
-                linkEl.className = "link-primary fw-semibold";
+                listItem.className = "publicacoes-item";
 
                 var normalizedUrl = entry.url;
                 try {
@@ -2436,26 +2008,32 @@
                   normalizedUrl = entry.url;
                 }
 
+                var linkEl = document.createElement("a");
+                linkEl.className = "publicacoes-item-link link-primary";
                 linkEl.href = normalizedUrl;
+                linkEl.target = "_blank";
+                linkEl.rel = "noopener";
+                linkEl.title = entry.description;
 
-                linkEl.dataset.openExternal = "true";
-                linkEl.dataset.previewLabel = entry.description;
+                var iconSpan = document.createElement("span");
+                iconSpan.className = "publicacoes-item-icon";
+                iconSpan.textContent = icon;
 
-                if (isFileLikeUrl(normalizedUrl)) {
-                  linkEl.dataset.forceDownload = "true";
+                var textSpan = document.createElement("span");
+                textSpan.textContent = entry.description;
+
+                linkEl.appendChild(iconSpan);
+                linkEl.appendChild(textSpan);
+
+                listItem.appendChild(linkEl);
+
+                if (formattedDate) {
+                  var timeEl = document.createElement("time");
+                  timeEl.textContent = formattedDate;
+                  timeEl.dateTime = entry.dateObj ? entry.dateObj.toISOString() : entry.rawDate || "";
+                  listItem.appendChild(timeEl);
                 }
 
-                if (normalizedUrl.split("?")[0].toLowerCase().endsWith(".pdf")) {
-                  linkEl.type = "application/pdf";
-                  linkEl.dataset.openPdf = "true";
-                }
-
-                attachExternalOpenHandler(linkEl);
-
-                linkEl.appendChild(document.createTextNode(emoji + " " + entry.description));
-
-                container.appendChild(linkEl);
-                listItem.appendChild(container);
                 list.appendChild(listItem);
               });
           })
