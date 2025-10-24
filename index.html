@@ -784,8 +784,13 @@
         var inscricoesResumoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/consultar-sesuite";
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
-        function getPublicationIcon(extension, url) {
+        function getPublicationIcon(mimeType, extension, url) {
           var normalizedExtension = "";
+          var normalizedMime = "";
+
+          if (mimeType) {
+            normalizedMime = String(mimeType).toLowerCase().trim();
+          }
 
           if (extension) {
             normalizedExtension = String(extension).toLowerCase().trim();
@@ -799,6 +804,16 @@
             var guessed = String(url).split("?")[0].split("#")[0];
             var parts = guessed.split(".");
             normalizedExtension = parts.length > 1 ? parts.pop().toLowerCase() : "";
+          }
+
+          if (normalizedMime) {
+            if (normalizedMime === "application/pdf" || normalizedMime === "application/x-pdf") {
+              return "pdf";
+            }
+
+            if (normalizedMime.indexOf("image/") === 0) {
+              return "image";
+            }
           }
 
           if (normalizedExtension === "pdf") {
@@ -1981,6 +1996,12 @@
                   description: description,
                   dateObj: dateObj,
                   rawDate: rawDate,
+                  mimetype:
+                    item.mimetype ||
+                    item.mimeType ||
+                    item.contentType ||
+                    item.tipoMime ||
+                    "",
                   extension: extension,
                 };
               })
@@ -2000,8 +2021,8 @@
                 return timeB - timeA;
               })
               .forEach(function (entry) {
-                var icon = getPublicationIcon(entry.extension, entry.url);
-                var formattedDate = formatDate(entry.dateObj) || (entry.rawDate || "");
+                var icon = getPublicationIcon(entry.mimetype, entry.extension, entry.url);
+                var formattedDate = formatDate(entry.dateObj);
                 var listItem = document.createElement("li");
                 listItem.className = "publicacoes-item";
 
