@@ -348,6 +348,82 @@
         font-weight: 600;
       }
 
+      .publicacoes-preview {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--surface-strong);
+        padding: 1.25rem;
+        box-shadow: 0 12px 32px rgba(0, 45, 98, 0.08);
+        display: none;
+      }
+
+      .publicacoes-preview.active {
+        display: block;
+      }
+
+      .publicacoes-preview-frame-wrapper {
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        overflow: hidden;
+        background: #000;
+        min-height: 320px;
+      }
+
+      .publicacoes-preview iframe {
+        border: 0;
+      }
+
+      .publicacoes-preview-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(27, 38, 59, 0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        z-index: 1200;
+      }
+
+      .publicacoes-preview-overlay.active {
+        display: flex;
+      }
+
+      .publicacoes-preview-overlay-content {
+        width: min(100%, 1080px);
+        background: var(--surface-strong);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+      }
+
+      .publicacoes-preview-overlay .ratio {
+        border-radius: 8px;
+        overflow: hidden;
+        background: #000;
+      }
+
+      .publicacoes-preview-overlay iframe {
+        border: 0;
+      }
+
+      body.publicacoes-overlay-open {
+        overflow: hidden;
+      }
+
+      @media (max-width: 575.98px) {
+        .publicacoes-preview {
+          padding: 1rem;
+        }
+
+        .publicacoes-preview-overlay {
+          padding: 1rem;
+        }
+
+        .publicacoes-preview-overlay-content {
+          padding: 1rem;
+        }
+      }
+
       .updates-panel {
         border-left: 3px solid var(--brand-highlight);
         padding-left: 1.2rem;
@@ -481,6 +557,37 @@
               <ul class="list-unstyled mb-0" id="publicacoes-list">
                 <li class="text-muted">Carregando publicações...</li>
               </ul>
+              <div class="publicacoes-preview mt-4" id="publicacoes-preview" hidden aria-hidden="true">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                  <h4 class="h6 mb-0" id="publicacoes-preview-title">Visualização do arquivo</h4>
+                  <div class="btn-group btn-group-sm" role="group" aria-label="Ações da visualização">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      id="publicacoes-expandir"
+                      aria-controls="publicacoes-preview-overlay"
+                      aria-expanded="false"
+                    >
+                      Expandir
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      id="publicacoes-fechar"
+                      aria-controls="publicacoes-preview"
+                    >
+                      Ocultar
+                    </button>
+                  </div>
+                </div>
+                <div class="ratio ratio-4x3 publicacoes-preview-frame-wrapper">
+                  <iframe
+                    id="publicacoes-frame"
+                    title="Visualização de arquivos de publicações"
+                    allowfullscreen
+                  ></iframe>
+                </div>
+              </div>
             </section>
             <article class="card card-programa">
               <div class="card-header">
@@ -585,6 +692,7 @@
               download="FORM MODELO DE LAUDO MÉDICO PARA PESSOAS COM DEFICIÊNCIA.pdf"
               data-open-external="true"
               data-force-download="true"
+              data-preview-label="Modelo de Laudo Médico para Pessoas com Deficiência"
               >Baixar modelo em PDF</a
             >
           </article>
@@ -598,6 +706,7 @@
               download="FORM TERMO DE AUTODECLARAÇÃO DE CANDIDATOS NEGROS (PRETO E PARDO).pdf"
               data-open-external="true"
               data-force-download="true"
+              data-preview-label="Termo de Autodeclaração — Candidatos Negros"
               >Baixar termo em PDF</a
             >
           </article>
@@ -611,6 +720,7 @@
               download="FORM TERMO DE AUTODECLARAÇÃO DE IDENTIDADE INDÍGENA - TADII.pdf"
               data-open-external="true"
               data-force-download="true"
+              data-preview-label="Termo de Autodeclaração de Identidade Indígena"
               >Baixar termo em PDF</a
             >
           </article>
@@ -671,6 +781,34 @@
         <button type="button" class="btn btn-primary mt-4" id="feedback-modal-close">Fechar</button>
       </div>
     </div>
+    <div
+      class="publicacoes-preview-overlay"
+      id="publicacoes-preview-overlay"
+      hidden
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="publicacoes-overlay-title"
+    >
+      <div class="publicacoes-preview-overlay-content">
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+          <h3 class="h5 mb-0" id="publicacoes-overlay-title">Visualização ampliada</h3>
+          <button
+            type="button"
+            class="btn-close"
+            id="publicacoes-overlay-close"
+            aria-label="Fechar visualização ampliada"
+          ></button>
+        </div>
+        <div class="ratio ratio-16x9">
+          <iframe
+            id="publicacoes-overlay-frame"
+            title="Visualização ampliada de arquivos de publicações"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         var button = document.getElementById("btn-preencher-inscricao");
@@ -724,67 +862,159 @@
         var inscricoesResumoEndpoint = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook/consultar-sesuite";
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
+        var previewContainer = document.getElementById("publicacoes-preview");
+        var previewFrame = document.getElementById("publicacoes-frame");
+        var previewTitle = document.getElementById("publicacoes-preview-title");
+        var previewExpandButton = document.getElementById("publicacoes-expandir");
+        var previewHideButton = document.getElementById("publicacoes-fechar");
+        var previewOverlay = document.getElementById("publicacoes-preview-overlay");
+        var previewOverlayFrame = document.getElementById("publicacoes-overlay-frame");
+        var previewOverlayTitle = document.getElementById("publicacoes-overlay-title");
+        var previewOverlayClose = document.getElementById("publicacoes-overlay-close");
 
-        function isSameOriginUrl(url) {
-          if (!url) {
-            return false;
+        function applyPreviewLabel(label) {
+          var fallback = "Visualização do arquivo";
+          var normalized = label && String(label).trim() ? String(label).trim() : fallback;
+
+          if (previewContainer) {
+            previewContainer.dataset.previewLabel = normalized;
           }
 
-          try {
-            var parsedUrl = new URL(url, window.location.href);
-            return parsedUrl.origin === window.location.origin;
-          } catch (error) {
-            return false;
+          if (previewTitle) {
+            previewTitle.textContent = normalized;
+          }
+
+          if (previewOverlayTitle) {
+            previewOverlayTitle.textContent =
+              normalized === fallback ? "Visualização ampliada" : "Visualização ampliada — " + normalized;
           }
         }
 
-        function fallbackDownloadViaIframe(url) {
+        function showFilePreview(url, label) {
           if (!url) {
             return;
           }
 
-          var iframe = document.createElement("iframe");
-          iframe.src = url;
-          iframe.style.display = "none";
-          iframe.setAttribute("aria-hidden", "true");
+          if (!previewContainer || !previewFrame) {
+            window.open(url, "_blank");
+            return;
+          }
 
-          document.body.appendChild(iframe);
+          var normalizedLabel = label && String(label).trim() ? String(label).trim() : "";
 
-          setTimeout(function () {
-            if (iframe.parentNode) {
-              iframe.parentNode.removeChild(iframe);
+          applyPreviewLabel(normalizedLabel);
+
+          if (previewFrame.getAttribute("src") !== url) {
+            previewFrame.setAttribute("src", url);
+          }
+
+          previewFrame.dataset.currentSrc = url;
+          previewContainer.classList.add("active");
+          previewContainer.removeAttribute("hidden");
+          previewContainer.setAttribute("aria-hidden", "false");
+
+          if (previewOverlay && previewOverlay.classList.contains("active") && previewOverlayFrame) {
+            previewOverlayFrame.setAttribute("src", url);
+          }
+
+          if (typeof previewContainer.scrollIntoView === "function") {
+            previewContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+
+        function hideFilePreview() {
+          if (previewFrame) {
+            previewFrame.removeAttribute("src");
+            previewFrame.dataset.currentSrc = "";
+          }
+
+          if (previewContainer) {
+            previewContainer.classList.remove("active");
+            previewContainer.setAttribute("hidden", "true");
+            previewContainer.setAttribute("aria-hidden", "true");
+          }
+
+          closePreviewOverlay();
+        }
+
+        function openPreviewOverlay() {
+          if (!previewOverlay || !previewOverlayFrame) {
+            return;
+          }
+
+          var currentSrc =
+            (previewFrame && (previewFrame.dataset.currentSrc || previewFrame.getAttribute("src"))) || "";
+
+          if (!currentSrc) {
+            return;
+          }
+
+          previewOverlayFrame.setAttribute("src", currentSrc);
+          previewOverlay.classList.add("active");
+          previewOverlay.removeAttribute("hidden");
+          previewOverlay.setAttribute("aria-hidden", "false");
+          document.body.classList.add("publicacoes-overlay-open");
+
+          if (previewOverlayClose) {
+            previewOverlayClose.focus();
+          }
+
+          if (previewExpandButton) {
+            previewExpandButton.setAttribute("aria-expanded", "true");
+          }
+        }
+
+        function closePreviewOverlay() {
+          if (!previewOverlay) {
+            return;
+          }
+
+          var wasActive = previewOverlay.classList.contains("active");
+
+          if (previewOverlayFrame) {
+            previewOverlayFrame.removeAttribute("src");
+          }
+
+          previewOverlay.classList.remove("active");
+          previewOverlay.setAttribute("hidden", "true");
+          previewOverlay.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("publicacoes-overlay-open");
+
+          if (previewExpandButton) {
+            previewExpandButton.setAttribute("aria-expanded", "false");
+          }
+
+          if (wasActive && previewExpandButton) {
+            previewExpandButton.focus();
+          }
+        }
+
+        if (previewHideButton) {
+          previewHideButton.addEventListener("click", hideFilePreview);
+        }
+
+        if (previewExpandButton) {
+          previewExpandButton.addEventListener("click", openPreviewOverlay);
+        }
+
+        if (previewOverlayClose) {
+          previewOverlayClose.addEventListener("click", closePreviewOverlay);
+        }
+
+        if (previewOverlay) {
+          previewOverlay.addEventListener("click", function (event) {
+            if (event.target === previewOverlay) {
+              closePreviewOverlay();
             }
-          }, 60000);
+          });
         }
 
-        function openDownloadInNewContext(url, downloadName) {
-          if (!url) {
-            return;
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape" && previewOverlay && previewOverlay.classList.contains("active")) {
+            event.preventDefault();
+            closePreviewOverlay();
           }
-
-          if (downloadName && isSameOriginUrl(url)) {
-            var tempLink = document.createElement("a");
-            tempLink.href = url;
-            tempLink.download = downloadName;
-            tempLink.style.display = "none";
-            tempLink.rel = "noopener";
-            document.body.appendChild(tempLink);
-            tempLink.click();
-            document.body.removeChild(tempLink);
-            return;
-          }
-
-          var popup = window.open(url, "_blank");
-
-          if (popup) {
-            try {
-              popup.opener = null;
-            } catch (error) {}
-            return;
-          }
-
-          fallbackDownloadViaIframe(url);
-        }
+        });
 
         function attachExternalOpenHandler(anchor) {
           if (
@@ -816,8 +1046,13 @@
 
             event.preventDefault();
 
-            var downloadName = anchor.getAttribute("download");
-            openDownloadInNewContext(targetUrl, downloadName);
+            var previewLabel =
+              anchor.getAttribute("data-preview-label") ||
+              anchor.getAttribute("download") ||
+              anchor.getAttribute("title") ||
+              anchor.textContent;
+
+            showFilePreview(targetUrl, previewLabel);
           });
         }
 
@@ -2132,6 +2367,7 @@
                 linkEl.href = normalizedUrl;
 
                 linkEl.dataset.openExternal = "true";
+                linkEl.dataset.previewLabel = entry.description;
 
                 if (isFileLikeUrl(normalizedUrl)) {
                   linkEl.dataset.forceDownload = "true";
