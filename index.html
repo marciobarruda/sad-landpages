@@ -725,63 +725,16 @@
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
 
-        function extractFilenameFromDisposition(dispositionValue) {
-          if (!dispositionValue) {
-            return "";
-          }
-
-          var utf8Match = dispositionValue.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
-          if (utf8Match && utf8Match[1]) {
-            try {
-              return decodeURIComponent(utf8Match[1]);
-            } catch (error) {
-              console.warn("Falha ao decodificar o nome de arquivo informado no cabeçalho:", error);
-            }
-          }
-
-          var quotedMatch = dispositionValue.match(/filename\s*=\s*"([^";]+)"/i);
-          if (quotedMatch && quotedMatch[1]) {
-            return quotedMatch[1];
-          }
-
-          var unquotedMatch = dispositionValue.match(/filename\s*=\s*([^";]+)/i);
-          if (unquotedMatch && unquotedMatch[1]) {
-            return unquotedMatch[1].trim();
-          }
-
-          return "";
-        }
-
-        function guessFilenameFromUrl(url) {
+        function isSameOriginUrl(url) {
           if (!url) {
-            return "download";
+            return false;
           }
-
-          var pathname = "";
 
           try {
             var parsedUrl = new URL(url, window.location.href);
-            pathname = parsedUrl.pathname || "";
+            return parsedUrl.origin === window.location.origin;
           } catch (error) {
-            var questionIndex = url.indexOf("?");
-            var hashIndex = url.indexOf("#");
-            var endIndex = questionIndex !== -1 ? questionIndex : hashIndex !== -1 ? hashIndex : url.length;
-            pathname = url.slice(0, endIndex);
-          }
-
-          if (!pathname) {
-            return "download";
-          }
-
-          var segments = pathname.split("/").filter(Boolean);
-          if (!segments.length) {
-            return "download";
-          }
-
-          try {
-            return decodeURIComponent(segments[segments.length - 1]);
-          } catch (error) {
-            return segments[segments.length - 1];
+            return false;
           }
         }
 
@@ -804,34 +757,33 @@
           }, 60000);
         }
 
-        function initiateDownload(url, suggestedName) {
-          var fallbackName = suggestedName || guessFilenameFromUrl(url);
+        function openDownloadInNewContext(url, downloadName) {
+          if (!url) {
+            return;
+          }
 
-          return fetch(url, { credentials: "include" })
-            .then(function (response) {
-              if (!response.ok) {
-                throw new Error("Falha ao obter o arquivo: " + response.status + " " + response.statusText);
-              }
+          if (downloadName && isSameOriginUrl(url)) {
+            var tempLink = document.createElement("a");
+            tempLink.href = url;
+            tempLink.download = downloadName;
+            tempLink.style.display = "none";
+            tempLink.rel = "noopener";
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+            return;
+          }
 
-              var dispositionHeader = response.headers.get("Content-Disposition") || "";
-              var fileName = extractFilenameFromDisposition(dispositionHeader) || fallbackName;
+          var popup = window.open(url, "_blank");
 
-              return response.blob().then(function (blob) {
-                var objectUrl = URL.createObjectURL(blob);
-                var tempLink = document.createElement("a");
-                tempLink.href = objectUrl;
-                tempLink.download = fileName || fallbackName;
-                tempLink.rel = "noopener";
-                tempLink.style.display = "none";
-                document.body.appendChild(tempLink);
-                tempLink.click();
-                document.body.removeChild(tempLink);
+          if (popup) {
+            try {
+              popup.opener = null;
+            } catch (error) {}
+            return;
+          }
 
-                setTimeout(function () {
-                  URL.revokeObjectURL(objectUrl);
-                }, 2000);
-              });
-            });
+          fallbackDownloadViaIframe(url);
         }
 
         function attachExternalOpenHandler(anchor) {
@@ -862,25 +814,10 @@
               return;
             }
 
-            if (anchor.dataset.downloadInProgress === "true") {
-              event.preventDefault();
-              return;
-            }
-
             event.preventDefault();
 
-            anchor.dataset.downloadInProgress = "true";
-
-            initiateDownload(targetUrl, anchor.getAttribute("download"))
-              .catch(function (error) {
-                console.error("Não foi possível baixar o arquivo diretamente:", error);
-                fallbackDownloadViaIframe(targetUrl);
-              })
-              .finally(function () {
-                requestAnimationFrame(function () {
-                  delete anchor.dataset.downloadInProgress;
-                });
-              });
+            var downloadName = anchor.getAttribute("download");
+            openDownloadInNewContext(targetUrl, downloadName);
           });
         }
 
