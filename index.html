@@ -582,6 +582,7 @@
             <a
               class="link-primary"
               href="FORM%20MODELO%20DE%20LAUDO%20MÉDICO%20PARA%20PESSOAS%20COM%20DEFICIÊNCIA.pdf"
+              download="FORM MODELO DE LAUDO MÉDICO PARA PESSOAS COM DEFICIÊNCIA.pdf"
               data-open-external="true"
               >Baixar modelo em PDF</a
             >
@@ -593,6 +594,7 @@
             <a
               class="link-primary"
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20CANDIDATOS%20NEGROS%20(PRETO%20E%20PARDO).pdf"
+              download="FORM TERMO DE AUTODECLARAÇÃO DE CANDIDATOS NEGROS (PRETO E PARDO).pdf"
               data-open-external="true"
               >Baixar termo em PDF</a
             >
@@ -604,6 +606,7 @@
             <a
               class="link-primary"
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20IDENTIDADE%20INDÍGENA%20-%20TADII.pdf"
+              download="FORM TERMO DE AUTODECLARAÇÃO DE IDENTIDADE INDÍGENA - TADII.pdf"
               data-open-external="true"
               >Baixar termo em PDF</a
             >
@@ -719,6 +722,115 @@
         var minhasInscricoesEmptyDefault = minhasInscricoesEmpty ? minhasInscricoesEmpty.textContent.trim() : "";
         var minhasInscricoesLoadingDefault = minhasInscricoesLoading ? minhasInscricoesLoading.textContent.trim() : "";
 
+        function extractFilenameFromDisposition(dispositionValue) {
+          if (!dispositionValue) {
+            return "";
+          }
+
+          var utf8Match = dispositionValue.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
+          if (utf8Match && utf8Match[1]) {
+            try {
+              return decodeURIComponent(utf8Match[1]);
+            } catch (error) {
+              console.warn("Falha ao decodificar o nome de arquivo informado no cabeçalho:", error);
+            }
+          }
+
+          var quotedMatch = dispositionValue.match(/filename\s*=\s*"([^";]+)"/i);
+          if (quotedMatch && quotedMatch[1]) {
+            return quotedMatch[1];
+          }
+
+          var unquotedMatch = dispositionValue.match(/filename\s*=\s*([^";]+)/i);
+          if (unquotedMatch && unquotedMatch[1]) {
+            return unquotedMatch[1].trim();
+          }
+
+          return "";
+        }
+
+        function guessFilenameFromUrl(url) {
+          if (!url) {
+            return "download";
+          }
+
+          var pathname = "";
+
+          try {
+            var parsedUrl = new URL(url, window.location.href);
+            pathname = parsedUrl.pathname || "";
+          } catch (error) {
+            var questionIndex = url.indexOf("?");
+            var hashIndex = url.indexOf("#");
+            var endIndex = questionIndex !== -1 ? questionIndex : hashIndex !== -1 ? hashIndex : url.length;
+            pathname = url.slice(0, endIndex);
+          }
+
+          if (!pathname) {
+            return "download";
+          }
+
+          var segments = pathname.split("/").filter(Boolean);
+          if (!segments.length) {
+            return "download";
+          }
+
+          try {
+            return decodeURIComponent(segments[segments.length - 1]);
+          } catch (error) {
+            return segments[segments.length - 1];
+          }
+        }
+
+        function fallbackDownloadViaIframe(url) {
+          if (!url) {
+            return;
+          }
+
+          var iframe = document.createElement("iframe");
+          iframe.src = url;
+          iframe.style.display = "none";
+          iframe.setAttribute("aria-hidden", "true");
+
+          document.body.appendChild(iframe);
+
+          setTimeout(function () {
+            if (iframe.parentNode) {
+              iframe.parentNode.removeChild(iframe);
+            }
+          }, 60000);
+        }
+
+        function initiateDownload(url, suggestedName) {
+          var fallbackName = suggestedName || guessFilenameFromUrl(url);
+
+          return fetch(url, { credentials: "include" })
+            .then(function (response) {
+              if (!response.ok) {
+                throw new Error("Falha ao obter o arquivo: " + response.status + " " + response.statusText);
+              }
+
+              var dispositionHeader = response.headers.get("Content-Disposition") || "";
+              var fileName = extractFilenameFromDisposition(dispositionHeader) || fallbackName;
+
+              return response.blob().then(function (blob) {
+                var objectUrl = URL.createObjectURL(blob);
+                var tempLink = document.createElement("a");
+                tempLink.href = objectUrl;
+                tempLink.download = fileName || fallbackName;
+                tempLink.rel = "noopener";
+                tempLink.style.display = "none";
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+
+                setTimeout(function () {
+                  URL.revokeObjectURL(objectUrl);
+                }, 2000);
+              });
+            });
+        }
+
         function attachExternalOpenHandler(anchor) {
           if (
             !anchor ||
@@ -747,17 +859,25 @@
               return;
             }
 
+            if (anchor.dataset.downloadInProgress === "true") {
+              event.preventDefault();
+              return;
+            }
+
             event.preventDefault();
 
-            var newWindow = window.open(targetUrl, "_blank", "noopener=yes,noreferrer=yes");
+            anchor.dataset.downloadInProgress = "true";
 
-            if (newWindow) {
-              if ("opener" in newWindow) {
-                newWindow.opener = null;
-              }
-            } else {
-              window.location.href = targetUrl;
-            }
+            initiateDownload(targetUrl, anchor.getAttribute("download"))
+              .catch(function (error) {
+                console.error("Não foi possível baixar o arquivo diretamente:", error);
+                fallbackDownloadViaIframe(targetUrl);
+              })
+              .finally(function () {
+                requestAnimationFrame(function () {
+                  delete anchor.dataset.downloadInProgress;
+                });
+              });
           });
         }
 
