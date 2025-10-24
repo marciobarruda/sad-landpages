@@ -584,6 +584,7 @@
               href="FORM%20MODELO%20DE%20LAUDO%20MÉDICO%20PARA%20PESSOAS%20COM%20DEFICIÊNCIA.pdf"
               download="FORM MODELO DE LAUDO MÉDICO PARA PESSOAS COM DEFICIÊNCIA.pdf"
               data-open-external="true"
+              data-force-download="true"
               >Baixar modelo em PDF</a
             >
           </article>
@@ -596,6 +597,7 @@
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20CANDIDATOS%20NEGROS%20(PRETO%20E%20PARDO).pdf"
               download="FORM TERMO DE AUTODECLARAÇÃO DE CANDIDATOS NEGROS (PRETO E PARDO).pdf"
               data-open-external="true"
+              data-force-download="true"
               >Baixar termo em PDF</a
             >
           </article>
@@ -608,6 +610,7 @@
               href="FORM%20TERMO%20DE%20AUTODECLARAÇÃO%20DE%20IDENTIDADE%20INDÍGENA%20-%20TADII.pdf"
               download="FORM TERMO DE AUTODECLARAÇÃO DE IDENTIDADE INDÍGENA - TADII.pdf"
               data-open-external="true"
+              data-force-download="true"
               >Baixar termo em PDF</a
             >
           </article>
@@ -881,34 +884,105 @@
           });
         }
 
+        var downloadExtensions = [
+          ".pdf",
+          ".doc",
+          ".docx",
+          ".xls",
+          ".xlsx",
+          ".csv",
+          ".ppt",
+          ".pptx",
+          ".odt",
+          ".ods",
+          ".zip",
+          ".rar",
+          ".7z",
+          ".txt",
+          ".rtf",
+          ".xml",
+          ".json",
+        ];
+
+        function isFileLikeUrl(hrefValue) {
+          if (!hrefValue) {
+            return false;
+          }
+
+          var trimmed = hrefValue.trim();
+          if (!trimmed || trimmed.charAt(0) === "#") {
+            return false;
+          }
+
+          if (/^mailto:/i.test(trimmed) || /^tel:/i.test(trimmed) || /^javascript:/i.test(trimmed)) {
+            return false;
+          }
+
+          var pathComponent = trimmed;
+          try {
+            var parsed = new URL(trimmed, window.location.href);
+            pathComponent = parsed.pathname || trimmed;
+          } catch (error) {
+            var questionIndex = trimmed.indexOf("?");
+            var hashIndex = trimmed.indexOf("#");
+            var endIndex = questionIndex !== -1 ? questionIndex : hashIndex !== -1 ? hashIndex : trimmed.length;
+            pathComponent = trimmed.slice(0, endIndex);
+          }
+
+          var lowerPath = pathComponent.toLowerCase();
+          if (
+            lowerPath.includes("/download") ||
+            lowerPath.endsWith("download") ||
+            /[?&]download(=|$)/i.test(trimmed)
+          ) {
+            return true;
+          }
+
+          return downloadExtensions.some(function (extension) {
+            return lowerPath.endsWith(extension);
+          });
+        }
+
+        function shouldHandleDownload(anchor) {
+          if (!anchor || anchor.dataset.allowSameTab === "true") {
+            return false;
+          }
+
+          if (anchor.dataset.forceDownload === "true") {
+            return true;
+          }
+
+          if (anchor.dataset.openPdf === "true") {
+            return true;
+          }
+
+          if (anchor.hasAttribute("download")) {
+            return true;
+          }
+
+          if (anchor.type && /^application\//i.test(anchor.type)) {
+            return true;
+          }
+
+          var hrefValue = anchor.getAttribute("href") || "";
+          if (!hrefValue) {
+            return false;
+          }
+
+          return isFileLikeUrl(hrefValue);
+        }
+
         function setupExternalOpenLinks(scope) {
           var root = scope || document;
           var anchors = root.querySelectorAll("a[href]");
 
           anchors.forEach(function (anchor) {
-            if (anchor.dataset.allowSameTab === "true") {
+            if (!shouldHandleDownload(anchor)) {
               return;
             }
 
-            var shouldMarkExternal =
-              anchor.dataset.openExternal !== "true" && anchor.dataset.openPdf !== "true";
-
-            if (shouldMarkExternal) {
-              var hrefValue = anchor.getAttribute("href") || "";
-              if (!hrefValue) {
-                return;
-              }
-
-              if (hrefValue.trim().charAt(0) === "#") {
-                return;
-              }
-
-              anchor.dataset.openExternal = "true";
-            }
-
-            if (anchor.dataset.openExternal === "true" || anchor.dataset.openPdf === "true") {
-              attachExternalOpenHandler(anchor);
-            }
+            anchor.dataset.openExternal = "true";
+            attachExternalOpenHandler(anchor);
           });
         }
 
@@ -2121,6 +2195,10 @@
                 linkEl.href = normalizedUrl;
 
                 linkEl.dataset.openExternal = "true";
+
+                if (isFileLikeUrl(normalizedUrl)) {
+                  linkEl.dataset.forceDownload = "true";
+                }
 
                 if (normalizedUrl.split("?")[0].toLowerCase().endsWith(".pdf")) {
                   linkEl.type = "application/pdf";
