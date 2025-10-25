@@ -3,10 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Seleção Simplificada — Formulário</title>
+    <title>Secretaria de Administração - SAD — Seleção Simplificada Hospital Veterinário do Recife</title>
+    <link
+      rel="icon"
+      href="https://statics.recife.pe.gov.br/images/dynamics/conecta/icons/favicon.png?w=32&amp;h=32&amp;fit=fill&amp;border=2,transparent,shrink"
+    />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -51,11 +59,75 @@
         background: linear-gradient(135deg, rgba(0, 83, 164, 0.96), rgba(0, 58, 115, 0.88));
         color: #ffffff;
         padding: 3.5rem 0 2.75rem;
+        font-family: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
-      header .lead {
+      header.site-header .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+
+      .site-header .hero-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+        max-width: 780px;
+      }
+
+      .badge-open {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        font-size: 0.95rem;
+      }
+
+      .site-header__title {
+        margin: 0;
+        font-weight: 700;
+        font-size: clamp(2rem, 2.8vw + 0.75rem, 2.9rem);
+        line-height: 1.18;
+      }
+
+      .site-header .lead {
+        margin: 0;
         color: rgba(255, 255, 255, 0.82);
-        max-width: 720px;
+        font-size: 1rem;
+        line-height: 1.65;
+        text-align: justify;
+        max-width: 100%;
+      }
+
+      @media (max-width: 768px) {
+        header.site-header {
+          padding: 2.5rem 0 2rem;
+        }
+
+        header.site-header .container {
+          padding-left: 1.25rem;
+          padding-right: 1.25rem;
+        }
+
+        .site-header .hero-copy {
+          gap: 0.9rem;
+        }
+
+        .badge-open {
+          width: 100%;
+          justify-content: center;
+          text-align: center;
+        }
       }
  
       header.hero {
@@ -122,7 +194,7 @@
 
       .wizard-shell {
         background: var(--surface);
-        border-radius: 1.25rem;
+        border-radius: 4px;
         padding: 1.75rem 1.5rem;
         box-shadow: 0 18px 40px rgba(26, 115, 232, 0.12), 0 8px 22px rgba(26, 115, 232, 0.08);
         border: 1px solid rgba(26, 115, 232, 0.12);
@@ -156,7 +228,7 @@
         align-items: flex-start;
         justify-content: center;
         padding: 0.6rem 1rem;
-        border-radius: 0.75rem;
+        border-radius: 4px;
         background: rgba(26, 115, 232, 0.12);
         color: #0b2447;
         font-size: 0.85rem;
@@ -289,7 +361,7 @@
 
       .step-card {
         border: 0;
-        border-radius: 1.25rem;
+        border-radius: 4px;
         overflow: hidden;
         box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
         margin-bottom: 2.5rem;
@@ -391,7 +463,7 @@
 
       .summary-section {
         border: 1px solid rgba(26, 115, 232, 0.08);
-        border-radius: 1rem;
+        border-radius: 4px;
         padding: 1.25rem 1.5rem;
         margin-bottom: 1.25rem;
         background: #ffffff;
@@ -426,7 +498,7 @@
 
       .dropzone {
         border: 2px dashed rgba(26, 115, 232, 0.25);
-        border-radius: 1rem;
+        border-radius: 4px;
         padding: 1rem 1.25rem;
         background: rgba(232, 240, 254, 0.55);
         color: #34518a;
@@ -438,7 +510,7 @@
 
       .upload-card {
         border: 2px dashed rgba(17, 37, 82, 0.18);
-        border-radius: 1rem;
+        border-radius: 4px;
         background: rgba(255, 255, 255, 0.75);
         padding: 1.5rem 1.25rem;
         min-height: var(--upload-min-height);
@@ -526,7 +598,7 @@
         max-width: 720px;
         text-align: center;
         background: var(--surface);
-        border-radius: 1.25rem;
+        border-radius: 4px;
         padding: 3rem 2.5rem;
         box-shadow: 0 18px 40px rgba(26, 115, 232, 0.12), 0 8px 22px rgba(26, 115, 232, 0.08);
         border: 1px solid rgba(26, 115, 232, 0.12);
@@ -565,7 +637,7 @@
         background: #0f5132;
         color: #fff;
         padding: 0.85rem 1.25rem;
-        border-radius: 0.75rem;
+        border-radius: 4px;
         box-shadow: 0 20px 45px rgba(15, 81, 50, 0.35);
         display: none;
         align-items: center;
@@ -629,11 +701,13 @@
   <body>
     <header class="site-header">
       <div class="container">
-        <span class="badge-open">Secretaria de Administração e Gestão de Pessoas - SADGP • Recife</span>
-        <h1 class="display-6 fw-semibold mt-3">Seleção Simplificada Hospital Veterinário do Recife</h1>
-        <p class="lead mt-2">
-          Inscrições abertas até 23:59:59 do dia 31 de outubro de 2025
-        </p>
+        <div class="hero-copy">
+          <span class="badge-open">Secretaria de Administração - SAD • Prefeitura do Recife</span>
+          <h1 class="site-header__title">Seleção Simplificada Hospital Veterinário do Recife</h1>
+          <p class="lead">
+            Inscrições abertas até 23:59:59 do dia 31 de outubro de 2025
+          </p>
+        </div>
       </div>
     </header>
     <!--<header class="hero">
